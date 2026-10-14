@@ -7,8 +7,8 @@ This is an offline probe of a saved excerpt. Read the saved public-rule excerpt 
 ## Context
 
 - Input: `fixtures/funding-timeline-rule.json`
-- Planned implementation: `harness/probe.py`
-- Planned checker: `eval/check_probe.py`
+- Implementation: `harness/probe.py`
+- Checker: `eval/check_probe.py`
 - Output: `out/probe.json`
 
 ## Constraints
@@ -21,7 +21,7 @@ This is an offline probe of a saved excerpt. Read the saved public-rule excerpt 
 
 ## Acceptance
 
-These acceptance criteria are proposed and await human review.
+Acceptance criteria approved on 14 October 2026.
 
 - Output has `source_url` and `checked_on` copied from the input.
 - Output has exactly one item containing the input's `rule_id` and `source_quote`, unchanged.
@@ -42,3 +42,9 @@ These acceptance criteria are proposed and await human review.
 ## Out of scope
 
 Live fetching, rule interpretation, eligibility decisions, the website and the full AI workflow.
+
+## Verified results
+
+- Initial independent check: `FileNotFoundError`, exit 1.
+- Normal output check: `PASS`, exit 0.
+- Three synthetic error-case tests: `OK`, exit 0.

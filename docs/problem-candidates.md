@@ -1,6 +1,6 @@
 # Problem candidates
 
-These are our proposals, not topics prescribed by the lecturer. All implementations and tests are pending. Codex helped draft this note; human review is pending.
+These are our proposals, not topics prescribed by the lecturer. Funding has a timeline-status checker with four previously passing tests and an offline probe with a checked normal output and three passing synthetic error-case tests. Complete candidate workflows remain unimplemented. Codex helped draft this note; human review is pending.
 
 ## 1. Funding preparation — preferred
 

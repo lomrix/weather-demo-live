@@ -23,3 +23,23 @@ python -m unittest discover -s eval -p check_funding_timeline.py -v
 Expected result: four tests and `OK`.
 
 Rule interpretation, document/date validation, AI stages and the website remain unimplemented.
+
+## Task 001: offline source probe
+
+The probe reads the saved public-rule excerpt in `fixtures/funding-timeline-rule.json` and generates `out/probe.json`, copying the source URL, checked date, rule ID and quote unchanged.
+
+Run these commands separately from the repository root:
+
+```text
+python harness/probe.py
+```
+
+```text
+python eval/check_probe.py
+```
+
+```text
+python -m unittest discover -s eval -p check_probe_inputs.py -v
+```
+
+Expected: the producer is normally silent, the checker prints `PASS`, and three tests report `OK`. The synthetic cases cover missing input, invalid JSON and missing `source_quote`; each checks that neither the output file nor its parent directory is created.
