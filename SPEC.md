@@ -16,4 +16,4 @@ Planned output is a sourced preparation checklist that marks missing or unknown 
 
 Requirements in the checklist must match the approved excerpts. Citations must be preserved, and unsupported conclusions must be flagged. The checklist must not guarantee eligibility or funding.
 
-The current implementation is one timeline-status checker with four passing synthetic tests. These tests do not establish live performance. AI interpretation, document/date validation and the end-to-end workflow are pending.
+The current implementation includes a timeline-status checker with four previously passing tests, and an offline probe with a checked normal output and three passing synthetic error-case tests. These checks do not establish live performance. AI interpretation, application-document/date validation and the full funding workflow remain pending.
