@@ -9,3 +9,17 @@ Forecasts are cached in memory until MET’s `Expires` time. After expiry, the s
 Before running any API request, set `MET_USER_AGENT` to an application identifier with your genuine contact email or project URL, as required by MET Norway. The server refuses to contact the API when this setting is missing. Use the same identifier for connectivity checks. A successful API request verifies connectivity only; it does not verify date selection or webpage rendering.
 
 Forecast data: MET Norway, CC BY 4.0. Low/high temperatures use hourly samples; precipitation totals appear only when hourly precipitation is available throughout tomorrow.
+
+## Funding preparation: first component
+
+The checker classifies a declared timeline-preparation answer and reads the source URL from the saved JSON rule. `True` means `declared_present`, not verified document contents.
+
+The tests use synthetic answers and a saved real rule. Python's standard library is sufficient. Run from the repository root:
+
+```text
+python -m unittest discover -s eval -p check_funding_timeline.py -v
+```
+
+Expected result: four tests and `OK`.
+
+Rule interpretation, document/date validation, AI stages and the website remain unimplemented.
