@@ -1,8 +1,8 @@
 # Project instructions
 
-- Provisional purpose: help voluntary organisations in Innlandet prepare for funding, initially using only the Regional Culture Fund, pending lecturer discussion.
+- Provisional purpose: investigate recurring traffic patterns and bus reliability around Hamar through sourced, checkable evidence for transport staff; follow each task's bounded scope.
 - Use Python's standard library for the current prototype.
-- Test command: `python -m unittest discover -s eval -p check_funding_timeline.py -v`
+- Verification: run each task's specified traffic acceptance and synthetic checks; retain the earlier funding regression command `python -m unittest discover -s eval -p check_funding_timeline.py -v` when applicable.
 - Never edit eval/ without explicit human permission.
 - No identifying personal data.
 - Do not read .env or authentication files.
