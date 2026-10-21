@@ -1,0 +1,550 @@
+{
+  "source_url": "https://api.entur.io/realtime/v1/rest/et?datasetId=INN&maxSize=100",
+  "client_identifier": "lomrix-weather-demo-live",
+  "retrieved_at_utc": "2026-10-21T14:12:00.852467+00:00",
+  "http_status": 200,
+  "server_date": "Wed, 21 Oct 2026 14:11:49 GMT",
+  "response_sha256": "72faadd1e586e333a1bb77f9320e56aa23a7622e7b53d6a58d12c34b697bc58d",
+  "selection": {
+    "line": "B21",
+    "stop_names": [
+      "CC Hamar",
+      "Hamar skysstasjon",
+      "Storhamarsenteret"
+    ],
+    "description": "Three named Hamar stops, all matching B21 journeys in a single bounded 100-journey INN response. Not representative of a day or all buses; calls at other stops and vehicle/staff identifiers excluded."
+  },
+  "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+  "licence_url": "https://data.norge.no/nlod/no/2.0",
+  "modified": true,
+  "journeys": [
+    {
+      "RecordedAtTime": "2026-10-21T16:11:32.875196852+02:00",
+      "LineRef": {
+        "value": "INN:Line:21"
+      },
+      "DirectionRef": {
+        "value": "Inbound"
+      },
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": {
+          "value": "2026-10-21"
+        },
+        "DatedVehicleJourneyRef": "INN:ServiceJourney:53561"
+      },
+      "Cancellation": false,
+      "PublishedLineName": [
+        {
+          "value": "B21"
+        }
+      ],
+      "OriginName": [
+        {
+          "value": "Hedmarktoppen"
+        }
+      ],
+      "DestinationName": [
+        {
+          "value": "Sanderud"
+        }
+      ],
+      "Monitored": true,
+      "RecordedCalls": {
+        "RecordedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:101673"
+            },
+            "Order": 15,
+            "StopPointName": [
+              {
+                "value": "Storhamarsenteret"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T15:41:00+02:00",
+            "ActualArrivalTime": "2026-10-21T15:42:34+02:00",
+            "AimedDepartureTime": "2026-10-21T15:41:00+02:00",
+            "ActualDepartureTime": "2026-10-21T15:43:13+02:00"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17861"
+            },
+            "Order": 22,
+            "StopPointName": [
+              {
+                "value": "Hamar skysstasjon"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T15:49:00+02:00",
+            "ActualArrivalTime": "2026-10-21T15:50:14+02:00",
+            "AimedDepartureTime": "2026-10-21T15:52:00+02:00",
+            "ActualDepartureTime": "2026-10-21T15:50:32+02:00"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17900"
+            },
+            "Order": 24,
+            "StopPointName": [
+              {
+                "value": "CC Hamar"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T15:55:00+02:00",
+            "ActualArrivalTime": "2026-10-21T15:56:49+02:00",
+            "AimedDepartureTime": "2026-10-21T15:55:00+02:00",
+            "ActualDepartureTime": "2026-10-21T15:57:57+02:00"
+          }
+        ]
+      }
+    },
+    {
+      "RecordedAtTime": "2026-10-21T16:11:00.292395211+02:00",
+      "LineRef": {
+        "value": "INN:Line:21"
+      },
+      "DirectionRef": {
+        "value": "Inbound"
+      },
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": {
+          "value": "2026-10-21"
+        },
+        "DatedVehicleJourneyRef": "INN:ServiceJourney:53562"
+      },
+      "Cancellation": false,
+      "PublishedLineName": [
+        {
+          "value": "B21"
+        }
+      ],
+      "OriginName": [
+        {
+          "value": "Hedmarktoppen"
+        }
+      ],
+      "DestinationName": [
+        {
+          "value": "Sanderud"
+        }
+      ],
+      "Monitored": true,
+      "RecordedCalls": {
+        "RecordedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:101673"
+            },
+            "Order": 15,
+            "StopPointName": [
+              {
+                "value": "Storhamarsenteret"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T15:56:00+02:00",
+            "ActualArrivalTime": "2026-10-21T15:54:17+02:00",
+            "AimedDepartureTime": "2026-10-21T15:56:00+02:00",
+            "ActualDepartureTime": "2026-10-21T15:55:04+02:00"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17861"
+            },
+            "Order": 22,
+            "StopPointName": [
+              {
+                "value": "Hamar skysstasjon"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:04:00+02:00",
+            "ActualArrivalTime": "2026-10-21T16:03:54+02:00",
+            "AimedDepartureTime": "2026-10-21T16:07:00+02:00",
+            "ActualDepartureTime": "2026-10-21T16:08:53+02:00"
+          }
+        ]
+      },
+      "EstimatedCalls": {
+        "EstimatedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17900"
+            },
+            "Order": 24,
+            "StopPointName": [
+              {
+                "value": "CC Hamar"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:10:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:10:58+02:00",
+            "ArrivalStatus": "arrived",
+            "AimedDepartureTime": "2026-10-21T16:10:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:10:58+02:00",
+            "DepartureStatus": "onTime"
+          }
+        ]
+      }
+    },
+    {
+      "RecordedAtTime": "2026-10-21T16:11:21.988035802+02:00",
+      "LineRef": {
+        "value": "INN:Line:21"
+      },
+      "DirectionRef": {
+        "value": "Inbound"
+      },
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": {
+          "value": "2026-10-21"
+        },
+        "DatedVehicleJourneyRef": "INN:ServiceJourney:53563"
+      },
+      "Cancellation": false,
+      "PublishedLineName": [
+        {
+          "value": "B21"
+        }
+      ],
+      "OriginName": [
+        {
+          "value": "Hedmarktoppen"
+        }
+      ],
+      "DestinationName": [
+        {
+          "value": "Sanderud"
+        }
+      ],
+      "Monitored": true,
+      "EstimatedCalls": {
+        "EstimatedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:101673"
+            },
+            "Order": 15,
+            "StopPointName": [
+              {
+                "value": "Storhamarsenteret"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:11:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:15:19+02:00",
+            "ArrivalStatus": "delayed",
+            "AimedDepartureTime": "2026-10-21T16:11:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:15:19+02:00",
+            "DepartureStatus": "delayed"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17861"
+            },
+            "Order": 22,
+            "StopPointName": [
+              {
+                "value": "Hamar skysstasjon"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:19:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:23:19+02:00",
+            "ArrivalStatus": "delayed",
+            "AimedDepartureTime": "2026-10-21T16:22:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:24:19+02:00",
+            "DepartureStatus": "delayed"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17900"
+            },
+            "Order": 24,
+            "StopPointName": [
+              {
+                "value": "CC Hamar"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:25:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:27:19+02:00",
+            "ArrivalStatus": "delayed",
+            "AimedDepartureTime": "2026-10-21T16:25:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:27:19+02:00",
+            "DepartureStatus": "delayed"
+          }
+        ]
+      }
+    },
+    {
+      "RecordedAtTime": "2026-10-21T16:11:11.097639064+02:00",
+      "LineRef": {
+        "value": "INN:Line:21"
+      },
+      "DirectionRef": {
+        "value": "Outbound"
+      },
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": {
+          "value": "2026-10-21"
+        },
+        "DatedVehicleJourneyRef": "INN:ServiceJourney:53462"
+      },
+      "Cancellation": false,
+      "PublishedLineName": [
+        {
+          "value": "B21"
+        }
+      ],
+      "OriginName": [
+        {
+          "value": "Sanderud sykehus"
+        }
+      ],
+      "DestinationName": [
+        {
+          "value": "Hamar vest"
+        }
+      ],
+      "Monitored": true,
+      "RecordedCalls": {
+        "RecordedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17901"
+            },
+            "Order": 14,
+            "StopPointName": [
+              {
+                "value": "CC Hamar"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:01:00+02:00",
+            "ActualArrivalTime": "2026-10-21T16:04:35+02:00",
+            "AimedDepartureTime": "2026-10-21T16:01:00+02:00",
+            "ActualDepartureTime": "2026-10-21T16:05:49+02:00"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:101587"
+            },
+            "Order": 16,
+            "StopPointName": [
+              {
+                "value": "Hamar skysstasjon"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:04:00+02:00",
+            "ActualArrivalTime": "2026-10-21T16:08:07+02:00",
+            "AimedDepartureTime": "2026-10-21T16:07:00+02:00",
+            "ActualDepartureTime": "2026-10-21T16:11:01+02:00"
+          }
+        ]
+      },
+      "EstimatedCalls": {
+        "EstimatedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:18003"
+            },
+            "Order": 23,
+            "StopPointName": [
+              {
+                "value": "Storhamarsenteret"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:15:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:19:01+02:00",
+            "ArrivalStatus": "delayed",
+            "AimedDepartureTime": "2026-10-21T16:15:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:19:01+02:00",
+            "DepartureStatus": "delayed"
+          }
+        ]
+      }
+    },
+    {
+      "RecordedAtTime": "2026-10-21T16:10:49.626717746+02:00",
+      "LineRef": {
+        "value": "INN:Line:21"
+      },
+      "DirectionRef": {
+        "value": "Outbound"
+      },
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": {
+          "value": "2026-10-21"
+        },
+        "DatedVehicleJourneyRef": "INN:ServiceJourney:53463"
+      },
+      "Cancellation": false,
+      "PublishedLineName": [
+        {
+          "value": "B21"
+        }
+      ],
+      "OriginName": [
+        {
+          "value": "Sanderud sykehus"
+        }
+      ],
+      "DestinationName": [
+        {
+          "value": "Hamar vest"
+        }
+      ],
+      "Monitored": true,
+      "EstimatedCalls": {
+        "EstimatedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17901"
+            },
+            "Order": 14,
+            "StopPointName": [
+              {
+                "value": "CC Hamar"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:16:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:18:46+02:00",
+            "ArrivalStatus": "delayed",
+            "AimedDepartureTime": "2026-10-21T16:16:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:18:46+02:00",
+            "DepartureStatus": "delayed"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:101587"
+            },
+            "Order": 16,
+            "StopPointName": [
+              {
+                "value": "Hamar skysstasjon"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:19:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:21:46+02:00",
+            "ArrivalStatus": "delayed",
+            "AimedDepartureTime": "2026-10-21T16:22:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:22:46+02:00",
+            "DepartureStatus": "onTime"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:18003"
+            },
+            "Order": 23,
+            "StopPointName": [
+              {
+                "value": "Storhamarsenteret"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:30:00+02:00",
+            "ExpectedArrivalTime": "2026-10-21T16:30:46+02:00",
+            "ArrivalStatus": "onTime",
+            "AimedDepartureTime": "2026-10-21T16:30:00+02:00",
+            "ExpectedDepartureTime": "2026-10-21T16:30:46+02:00",
+            "DepartureStatus": "onTime"
+          }
+        ]
+      }
+    },
+    {
+      "RecordedAtTime": "2026-10-21T16:11:32.874008701+02:00",
+      "LineRef": {
+        "value": "INN:Line:21"
+      },
+      "DirectionRef": {
+        "value": "Outbound"
+      },
+      "FramedVehicleJourneyRef": {
+        "DataFrameRef": {
+          "value": "2026-10-21"
+        },
+        "DatedVehicleJourneyRef": "INN:ServiceJourney:53461"
+      },
+      "Cancellation": false,
+      "PublishedLineName": [
+        {
+          "value": "B21"
+        }
+      ],
+      "OriginName": [
+        {
+          "value": "Sanderud sykehus"
+        }
+      ],
+      "DestinationName": [
+        {
+          "value": "Hamar vest"
+        }
+      ],
+      "Monitored": true,
+      "RecordedCalls": {
+        "RecordedCall": [
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:17901"
+            },
+            "Order": 14,
+            "StopPointName": [
+              {
+                "value": "CC Hamar"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T15:46:00+02:00",
+            "ActualArrivalTime": "2026-10-21T15:46:15+02:00",
+            "AimedDepartureTime": "2026-10-21T15:46:00+02:00",
+            "ActualDepartureTime": "2026-10-21T15:47:12+02:00"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:101587"
+            },
+            "Order": 16,
+            "StopPointName": [
+              {
+                "value": "Hamar skysstasjon"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T15:49:00+02:00",
+            "ActualArrivalTime": "2026-10-21T15:49:20+02:00",
+            "AimedDepartureTime": "2026-10-21T15:52:00+02:00",
+            "ActualDepartureTime": "2026-10-21T15:52:47+02:00"
+          },
+          {
+            "StopPointRef": {
+              "value": "NSR:Quay:18003"
+            },
+            "Order": 23,
+            "StopPointName": [
+              {
+                "value": "Storhamarsenteret"
+              }
+            ],
+            "Cancellation": false,
+            "AimedArrivalTime": "2026-10-21T16:00:00+02:00",
+            "ActualArrivalTime": "2026-10-21T16:01:11+02:00",
+            "AimedDepartureTime": "2026-10-21T16:00:00+02:00",
+            "ActualDepartureTime": "2026-10-21T16:02:36+02:00"
+          }
+        ]
+      }
+    }
+  ]
+}
