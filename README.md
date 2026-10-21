@@ -1,6 +1,51 @@
 # Hamar traffic and bus reliability ? provisional project
 
-Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline; recurring collection and runtime AI remain pending.
+Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline. The checked briefing controller is implemented; real AI execution and recurring collection remain unverified/pending.
+
+## Task 004: checked briefing workflow
+
+Run from the repository root (mode is always explicit):
+
+```text
+python harness/traffic_brief.py --mode prepare
+```
+
+Synthetic replay (offline, not real AI execution): create an ignored JSON decision file under `out/` so the offline replay is reproducible without relying on the temporary `out/task004-checks-domzmx58/valid.json` path from a prior run. PowerShell example:
+
+```powershell
+New-Item -ItemType Directory -Force -Path out | Out-Null
+$decision = @{
+    highlight_ids = @('bus.actual_max_seconds', 'road.vang_kirke.peak')
+    followup_ids = @('collect_same_day_samples')
+}
+$decision | ConvertTo-Json -Compress | Set-Content -Path 'out/task004-synthetic-decision.json' -Encoding utf8
+```
+
+Exact synthetic contents written to `out/task004-synthetic-decision.json`:
+
+```json
+{"highlight_ids":["bus.actual_max_seconds","road.vang_kirke.peak"],"followup_ids":["collect_same_day_samples"]}
+```
+
+Replay using that reproducible path:
+
+```text
+python harness/traffic_brief.py --mode replay --decision-file out/task004-synthetic-decision.json
+```
+
+This replay is labelled OFFLINE REPLAY and never establishes AI execution. Prepare stops after computing facts and reading runtime context. Each command prints its unique directory under `out/traffic-brief/`, containing `trace.json`, `facts.json` and `prompt.txt` after valid input preparation. Checked replay also writes `checked-decision.json`, `briefing.json` and self-contained `briefing.html`. Failed runs record a reason and never reuse an older briefing as current.
+
+PENDING: real AI execution. For a later separately authorised ordinary-terminal real run, the existing installed/logged-in Codex CLI is required; no API key or new provider setup is introduced:
+
+```text
+python harness/traffic_brief.py --mode codex
+```
+
+PENDING: permission verification. An optional `--codex-path` selects an existing executable; otherwise PATH and the known standalone Windows install are checked. No model override is used and login files are never inspected. The child uses a one-time narrowed named permission profile (read-only, .env/.env.local denied, command networking disabled), not modified permission files or bypass flags. The local non-model permission diagnostic failed with Access is denied; syntax/enforcement and real account availability remain unverified. Do not treat successful offline replay as a successful live model run.
+
+The controller permits one model invocation, no controller retries, a 12,000-character prompt, 120-second child timeout, 4,096-byte decision and bounded 1 MiB stdout/1 MiB stderr capture. Tool events, failed turns and invalid selections are rejected. Reported token usage is retained when available. These are invocation/time/size controls, **not a proven hard token or monetary budget**. The model selects IDs only; program-owned verified facts/questions are rendered. Compare selection usefulness with a deterministic baseline before claiming AI superiority. Recurring acquisition, repeated-day evidence, that evaluation and a hard budget remain outstanding.
+
+Task 004 offline checks verified all ten fact anchors, source dates/hashes, context read, a valid replay, unknown-ID rejection and malformed-input rejection; all recorded zero Codex invocations. See `tasks/004-checked-traffic-brief.md` for actual commands, runs, outputs and blocked diagnostics. HTML visual inspection remains pending.
 
 Run separately from the repository root:
 

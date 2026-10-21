@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "highlight_ids": {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 4, "uniqueItems": true},
+    "followup_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 2, "uniqueItems": true}
+  },
+  "required": ["highlight_ids", "followup_ids"],
+  "additionalProperties": false
+}
