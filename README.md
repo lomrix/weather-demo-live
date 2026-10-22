@@ -2,6 +2,20 @@
 
 Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline. The checked briefing controller has two successful real AI runs using saved real data; recurring collection remains pending.
 
+## Task 005: repeatable offline verification
+
+From the repository root, with standard-library Python (CI uses Python 3.12):
+
+```text
+python scripts/verify_traffic.py
+```
+
+Exit 0 and `PASS: 9/9 offline cases; zero model requests` mean all expected results were checked. An expected controller rejection passes its test; any unexpected result, timeout or failed assertion makes the verifier exit nonzero and identify the failed case. Each execution creates a fresh ignored directory under `out/traffic-verification/`, with synthetic decisions, copied/mutated inputs, per-case commands, stdout/stderr, actual exit codes, assertions and `summary.json`. Controller run paths come from each invocation's output and are checked to stay inside `out/traffic-brief/`.
+
+Checks use saved real fixtures and synthetic decisions, only prepare/replay modes, zero model invocations and no live data. They cover reviewed fact anchors/provenance, accepted JSON/HTML content, unknown/duplicate IDs, malformed/missing input and unavailable actual statistics. Missing actuals remain unknown, while predictions remain separate. Content checks are not visual or accessibility inspection, usefulness evaluation or proof of recurring performance.
+
+The `Traffic offline verification` GitHub workflow runs the same command on PRs targeting main, pushes to main and manual dispatch, using Ubuntu/Windows with Python 3.12. After a remote run, open the PR's **Checks** tab (or repository **Actions**) and inspect both matrix jobs and their logs. Remote GitHub verification is **pending**; a local pass does not establish CI success or an observed remote red-then-green exercise. Official action/runtime setup normally downloads components; the Python verifier is offline, without an isolated runner network sandbox. Task evidence and remaining limits are recorded in `tasks/005-offline-traffic-checks.md`.
+
 ## Task 004: checked briefing workflow
 
 Run from the repository root (mode is always explicit):

@@ -1,5 +1,9 @@
 # Prompt log
 
+## Task 005 offline verifier, 22 October 2026
+
+Implemented the supplied five-file brief: a portable standard-library verification command, Ubuntu/Windows GitHub workflow and reproduction records. Local Python 3.12 checks passed all nine prepare/synthetic replay cases with zero model invocations, including duplicate rejection and missing-actual boundaries. Evidence is under `out/traffic-verification/`; remote GitHub execution remains pending. No application/eval/fixture/permission changes, live requests, model calls, installs, commits or pushes.
+
 These entries describe two real events from 1 October 2026. They were written on 5 October 2026.
 
 ## 1. API identification correction
