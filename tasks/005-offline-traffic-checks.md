@@ -38,4 +38,27 @@ After removing an unused verifier variable, the same command was rerun: exit **0
 
 Workflow: PRs targeting main, pushes to main and manual dispatch; read-only contents permission, checkout without persisted credentials, Python 3.12, Ubuntu/Windows matrix with fail-fast false, five-minute job timeout and UTF-8/no-bytecode environment. Uses official `actions/checkout@v7` and `actions/setup-python@v7` as specified by the brief's dated upstream README verification. No network requests were made to re-verify upstream during this task. No path filters, installs, credentials/model setup or scheduled acquisition. GitHub action/runtime setup normally downloads components; this is not a runner network sandbox.
 
-GitHub execution and Linux verification remain **pending** until remote runs occur. No observed remote red-then-green evidence exists from this task. Recurring collection, usefulness comparison against a deterministic baseline, a hard token/cost budget, municipal benefit and full coursework completion remain pending. No model calls, live-data requests, package installation, commits or pushes were performed.
+Initial GitHub run `39803550320` passed on Windows and Ubuntu. The deliberate failure exercise and local repair are recorded below; remote checks after the repair remain **pending**. Recurring collection, usefulness comparison against a deterministic baseline, a hard token/cost budget, municipal benefit and full coursework completion remain pending. No model calls, live-data requests, package installation, commits or pushes were performed.
+
+
+## Deliberate CI failure and repair, 22 October 2026
+
+Remote results supplied by the user: initial run `39803550320` passed on Windows and Ubuntu. Deliberately incorrect test expectation 19577 (verified correct value 19576) was pushed as commit `8724b9d`. Ubuntu job `119914885500` in run `39804761955` rejected it: `prepare`, `valid-replay` and `no-actuals-prepare` failed the fact-value assertion; overall 6/9 passed, exit 1. This was a deliberate test exercise, not a discovered application defect. These remote results were not fetched during this repair.
+
+Restored only `ANCHORS["road.vang_kirke.total"]` to 19576 in the verifier. Actual local command `python scripts/verify_traffic.py` exited **0**, stderr empty:
+
+```text
+EVIDENCE_DIRECTORY C:\Users\moham\weather-demo-live\out\traffic-verification\checks-prvdkhze
+PASS prepare (controller exit 0)
+PASS valid-replay (controller exit 0)
+PASS unknown-highlight (controller exit 1)
+PASS duplicate-highlights (controller exit 1)
+PASS duplicate-followups (controller exit 1)
+PASS malformed-time (controller exit 1)
+PASS missing-input (controller exit 1)
+PASS no-actuals-prepare (controller exit 0)
+PASS unavailable-actual (controller exit 1)
+PASS: 9/9 offline cases; zero model requests
+```
+
+Full evidence: `out/traffic-verification/checks-prvdkhze/summary.json`. Remote checks after repair remain **pending**; this local pass does not establish remote green after red. No application/fixture/permission changes, model calls, live-data requests, commits or pushes were made in this repair. Unrelated changes were preserved. `git diff --check` exited **0**, with no whitespace errors; Git emitted an LF-to-CRLF normalization warning for the verifier.
