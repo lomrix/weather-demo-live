@@ -28,7 +28,7 @@ LIMITATIONS = [
     "Passenger harm, delay causes, intervention success and municipal benefit are not established.",
 ]
 ANCHORS = {
-    "road.vang_kirke.total": 19576, "road.vang_kirke.peak": 1834,
+    "road.vang_kirke.total": 19577, "road.vang_kirke.peak": 1834,
     "road.disen_ost.total": 19806, "road.disen_ost.peak": 1831,
     "road.vangsvegen_91.total": 13976, "road.vangsvegen_91.peak": 1149,
     "bus.actual_count": 10, "bus.prediction_only_count": 8,
