@@ -1,5 +1,9 @@
 # Prompt log
 
+## Task 005 offline verifier, 22 October 2026
+
+Implemented the supplied five-file brief: a portable standard-library verification command, Ubuntu/Windows GitHub workflow and reproduction records. Local Python 3.12 checks passed all nine prepare/synthetic replay cases with zero model invocations, including duplicate rejection and missing-actual boundaries. Evidence is under `out/traffic-verification/`; remote GitHub execution was pending at implementation (later exercise recorded below). No application/eval/fixture/permission changes, live requests, model calls, installs, commits or pushes.
+
 These entries describe two real events from 1 October 2026. They were written on 5 October 2026.
 
 ## 1. API identification correction
@@ -82,3 +86,8 @@ All three runs recorded **zero Codex invocations**. These are offline synthetic 
 Reviewed saved evidence for `20261022T143808Z-e3red74e` and `20261022T144225Z-x1srsxg5` under `out/traffic-brief/`: both exited 0 with one real Codex invocation and checked HTML/JSON briefings using saved real road/bus data. Both selected `road.vang_kirke.total`, `bus.actual_count`, `bus.actual_min_seconds`, `bus.actual_max_seconds`; follow-ups were `collect_same_day_samples` and `check_early_departure_records`. Reported input/output tokens: 17,513/54 and 17,514/54 respectively; all other reported usage fields were zero.
 
 Updated README, SPEC and Task 004; preserved the dated schema failure/repair. Recurring collection, usefulness evaluation and a hard token/cost budget remain pending. This review made no model calls or network requests.
+
+
+## Task 005 deliberate CI exercise repair, 22 October 2026
+
+User-reported GitHub evidence: initial run `39803550320` passed Windows/Ubuntu; intentional wrong expectation was pushed in `8724b9d`. Ubuntu job `119914885500`, run `39804761955`, rejected it: prepare, valid-replay and no-actuals-prepare failed, 6/9 passed, exit 1. This was a deliberate test exercise, not an application defect. Restored 19577 to verified 19576; local `python scripts/verify_traffic.py` exited 0, all 9 cases passed, zero model requests (`out/traffic-verification/checks-prvdkhze/summary.json`). Remote checks after repair remain pending. No live requests, commits or pushes.
