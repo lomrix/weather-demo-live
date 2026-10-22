@@ -1,6 +1,6 @@
 # Hamar traffic and bus reliability ? provisional project
 
-Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline. The checked briefing controller is implemented; real AI execution and recurring collection remain unverified/pending.
+Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline. The checked briefing controller has two successful real AI runs using saved real data; recurring collection remains pending.
 
 ## Task 004: checked briefing workflow
 
@@ -35,13 +35,19 @@ python harness/traffic_brief.py --mode replay --decision-file out/task004-synthe
 
 This replay is labelled OFFLINE REPLAY and never establishes AI execution. Prepare stops after computing facts and reading runtime context. Each command prints its unique directory under `out/traffic-brief/`, containing `trace.json`, `facts.json` and `prompt.txt` after valid input preparation. Checked replay also writes `checked-decision.json`, `briefing.json` and self-contained `briefing.html`. Failed runs record a reason and never reuse an older briefing as current.
 
-PENDING: real AI execution. For a later separately authorised ordinary-terminal real run, the existing installed/logged-in Codex CLI is required; no API key or new provider setup is introduced:
+Real AI execution succeeded with the existing installed/logged-in Codex CLI. Working command from the repository root:
 
 ```text
-python harness/traffic_brief.py --mode codex
+python harness/traffic_brief.py --mode codex --codex-path "C:\Users\moham\.codex\packages\standalone\current\bin\codex.exe"
 ```
 
-PENDING: permission verification. An optional `--codex-path` selects an existing executable; otherwise PATH and the known standalone Windows install are checked. No model override is used and login files are never inspected. The child uses a one-time narrowed named permission profile (read-only, .env/.env.local denied, command networking disabled), not modified permission files or bypass flags. The local non-model permission diagnostic failed with Access is denied; syntax/enforcement and real account availability remain unverified. Do not treat successful offline replay as a successful live model run.
+The saved successful runs used the configured permission override. An optional `--codex-path` selects an existing executable; otherwise PATH and the known standalone Windows install are checked. No model override is used and login files are never inspected. The child uses a one-time narrowed named permission profile (read-only, .env/.env.local denied, command networking disabled), not modified permission files or bypass flags. The earlier non-model diagnostic failed with Access is denied, but the later real runs completed with this override. Successful runs do not independently prove permission enforcement or timeout/process-tree controls.
+
+On 22 October 2026, saved runs `out/traffic-brief/20261022T143808Z-e3red74e` and `out/traffic-brief/20261022T144225Z-x1srsxg5` each recorded process exit 0, one Codex invocation, a completed turn, checked decisions and rendered HTML/JSON briefings. Both used saved real data: road observations from 20 October and bus observations from 21 October, not new live collection or synthetic decisions.
+
+Both selected `road.vang_kirke.total` (19,576 vehicle passages), `bus.actual_count` (10 stop-call comparisons), `bus.actual_min_seconds` (-88 signed seconds) and `bus.actual_max_seconds` (289 signed seconds), with `collect_same_day_samples` and `check_early_departure_records` as follow-ups.
+
+Reported usage was 17,513 input / 54 output tokens for `20261022T143808Z-e3red74e` and 17,514 input / 54 output tokens for `20261022T144225Z-x1srsxg5`. Both reported zero cached-input, cache-write-input and reasoning-output tokens.
 
 The controller permits one model invocation, no controller retries, a 12,000-character prompt, 120-second child timeout, 4,096-byte decision and bounded 1 MiB stdout/1 MiB stderr capture. Tool events, failed turns and invalid selections are rejected. Reported token usage is retained when available. These are invocation/time/size controls, **not a proven hard token or monetary budget**. The model selects IDs only; program-owned verified facts/questions are rendered. Compare selection usefulness with a deterministic baseline before claiming AI superiority. Recurring acquisition, repeated-day evidence, that evaluation and a hard budget remain outstanding.
 
@@ -62,7 +68,7 @@ Bus attribution: Inneholder data under Norsk lisens for offentlige data (NLOD) t
 
 The filtered B21 snapshot contains six journeys and 18 calls at three stops from one bounded 100-journey INN response on 21 October 2026, not complete regional coverage. Other calls and vehicle/staff identifiers were excluded. The retained response hash describes the original whole response, not the fixture bytes. Source-reported actuals are provider observations, not independently verified physical events or evidence of a legal service breach. Predictions are separate; missing comparisons are unknown and cancelled calls are excluded. Negative differences are preserved.
 
-The road and bus samples are on different dates and are not simultaneous observations. These samples do not establish recurring delay rates, passenger harm, causes or intervention success. Recurring acquisition, repeated-day evidence, checked AI briefings and actual municipal benefit remain pending.
+The road and bus samples are on different dates and are not simultaneous observations. These samples do not establish recurring delay rates, passenger harm, causes or intervention success. Recurring acquisition, repeated-day evidence, usefulness evaluation and actual municipal benefit remain pending.
 
 ## Earlier weather practice exercise
 
