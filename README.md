@@ -2,6 +2,21 @@
 
 Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline. The checked briefing controller has two successful real AI runs using saved real data; recurring collection remains pending.
 
+## Task 006: saved route coverage at three stops
+
+Run from the repository root with standard-library Python:
+
+```text
+python harness/route_coverage_report.py --input fixtures/hamar-route-coverage-2026-10-21.json --output-dir out/route-coverage
+python scripts/verify_route_coverage.py
+```
+
+The producer writes self-contained `out/route-coverage/route-coverage.html` and `route-coverage.json`. This saved 21 October snapshot inventories six verified quays at Storhamarsenteret, Hamar skysstasjon and CC Hamar from one bounded first page of 100 INN journeys. Observed routes are B21 (6 journeys, 18 calls, 10 actual/8 prediction-only), B22 (3 journeys, 6 calls, 3 actual/3 prediction-only) and 660 (1 journey, 2 calls, 0 actual/2 prediction-only). Totals: 10 distinct observed journeys, 26 calls, 13 actual and 13 prediction-only; zero unknown/cancelled. Route 660's lack of actual comparisons describes data availability, not proof of poor service.
+
+B22 actual observations are now represented by this saved-data component. Repeated-day capture and the main AI catalogue integration remain pending; the existing AI briefing does not automatically cover B22. This is no complete city/day survey; absence from the subset does not establish absence of a service. Predictions remain separate, missing data is unknown, provider actuals are not independently verified physical events and counts are not passenger counts. No recurring patterns, causes, performance ranking or municipal benefit are demonstrated.
+
+The new verifier uses fresh ignored `out/route-coverage-verification/checks-*/` directories and records commands, stdout/stderr, exits, assertions and `summary.json`. Mutations are synthetic software checks, not live or repeated-day experiments. The existing nine traffic cases remain unchanged. The Windows/Ubuntu workflow now also runs the route verifier; remote CI for this addition remains **pending**. See `tasks/006-route-coverage-sample.md` for local evidence.
+
 ## Task 005: repeatable offline verification
 
 From the repository root, with standard-library Python (CI uses Python 3.12):

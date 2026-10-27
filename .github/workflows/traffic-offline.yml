@@ -27,3 +27,5 @@ jobs:
           python-version: '3.12'
       - name: Verify saved traffic data offline
         run: python scripts/verify_traffic.py
+      - name: Verify saved route coverage offline
+        run: python scripts/verify_route_coverage.py
