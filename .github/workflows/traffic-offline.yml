@@ -29,3 +29,5 @@ jobs:
         run: python scripts/verify_traffic.py
       - name: Verify saved route coverage offline
         run: python scripts/verify_route_coverage.py
+      - name: Verify bounded bus collection offline
+        run: python scripts/verify_bus_collection.py
