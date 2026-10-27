@@ -2,6 +2,38 @@
 
 Intended users are transport staff reviewing recurring road patterns and bus timing evidence around Hamar. These standard-library components use genuine saved samples offline. The checked briefing controller has two successful real AI runs using saved real data; recurring collection remains pending.
 
+## Task 007: bounded bus collection
+
+The collector is implemented in [harness/collect_bus_sample.py](harness/collect_bus_sample.py). It defaults to a no-mutation, no-network dry-run:
+
+```text
+python harness/collect_bus_sample.py --mode dry-run
+```
+
+The dry-run prints the exact Entur endpoint, public client identifier, `Accept` header, one-request/5 MiB/20-second bounds and destination. It does not create the output directory or claim a capture. A synthetic SIRI XML response can be replayed offline:
+
+```text
+python harness/collect_bus_sample.py --mode replay --response-file out/task007-synthetic-response.xml --output-root out/bus-collection
+```
+
+Replay writes a unique directory containing `snapshot.json` and `manifest.json`, marks the result synthetic/offline, preserves provider timestamps and records replay execution time separately. Open those JSON files directly to inspect the filtered snapshot and provenance. The source body is never saved by the collector; synthetic input files are test data only.
+
+Live mode is explicit and is not required for this task:
+
+```text
+python harness/collect_bus_sample.py --mode live --output-root out/bus-collection
+```
+
+It makes one bounded request only, uses the fixed public endpoint and headers, rejects redirects/non-XML/error responses, and applies local lock and cooldown coordination within that output root. It is not background collection, scheduling, complete Hamar coverage or integration with the existing historical report. Live preflight and remote CI remain pending; no live request is needed yet.
+
+Run the independent offline checks:
+
+```text
+python scripts/verify_bus_collection.py
+```
+
+The verifier uses synthetic XML and mocked transport only, creates fresh ignored `out/bus-collection-verification/checks-*/` evidence, and must be run alongside the existing route and traffic verifiers. The collection snapshot is a new schema and must not be passed to the Task 006 historical report without a later integration task.
+
 ## Task 006: saved route coverage at three stops
 
 Run from the repository root with standard-library Python:
