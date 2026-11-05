@@ -102,6 +102,20 @@ python harness\ollama_scenario.py --scenario fixtures\scenarios\synthetic-compar
 
 The synthetic comparison has two journeys and three assumed candidate connections. Python reports baseline, closure-only, and both selected options for every journey, including restored access, remaining unreachable journeys, and distance changes. The model supplies only two candidate IDs and reasons; candidate geometry, assumed lengths, and the confirmed closure remain Python-controlled.
 
+### Named construction projects active on a date
+
+A scenario may add a `projects` list beside `network` and `journeys`; scenarios without it, including the single-closure fixtures above, are unchanged. Each project has a unique `id`, a `label`, a required boolean `hypothetical` (validated; strings and missing values are rejected), `start_date`, `end_date` and explicit `restrictions` that reuse the existing operations (`close_links` with `"mode": "walking"`, `restrict_links` with `"mode": "vehicle"`). Dates are ISO `YYYY-MM-DD` and **both boundaries are inclusive**: a project is active when `start_date <= assessment date <= end_date`, and a one-day project has equal dates. An end date before the start date, a malformed or impossible date, a duplicate project ID, an unknown link ID or an empty restriction list stops with a message naming the project.
+
+For one assessment date Python applies every active project together to the walking network, then reports per journey the baseline, the combined result, each project's result alone, `contributing_projects` (projects whose own closure changes the journey, or whose removal changes the combined result) and `overlap_effect` (the combination is worse than any single project). Walking-mode vehicle restrictions do not change walking routes. No model call is involved. The new `fixtures/scenarios/synthetic-projects.json` is synthetic: station-road-works runs 2026-11-10 to 2026-11-20 and mill-lane-works 2026-11-16 to 2026-11-27, overlapping 2026-11-16 to 2026-11-20.
+
+```text
+python harness/project_scenario.py --scenario fixtures/scenarios/synthetic-projects.json --date 2026-11-18
+python harness/project_scenario.py --scenario fixtures/scenarios/synthetic-projects.json --date 2026-11-18 --json | python harness/render_comparison.py --output out/projects.html
+python -m unittest check_project_scenarios.py -v
+```
+
+The browser report lists the assessment date, date rule, hypothetical status, active and inactive projects, and a journey table with baseline, combined and per-project results. An assessment is hypothetical when any active project is hypothetical; the status is carried in `project_assessment.hypothetical` and the combined alternative. The synthetic fixture projects are both hypothetical.
+
 ### First real-data case: Ringgata junction area to Ankerskogen
 
 The bounded real-data scenario is saved in
@@ -246,6 +260,18 @@ small browser fixture. Its route distances and access statuses are generated
 by Python from the explicitly synthetic scenario; its `proposal` rationale and
 two candidate selections are the only parts copied from a recorded
 `qwen2.5:3b` run. The rationale is draft text, not checked evidence.
+
+## Interactive planning workspace
+
+Start the local browser workspace (Python standard library only, bound to `127.0.0.1`):
+
+```text
+python hamar_workspace.py
+```
+
+Open `http://127.0.0.1:8765/` (`--port N` changes the port, `--open` launches the browser). Pick one of the two mapped Hamar cases, a journey and an assessment date, edit the named hypothetical projects (each closes verified or hypothetical route sections; dates are inclusive), then use **Assess projects**. This is a deterministic Python calculation that works with Ollama stopped. **Compare options with AI** recalculates the assessment, then makes one bounded request to the local `qwen2.5:3b` model; Python alone computes candidate geometry and lengths, and the same active closures apply under every option. The model's prose is shown as unchecked text, and its raw reply is kept in collapsed diagnostics. Changing a date, project, section or the question marks displayed results outdated (the fingerprint is computed in Python) until recalculated.
+
+Limits: walking mode only (other modes are planned); the two cases come from saved sanitized OpenStreetMap fixtures; only the verified closure section reflects the real planning notice, other sections are hypothetical; connector lengths are planning allowances, not verified feasibility. The server accepts only fixed case IDs and JSON bodies up to 32 KB, rejects foreign `Host`/`Origin` headers, and has no file-path or shell inputs. Checks: `python -m unittest check_workspace.py` (synthetic, fake Ollama).
 
 ## Local Ollama planner
 

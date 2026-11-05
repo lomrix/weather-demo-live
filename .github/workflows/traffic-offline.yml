@@ -39,3 +39,7 @@ jobs:
           check_ollama_scenario.py
           check_comparison_renderer.py
           check_scenario_compare.py
+      - name: Run multi-project scenario checks
+        run: python -m unittest check_project_scenarios.py
+      - name: Run workspace request-boundary and stale-result checks
+        run: python -m unittest check_workspace.py
