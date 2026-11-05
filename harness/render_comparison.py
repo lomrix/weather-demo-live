@@ -604,6 +604,47 @@ def _comparison_page(result):
 """
 
 
+def _project_section(info, alternatives):
+    def project_item(project):
+        links = ", ".join(project["closed_walking_links"] + project["restricted_vehicle_links"])
+        return (
+            f"<li><strong>{escape(project['label'])}</strong> ({escape(project['id'])}, "
+            f"{'hypothetical' if project.get('hypothetical') else 'not hypothetical'}): "
+            f"{escape(project['start_date'])} to {escape(project['end_date'])}; "
+            f"restricted links: {escape(links)}</li>"
+        )
+
+    active = info["active_projects"]
+    inactive = info["inactive_projects"]
+    rows = []
+    for alternative in alternatives[:1]:
+        for journey in alternative["journeys"]:
+            individual = "; ".join(
+                f"{escape(project_id)}: {escape(_route_text(item['metres']))}"
+                for project_id, item in journey.get("individual_projects", {}).items()
+            ) or "none active"
+            contributors = ", ".join(journey.get("contributing_projects", [])) or "none"
+            overlap = " Overlap makes this worse than any single project." if journey.get("overlap_effect") else ""
+            rows.append(
+                f"<tr><td>{escape(journey['journey_id'])}</td>"
+                f"<td>{escape(_route_text(journey['baseline']['metres']))}</td>"
+                f"<td>{escape(_route_text(journey['route']['metres']))}</td>"
+                f"<td>{individual}</td><td>{escape(contributors)}{overlap}</td></tr>"
+            )
+    return (
+        '<section class="evidence"><h2>Active projects</h2>'
+        + ("<p><strong>Hypothetical assessment:</strong> at least one active project is hypothetical.</p>"
+           if info.get("hypothetical") else "") +
+        f"<p><strong>Assessment date:</strong> {escape(info['assessment_date'])}. "
+        f"{escape(info['date_rule'])}</p>"
+        f"<ul>{''.join(project_item(p) for p in active) or '<li>No project is active on this date.</li>'}</ul>"
+        f"<p>Not active: {escape(', '.join(p['id'] for p in inactive) or 'none')}.</p>"
+        "<table><thead><tr><th>Journey</th><th>Baseline</th><th>All active projects together</th>"
+        "<th>Each active project alone</th><th>Contributing projects</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table></section>"
+    )
+
+
 def _scenario_page(result):
     comparison = result["comparison"]
     scenario = comparison["scenario"]
@@ -690,6 +731,8 @@ def _scenario_page(result):
         "</section>"
     )
     sections.insert(0, _route_map_section(comparison))
+    if "project_assessment" in result:
+        sections.insert(0, _project_section(result["project_assessment"], alternatives))
     badge = "Synthetic case" if scenario.get("synthetic") else "Real-data case"
     return _scenario_document(
         scenario, badge, sections, evidence, "Hamar Access Lab comparison"
@@ -732,6 +775,8 @@ def _scenario_document(scenario, badge, sections, evidence, title):
   .interruption-key::before {{ border-color: #b42318; border-top-width: 7px }}
   .legend-context::before {{ border-color: #b6c8c5; border-top-width: 2px }}
   .attribution {{ color: #385d5a; font-size: .9rem }}
+  table {{ border-collapse: collapse; width: 100%; background: white }}
+  th, td {{ border: 1px solid #bed1ce; padding: .4rem .55rem; text-align: left; vertical-align: top }}
   .closure {{ border-color: #c79672 }}
   .option {{ border-color: #6b9b91 }}
   .distance {{ font-size: 1.65rem; font-weight: 750; margin: .55rem 0 }}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hamar Access Lab · Planning workspace</title>
+<link rel="stylesheet" href="/app.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#controls">Skip to controls</a>
+<header class="topbar">
+  <div>
+    <p class="eyebrow">Hamar Access Lab</p>
+    <h1>Access planning workspace</h1>
+  </div>
+  <ul class="badges" aria-label="Workspace status">
+    <li class="badge">Offline · saved OpenStreetMap fixtures</li>
+    <li class="badge badge-mode" id="mode-badge">Walking supported · other modes planned</li>
+  </ul>
+</header>
+
+<main class="layout">
+  <section class="map-card" id="map-card" aria-labelledby="map-title">
+    <div class="map-head">
+      <div>
+        <h2 id="map-title">Route map</h2>
+        <p class="hint" id="map-caption">Loading saved map…</p>
+      </div>
+      <p class="chip chip-idle" id="map-freshness" role="status">No results yet</p>
+    </div>
+    <div class="map-tools" role="toolbar" aria-label="Map view">
+      <button type="button" class="btn btn-small" id="zoom-in">Zoom in</button>
+      <button type="button" class="btn btn-small" id="zoom-out">Zoom out</button>
+      <button type="button" class="btn btn-small" id="fit-route">Fit journey</button>
+      <button type="button" class="btn btn-small" id="fit-all">Whole area</button>
+    </div>
+    <div class="map-frame" id="map-frame" tabindex="0" role="group"
+         aria-label="Route map" aria-describedby="map-help">
+      <svg id="map" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <p class="stale-banner" id="map-stale" hidden>Outdated: inputs changed. Recalculate to refresh the map.</p>
+    </div>
+    <p class="hint" id="map-help">Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms.</p>
+    <fieldset class="layers">
+      <legend>Map layers</legend>
+      <div id="layer-list" class="layer-list"></div>
+    </fieldset>
+    <p class="attribution">Map data © OpenStreetMap contributors (ODbL 1.0). Saved, sanitized extract; no live map tiles.</p>
+  </section>
+
+  <aside class="controls" id="controls" aria-label="Planning controls" tabindex="-1">
+    <form id="plan-form" novalidate>
+      <section class="group" aria-labelledby="g-case">
+        <h2 id="g-case"><span class="step" aria-hidden="true">1</span> Case and journey</h2>
+        <label for="case-select">Mapped Hamar case</label>
+        <select id="case-select"></select>
+        <p class="hint" id="case-summary"></p>
+        <label for="journey-select">Journey</label>
+        <select id="journey-select"></select>
+      </section>
+
+      <section class="group" aria-labelledby="g-projects">
+        <h2 id="g-projects"><span class="step" aria-hidden="true">2</span> Date and projects</h2>
+        <label for="assess-date">Assessment date</label>
+        <input type="date" id="assess-date" required>
+        <p class="hint" id="date-rule"></p>
+        <div id="projects"></div>
+        <button type="button" class="btn btn-small" id="add-project">Add hypothetical project</button>
+        <p class="alert" id="form-error" role="alert" hidden></p>
+        <button type="button" class="btn btn-primary" id="assess-btn">Assess projects</button>
+        <p class="hint">Local calculation. Works without Ollama.</p>
+      </section>
+
+      <section class="group" aria-labelledby="g-ai">
+        <h2 id="g-ai"><span class="step" aria-hidden="true">3</span> Mitigation options</h2>
+        <label for="question">Question for the planning assistant</label>
+        <textarea id="question" rows="3" maxlength="400"></textarea>
+        <button type="button" class="btn btn-secondary" id="compare-btn">Compare options with AI</button>
+        <p class="hint" id="ai-note"></p>
+      </section>
+    </form>
+    <p class="busy" id="busy" role="status" aria-live="polite" hidden></p>
+  </aside>
+
+  <section class="results" id="results" aria-labelledby="results-title">
+    <h2 id="results-title">Checked results</h2>
+    <div id="result-cards"></div>
+    <details class="panel" id="evidence">
+      <summary>Evidence and technical IDs</summary>
+      <div id="evidence-body"></div>
+    </details>
+    <details class="panel" id="diagnostics">
+      <summary>Model diagnostics (raw reply)</summary>
+      <div id="diagnostics-body"><p class="hint">No model request has been made yet.</p></div>
+    </details>
+  </section>
+</main>
+</body>
+</html>

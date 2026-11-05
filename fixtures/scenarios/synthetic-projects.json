@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "id": "synthetic-projects",
+    "label": "Synthetic two-site construction overlap",
+    "synthetic": true,
+    "offline": true,
+    "planning_case": "Synthetic network with two named construction projects; not Hamar data.",
+    "unknowns": [
+      "Network, distances and project dates are invented to test overlap logic.",
+      "Only walking links are assessed; vehicle restrictions do not change walking routes."
+    ]
+  },
+  "network": [
+    {"id": "home-centre", "from": "Home", "to": "Centre", "metres": 100, "modes": ["walking", "vehicle"]},
+    {"id": "centre-school", "from": "Centre", "to": "School", "metres": 100, "modes": ["walking", "vehicle"]},
+    {"id": "centre-clinic", "from": "Centre", "to": "Clinic", "metres": 80, "modes": ["walking"]},
+    {"id": "centre-hall", "from": "Centre", "to": "Hall", "metres": 90, "modes": ["walking"]},
+    {"id": "home-north", "from": "Home", "to": "North", "metres": 90, "modes": ["walking"]},
+    {"id": "north-school", "from": "North", "to": "School", "metres": 130, "modes": ["walking"]},
+    {"id": "north-hall", "from": "North", "to": "Hall", "metres": 130, "modes": ["walking"]},
+    {"id": "home-south", "from": "Home", "to": "South", "metres": 100, "modes": ["walking"]},
+    {"id": "south-school", "from": "South", "to": "School", "metres": 150, "modes": ["walking"]},
+    {"id": "south-clinic", "from": "South", "to": "Clinic", "metres": 60, "modes": ["walking"]}
+  ],
+  "journeys": [
+    {"id": "home-to-school", "origin": "Home", "destination": "School"},
+    {"id": "home-to-hall", "origin": "Home", "destination": "Hall"},
+    {"id": "home-to-clinic", "origin": "Home", "destination": "Clinic"},
+    {"id": "north-to-school", "origin": "North", "destination": "School"}
+  ],
+  "projects": [
+    {
+      "id": "station-road-works",
+      "label": "Station Road works (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-10",
+      "end_date": "2026-11-20",
+      "restrictions": [
+        {"type": "close_links", "mode": "walking", "link_ids": ["centre-school", "centre-hall"]}
+      ]
+    },
+    {
+      "id": "mill-lane-works",
+      "label": "Mill Lane works (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-16",
+      "end_date": "2026-11-27",
+      "restrictions": [
+        {"type": "close_links", "mode": "walking", "link_ids": ["north-school", "north-hall"]}
+      ]
+    }
+  ]
+}
