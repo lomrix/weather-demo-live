@@ -1,6 +1,6 @@
 # Provisional problem and users
 
-Transport staff around Hamar need checkable evidence when investigating recurring road patterns and bus reliability. This direction is provisional; comparison with existing planning tools and municipal usefulness remain unresolved. Earlier weather and funding exercises are preserved, with reproduction instructions in README.md.
+Transport staff around Hamar need checkable evidence when investigating recurring road patterns and bus reliability. This direction is provisional; comparison with existing planning tools and municipal usefulness remain unresolved. The earlier funding exercise is preserved, with reproduction instructions in README.md; the earlier weather exercise files were removed and remain only in Git history.
 
 # Intended workflow and checkable success
 
