@@ -1,0 +1,297 @@
+{
+  "kind": "comparison_draft",
+  "proposal": {
+    "kind": "comparison_draft",
+    "rationale": "Compare the effects of adding hypothetical temporary walking links between the side path and North stop or South stop to alleviate the closure of North-origin-crossing and South-origin-crossing.",
+    "options": [
+      {
+        "candidate_id": "north-temporary-link",
+        "reason": "Adding a hypothetical 140 metre temporary walking link from Side path to North stop could potentially restore some journeys but may make the journey longer for North journeys and inaccessible for South journeys."
+      },
+      {
+        "candidate_id": "south-temporary-link",
+        "reason": "Adding a hypothetical 160 metre temporary walking link from Side path to South stop could potentially make some journeys accessible again and reduce the distance for South journeys, but may make North journeys longer and inaccessible."
+      }
+    ]
+  },
+  "comparison": {
+    "mode": "offline_scenario_comparison",
+    "scenario": {
+      "id": "synthetic-comparison",
+      "label": "Synthetic two-journey comparison",
+      "synthetic": true,
+      "offline": true
+    },
+    "baseline": [
+      {
+        "journey_id": "north-journey",
+        "route": {
+          "metres": 200,
+          "path": [
+            "North home",
+            "North crossing",
+            "North stop"
+          ]
+        }
+      },
+      {
+        "journey_id": "south-journey",
+        "route": {
+          "metres": 240,
+          "path": [
+            "South home",
+            "South crossing",
+            "South stop"
+          ]
+        }
+      }
+    ],
+    "alternatives": [
+      {
+        "id": "closure-only",
+        "label": "closure-only",
+        "hypothetical": true,
+        "journeys": [
+          {
+            "journey_id": "north-journey",
+            "baseline": {
+              "metres": 200,
+              "path": [
+                "North home",
+                "North crossing",
+                "North stop"
+              ]
+            },
+            "route": {
+              "metres": null,
+              "path": []
+            },
+            "change_metres": null
+          },
+          {
+            "journey_id": "south-journey",
+            "baseline": {
+              "metres": 240,
+              "path": [
+                "South home",
+                "South crossing",
+                "South stop"
+              ]
+            },
+            "route": {
+              "metres": null,
+              "path": []
+            },
+            "change_metres": null
+          }
+        ]
+      },
+      {
+        "id": "option-1",
+        "label": "north-temporary-link",
+        "hypothetical": true,
+        "journeys": [
+          {
+            "journey_id": "north-journey",
+            "baseline": {
+              "metres": 200,
+              "path": [
+                "North home",
+                "North crossing",
+                "North stop"
+              ]
+            },
+            "route": {
+              "metres": 220,
+              "path": [
+                "North home",
+                "Side path",
+                "North stop"
+              ]
+            },
+            "change_metres": 20
+          },
+          {
+            "journey_id": "south-journey",
+            "baseline": {
+              "metres": 240,
+              "path": [
+                "South home",
+                "South crossing",
+                "South stop"
+              ]
+            },
+            "route": {
+              "metres": null,
+              "path": []
+            },
+            "change_metres": null
+          }
+        ]
+      },
+      {
+        "id": "option-2",
+        "label": "south-temporary-link",
+        "hypothetical": true,
+        "journeys": [
+          {
+            "journey_id": "north-journey",
+            "baseline": {
+              "metres": 200,
+              "path": [
+                "North home",
+                "North crossing",
+                "North stop"
+              ]
+            },
+            "route": {
+              "metres": null,
+              "path": []
+            },
+            "change_metres": null
+          },
+          {
+            "journey_id": "south-journey",
+            "baseline": {
+              "metres": 240,
+              "path": [
+                "South home",
+                "South crossing",
+                "South stop"
+              ]
+            },
+            "route": {
+              "metres": 250,
+              "path": [
+                "South home",
+                "Side path",
+                "South stop"
+              ]
+            },
+            "change_metres": 10
+          }
+        ]
+      }
+    ]
+  },
+  "impact_summary": {
+    "closure_only": [
+      {
+        "journey_id": "north-journey",
+        "baseline": {
+          "metres": 200,
+          "path": [
+            "North home",
+            "North crossing",
+            "North stop"
+          ]
+        },
+        "route": {
+          "metres": null,
+          "path": []
+        },
+        "change_metres": null
+      },
+      {
+        "journey_id": "south-journey",
+        "baseline": {
+          "metres": 240,
+          "path": [
+            "South home",
+            "South crossing",
+            "South stop"
+          ]
+        },
+        "route": {
+          "metres": null,
+          "path": []
+        },
+        "change_metres": null
+      }
+    ],
+    "selected_candidates": [
+      {
+        "candidate_id": "north-temporary-link",
+        "assumed_metres": 140,
+        "assumption": "Synthetic temporary walking length.",
+        "journeys": [
+          {
+            "journey_id": "north-journey",
+            "candidate_id": "north-temporary-link",
+            "assumed_metres": 140,
+            "baseline_metres": 200,
+            "closure_metres": null,
+            "candidate_metres": 220,
+            "access_restored": true,
+            "unreachable_after_closure": true,
+            "unreachable_with_candidate": false,
+            "change_vs_baseline": 20,
+            "change_vs_closure": null
+          },
+          {
+            "journey_id": "south-journey",
+            "candidate_id": "north-temporary-link",
+            "assumed_metres": 140,
+            "baseline_metres": 240,
+            "closure_metres": null,
+            "candidate_metres": null,
+            "access_restored": false,
+            "unreachable_after_closure": true,
+            "unreachable_with_candidate": true,
+            "change_vs_baseline": null,
+            "change_vs_closure": null
+          }
+        ]
+      },
+      {
+        "candidate_id": "south-temporary-link",
+        "assumed_metres": 160,
+        "assumption": "Synthetic temporary walking length.",
+        "journeys": [
+          {
+            "journey_id": "north-journey",
+            "candidate_id": "south-temporary-link",
+            "assumed_metres": 160,
+            "baseline_metres": 200,
+            "closure_metres": null,
+            "candidate_metres": null,
+            "access_restored": false,
+            "unreachable_after_closure": true,
+            "unreachable_with_candidate": true,
+            "change_vs_baseline": null,
+            "change_vs_closure": null
+          },
+          {
+            "journey_id": "south-journey",
+            "candidate_id": "south-temporary-link",
+            "assumed_metres": 160,
+            "baseline_metres": 240,
+            "closure_metres": null,
+            "candidate_metres": 250,
+            "access_restored": true,
+            "unreachable_after_closure": true,
+            "unreachable_with_candidate": false,
+            "change_vs_baseline": 10,
+            "change_vs_closure": null
+          }
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "fixture": "offline browser demonstration",
+    "scenario_source": "fixtures/scenarios/synthetic-comparison.json",
+    "checked_by": "Python scenario_compare and render_comparison",
+    "model": "qwen2.5:3b",
+    "model_run": "recorded local Ollama run on 2026-11-04",
+    "model_owned": [
+      "proposal.rationale",
+      "proposal.options"
+    ],
+    "python_owned": [
+      "comparison",
+      "impact_summary"
+    ],
+    "synthetic": true
+  }
+}

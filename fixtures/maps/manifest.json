@@ -1,0 +1,63 @@
+{
+  "procedure": "harness/sanitize_osm_fixture.py",
+  "attribution": "OpenStreetMap contributors",
+  "license": "ODbL 1.0",
+  "retained_fields": [
+    "OSM bounds",
+    "node id/lat/lon",
+    "walking way id",
+    "walking way node references",
+    "highway and foot tags"
+  ],
+  "removed_fields": [
+    "user",
+    "uid",
+    "changeset",
+    "timestamp",
+    "version",
+    "relations",
+    "non-walking ways",
+    "non-walking tags",
+    "personal contact tags"
+  ],
+  "fixtures": {
+    "ringgata.osm": {
+      "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.060,60.796,11.090,60.805",
+      "retrieved_at": "2026-11-04T16:57:02+01:00",
+      "original_download_sha256": "afdb61021e187a1b0eb447592ba9114fd1da55ce3812868ece59c81b6f4c760d",
+      "sanitized_fixture_sha256": "db6079d622a2e380b79f1bc75a0732a9993646efa98b924e2af3635785f59621",
+      "retained_way_count": 334,
+      "retained_node_count": 1934,
+      "removed_contact_tag_keys": [
+        "contact:email",
+        "contact:phone",
+        "email",
+        "emergency:phone",
+        "phone",
+        "website"
+      ],
+      "route_distances_metres_before_after": {
+        "baseline": [1384, 1384],
+        "closure_only": [2332, 2332]
+      }
+    },
+    "furubergvegen-masabekkvegen.osm": {
+      "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.040,60.800,11.055,60.810",
+      "retrieved_at": "2026-11-05",
+      "original_download_sha256": "6b74c015c48f0ef4826888b3b56b30525b74a1999babc3027bf84b64c43babcf",
+      "sanitized_fixture_sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
+      "retained_way_count": 163,
+      "retained_node_count": 1031,
+      "removed_contact_tag_keys": [
+        "email",
+        "emergency:phone",
+        "phone",
+        "website"
+      ],
+      "route_distances_metres_before_after": {
+        "baseline": [[201, 241], [201, 241]],
+        "closure_only": [[362, 402], [362, 402]]
+      }
+    }
+  }
+}

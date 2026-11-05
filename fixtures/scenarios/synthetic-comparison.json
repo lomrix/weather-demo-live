@@ -1,0 +1,20 @@
+{
+  "metadata": {"id": "synthetic-comparison", "label": "Synthetic two-journey comparison", "synthetic": true, "offline": true},
+  "network": [
+    {"id": "north-origin-crossing", "from": "North home", "to": "North crossing", "metres": 100, "modes": ["walking"]},
+    {"id": "north-crossing-destination", "from": "North crossing", "to": "North stop", "metres": 100, "modes": ["walking"]},
+    {"id": "south-origin-crossing", "from": "South home", "to": "South crossing", "metres": 120, "modes": ["walking"]},
+    {"id": "south-crossing-destination", "from": "South crossing", "to": "South stop", "metres": 120, "modes": ["walking"]},
+    {"id": "north-home-side", "from": "North home", "to": "Side path", "metres": 80, "modes": ["walking"]},
+    {"id": "south-home-side", "from": "South home", "to": "Side path", "metres": 90, "modes": ["walking"]}
+  ],
+  "journeys": [
+    {"id": "north-journey", "origin": "North home", "destination": "North stop"},
+    {"id": "south-journey", "origin": "South home", "destination": "South stop"}
+  ],
+  "candidates": [
+    {"id": "north-temporary-link", "from": "Side path", "to": "North stop", "metres": 140, "assumption": "Synthetic temporary walking length."},
+    {"id": "south-temporary-link", "from": "Side path", "to": "South stop", "metres": 160, "assumption": "Synthetic temporary walking length."},
+    {"id": "north-long-temporary-link", "from": "Side path", "to": "North stop", "metres": 220, "assumption": "Synthetic longer north walking length."}
+  ]
+}
