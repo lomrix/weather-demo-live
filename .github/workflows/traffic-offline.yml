@@ -31,3 +31,11 @@ jobs:
         run: python scripts/verify_route_coverage.py
       - name: Verify bounded bus collection offline
         run: python scripts/verify_bus_collection.py
+      - name: Run Hamar Access Lab offline evaluation
+        run: >-
+          python -m unittest
+          check_ringgata_demo.py
+          check_hamar_real_case.py
+          check_ollama_scenario.py
+          check_comparison_renderer.py
+          check_scenario_compare.py

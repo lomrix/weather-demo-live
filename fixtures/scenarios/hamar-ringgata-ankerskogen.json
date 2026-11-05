@@ -1,0 +1,461 @@
+{
+  "metadata": {
+    "id": "hamar-ringgata-ankerskogen-2026",
+    "label": "Ringgata junction area to Ankerskogen",
+    "synthetic": false,
+    "offline": true,
+    "source_date": "2026-11-04",
+    "planning_case": "2026/20689",
+    "planning_source": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx",
+    "plan_area_map": "https://innlandetfylke.no/_f/p1/i5d040b2a-92c0-413b-898b-2fd7b7e05583/kart-over-planomrade_varsel-om-oppstart-ringgata.pdf",
+    "secondary_plan": {
+      "name": "Johannesenl\u00f8kka",
+      "id": "080400",
+      "source": "https://arealplaner.no/hamar3403/arealplaner/search?planStatusId=0%2C1%2C2%2C6",
+      "status": "geometry not located in public register extract"
+    },
+    "map_source": "https://www.openstreetmap.org/",
+    "map_license": "OpenStreetMap contributors, ODbL 1.0",
+    "map_bbox": "11.060,60.796,11.090,60.805",
+    "map_extract": {
+      "url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.060,60.796,11.090,60.805",
+      "retrieved_at": "2026-11-04T16:57:02+01:00",
+      "sha256": "db6079d622a2e380b79f1bc75a0732a9993646efa98b924e2af3635785f59621",
+      "origin": {
+        "node_id": "3223998135",
+        "coordinates": [
+          60.7988246,
+          11.0881825
+        ],
+        "role": "mapped Ringgata crossing in the junction area"
+      },
+      "destination": {
+        "node_id": "331953301",
+        "coordinates": [
+          60.8031248,
+          11.0702252
+        ],
+        "park_way_id": "44330923",
+        "role": "mapped path node near Ankerskogen park"
+      },
+      "interrupted_link": {
+        "way_id": "1396077789",
+        "from": "1020583235",
+        "to": "12922053054",
+        "coordinates": {
+          "from": [
+            60.7987973,
+            11.0880717
+          ],
+          "to": [
+            60.7999568,
+            11.0861151
+          ]
+        },
+        "section_metres_geometry": 169.4,
+        "closure_segment_ids": [
+          "osm-way-1396077789-segment-7",
+          "osm-way-1396077789-segment-8",
+          "osm-way-1396077789-segment-9",
+          "osm-way-1396077789-segment-10",
+          "osm-way-1396077789-segment-11",
+          "osm-way-1396077789-segment-12",
+          "osm-way-1396077789-segment-13"
+        ],
+        "tags": {
+          "highway": "cycleway",
+          "foot": "designated",
+          "surface": "asphalt",
+          "source": "Bing"
+        }
+      },
+      "connected_route_way_ids": [
+        "1396077783",
+        "1396077784",
+        "1396077789",
+        "1396077790",
+        "316290654",
+        "712557263",
+        "1396077795",
+        "88226096",
+        "1396077798",
+        "712557251",
+        "564090387",
+        "659769353",
+        "1396077805",
+        "1396077804",
+        "1396077803",
+        "712557262",
+        "1396077817",
+        "1396077816",
+        "1396176347",
+        "1396176348",
+        "929817530",
+        "1259039790",
+        "30123345"
+      ],
+      "baseline_metres": 1384,
+      "alternative_finding": "No alternative found in the saved walking network",
+      "original_sha256": "afdb61021e187a1b0eb447592ba9114fd1da55ce3812868ece59c81b6f4c760d",
+      "sanitization": {
+        "procedure": "Retain OSM bounds, attribution/license, nodes referenced by walking ways, walking way node references, and highway/foot tags; remove contributor/change attributes, relations, non-walking ways, and all other tags.",
+        "retained_way_count": 334,
+        "retained_node_count": 1934,
+        "removed_way_count": 2646,
+        "removed_tag_count": 670,
+        "removed_contact_tag_keys": [],
+        "original_contact_tag_count": 85,
+        "original_contact_tag_keys": [
+          "contact:email",
+          "contact:phone",
+          "email",
+          "emergency:phone",
+          "phone",
+          "website"
+        ],
+        "sanitized_has_user_uid": false,
+        "sanitized_contact_tag_count": 0
+      }
+    },
+    "modeled_scenario_note": "Vehicle-only restriction is a modeled scenario, not an observed closure or measured effect.",
+    "unknowns": [
+      "The exact Ringgata-Disenvegen pedestrian junction node is not confirmed; the origin is a mapped Ringgata crossing in the junction area.",
+      "Rollsl\u00f8kken skole main entrance node 2284553352 is not connected to a mapped pedestrian way.",
+      "Accessibility, maintenance, legal access and temporary construction effects are unknown."
+    ]
+  },
+  "osm_import": {
+    "journeys": [
+      {
+        "id": "junction-area-to-ankerskogen",
+        "origin": "3223998135",
+        "destination": "331953301"
+      }
+    ],
+    "closure": {
+      "way_id": "1396077789",
+      "from": "1020583235",
+      "to": "12922053054"
+    },
+    "candidates": [
+      {
+        "id": "junction-west-connector",
+        "from": "1020583128",
+        "to": "3223998172",
+        "metres": 203,
+        "assumption": "Straight-line estimate between mapped nodes; surface and crossing safety require a site check.",
+        "site_check": "Confirm a safe, accessible crossing and whether a temporary link can connect these mapped paths."
+      },
+      {
+        "id": "central-path-connector",
+        "from": "1025058025",
+        "to": "1025058322",
+        "metres": 575,
+        "assumption": "Straight-line estimate between mapped nodes; intervening land and surface require a site check.",
+        "site_check": "Confirm land access, gradient, surface and whether the two mapped paths can be connected."
+      },
+      {
+        "id": "park-side-connector",
+        "from": "331953330",
+        "to": "5904954401",
+        "metres": 400,
+        "assumption": "Straight-line estimate between mapped nodes; park-side access requires a site check.",
+        "site_check": "Confirm the park-side connection, accessibility and any boundary or entrance constraints."
+      }
+    ]
+  },
+  "network": [
+    {
+      "id": "osm-1396077783",
+      "from": "3223998135",
+      "to": "12922053048",
+      "metres": 4,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077783"
+    },
+    {
+      "id": "osm-1396077784",
+      "from": "12922053048",
+      "to": "1020583235",
+      "metres": 3,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077784"
+    },
+    {
+      "id": "osm-1396077789",
+      "from": "1020583235",
+      "to": "12922053054",
+      "metres": 169,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077789"
+    },
+    {
+      "id": "osm-1396077790",
+      "from": "12922053054",
+      "to": "12922053053",
+      "metres": 7,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077790"
+    },
+    {
+      "id": "osm-316290654",
+      "from": "12922053053",
+      "to": "1020583068",
+      "metres": 262,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/316290654"
+    },
+    {
+      "id": "osm-712557263",
+      "from": "1020583068",
+      "to": "1025057967",
+      "metres": 32,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/712557263"
+    },
+    {
+      "id": "osm-1396077795",
+      "from": "1025057967",
+      "to": "12922053072",
+      "metres": 11,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077795"
+    },
+    {
+      "id": "osm-88226096",
+      "from": "12922053072",
+      "to": "12922053071",
+      "metres": 8,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/88226096"
+    },
+    {
+      "id": "osm-1396077798",
+      "from": "12922053071",
+      "to": "1025058094",
+      "metres": 3,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077798"
+    },
+    {
+      "id": "osm-712557251",
+      "from": "1025058094",
+      "to": "1025058128",
+      "metres": 204,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/712557251"
+    },
+    {
+      "id": "osm-564090387",
+      "from": "1025058128",
+      "to": "6177082393",
+      "metres": 53,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/564090387"
+    },
+    {
+      "id": "osm-659769353",
+      "from": "6177082393",
+      "to": "12922053120",
+      "metres": 5,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/659769353"
+    },
+    {
+      "id": "osm-1396077805",
+      "from": "12922053120",
+      "to": "12922053119",
+      "metres": 2,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077805"
+    },
+    {
+      "id": "osm-1396077804",
+      "from": "12922053119",
+      "to": "12922053118",
+      "metres": 4,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077804"
+    },
+    {
+      "id": "osm-1396077803",
+      "from": "12922053118",
+      "to": "1020545841",
+      "metres": 3,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077803"
+    },
+    {
+      "id": "osm-712557262",
+      "from": "1020545841",
+      "to": "12922053137",
+      "metres": 106,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/712557262"
+    },
+    {
+      "id": "osm-1396077817",
+      "from": "12922053137",
+      "to": "12922053138",
+      "metres": 8,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077817"
+    },
+    {
+      "id": "osm-1396077816",
+      "from": "12922053138",
+      "to": "8622738123",
+      "metres": 85,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396077816"
+    },
+    {
+      "id": "osm-1396176347",
+      "from": "8622738123",
+      "to": "12922905346",
+      "metres": 53,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396176347"
+    },
+    {
+      "id": "osm-1396176348",
+      "from": "12922905346",
+      "to": "12922905345",
+      "metres": 10,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1396176348"
+    },
+    {
+      "id": "osm-929817530",
+      "from": "12922905345",
+      "to": "331953318",
+      "metres": 53,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/929817530"
+    },
+    {
+      "id": "osm-1259039790",
+      "from": "331953318",
+      "to": "11704095829",
+      "metres": 10,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/1259039790"
+    },
+    {
+      "id": "osm-30123345",
+      "from": "11704095829",
+      "to": "331953301",
+      "metres": 289,
+      "modes": [
+        "walking"
+      ],
+      "source": "https://www.openstreetmap.org/way/30123345"
+    },
+    {
+      "id": "osm-ringgata-83129092",
+      "from": "276029085",
+      "to": "9724073868",
+      "metres": 519,
+      "modes": [
+        "vehicle"
+      ],
+      "source": "https://www.openstreetmap.org/way/83129092"
+    },
+    {
+      "id": "osm-disenvegen-25968696",
+      "from": "3214782868",
+      "to": "1020583141",
+      "metres": 201,
+      "modes": [
+        "vehicle"
+      ],
+      "source": "https://www.openstreetmap.org/way/25968696"
+    }
+  ],
+  "journeys": [
+    {
+      "id": "junction-area-to-ankerskogen",
+      "origin": "3223998135",
+      "destination": "331953301",
+      "evidence": {
+        "origin": "https://www.openstreetmap.org/node/3223998135",
+        "destination": "https://www.openstreetmap.org/way/44330923",
+        "destination_note": "Mapped path node nearest the named Ankerskogen park polygon."
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "id": "vehicle-only-restriction",
+      "label": "Vehicle-only restriction",
+      "operations": [
+        {
+          "type": "restrict_links",
+          "mode": "vehicle",
+          "link_ids": [
+            "osm-ringgata-83129092",
+            "osm-disenvegen-25968696"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hypothetical-pedestrian-interruption",
+      "label": "Hypothetical pedestrian interruption",
+      "hypothetical": true,
+      "operations": [
+        {
+          "type": "close_links",
+          "mode": "walking",
+          "link_ids": [
+            "osm-1396077789"
+          ]
+        }
+      ]
+    }
+  ]
+}

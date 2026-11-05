@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "id": "synthetic-park",
+    "label": "Synthetic park access network",
+    "synthetic": true,
+    "offline": true
+  },
+  "network": [
+    {"id": "gate-to-path", "from": "Gate", "to": "Path", "metres": 60, "modes": ["walking"]},
+    {"id": "path-to-library", "from": "Path", "to": "Library", "metres": 140, "modes": ["walking"]}
+  ],
+  "journeys": [
+    {"id": "gate-to-library", "origin": "Gate", "destination": "Library"}
+  ],
+  "alternatives": [
+    {
+      "id": "same-path",
+      "label": "No change",
+      "hypothetical": false,
+      "operations": [
+        {"type": "restrict_links", "mode": "vehicle", "link_ids": ["gate-to-path"]}
+      ]
+    }
+  ]
+}

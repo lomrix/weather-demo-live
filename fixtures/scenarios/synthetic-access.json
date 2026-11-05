@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "id": "synthetic-access",
+    "label": "Synthetic access network",
+    "synthetic": true,
+    "offline": true
+  },
+  "network": [
+    {"id": "home-to-crossing", "from": "Home", "to": "Crossing", "metres": 100, "modes": ["walking", "vehicle"]},
+    {"id": "crossing-to-stop", "from": "Crossing", "to": "Stop", "metres": 100, "modes": ["walking", "vehicle"]},
+    {"id": "home-to-side", "from": "Home", "to": "Side", "metres": 80, "modes": ["walking"]},
+    {"id": "side-to-dead-end", "from": "Side", "to": "Dead end", "metres": 80, "modes": ["walking"]},
+    {"id": "vehicle-only-road", "from": "Home", "to": "Vehicle yard", "metres": 50, "modes": ["vehicle"]}
+  ],
+  "journeys": [
+    {"id": "home-to-stop", "origin": "Home", "destination": "Stop"}
+  ],
+  "alternatives": [
+    {
+      "id": "temporary-footbridge",
+      "label": "Hypothetical temporary footbridge",
+      "hypothetical": true,
+      "operations": [
+        {"type": "close_links", "mode": "walking", "link_ids": ["home-to-crossing", "crossing-to-stop"]},
+        {"type": "add_links", "links": [
+          {"id": "temporary-footbridge-link", "from": "Side", "to": "Stop", "metres": 110, "modes": ["walking"]}
+        ]}
+      ]
+    },
+    {
+      "id": "vehicle-restriction",
+      "label": "Hypothetical vehicle-only restriction",
+      "hypothetical": true,
+      "operations": [
+        {"type": "restrict_links", "mode": "vehicle", "link_ids": ["vehicle-only-road"]}
+      ]
+    }
+  ]
+}

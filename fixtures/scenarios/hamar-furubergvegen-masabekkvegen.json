@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "id": "hamar-furubergvegen-masabekkvegen-2026",
+    "label": "Furubergvegen-M\u00e5s\u00e5bekkvegen junction",
+    "synthetic": false,
+    "offline": true,
+    "source_date": "2026-11-05",
+    "map_source": "https://www.openstreetmap.org/",
+    "map_license": "OpenStreetMap contributors, ODbL 1.0",
+    "map_bbox": "11.040,60.800,11.055,60.810",
+    "petition": {
+      "url": "https://minsak.no/sak/3723",
+      "role": "Reported pedestrian safety concern; not proof of a mapped crossing or access."
+    },
+    "map_extract": {
+      "url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.040,60.800,11.055,60.810",
+      "retrieved_at": "2026-11-05",
+      "sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
+      "origin": {
+        "node_id": "302664786",
+        "coordinates": [
+          60.8058695,
+          11.0505925
+        ],
+        "role": "Mapped crossing-area node near Furubergvegen and M\u00e5s\u00e5bekkvegen; coordinates populated on import."
+      },
+      "destination": {
+        "node_id": "1020679221",
+        "coordinates": [
+          60.8045626,
+          11.0527975
+        ],
+        "role": "Mapped connected cycleway node; coordinates populated on import."
+      },
+      "interrupted_link": {
+        "way_id": "1482019890",
+        "from": "302664786",
+        "to": "13591294853",
+        "tags": {
+          "highway": "footway",
+          "footway": "crossing",
+          "crossing": "uncontrolled",
+          "crossing:markings": "zebra"
+        }
+      },
+      "connected_way_ids": [
+        "27258453",
+        "27564904",
+        "30346790",
+        "1482019889",
+        "1482019890",
+        "262597915",
+        "87791803"
+      ],
+      "evidence_note": "The petition is a reported concern. The mapped crossing and walking graph are separate evidence; the precise petition wording is not treated as a measured closure.",
+      "unknowns": [
+        "The petition does not establish current crossing accessibility or legal access.",
+        "Candidate connections are hypothetical and require site checks for surface, safety, land access and accessibility."
+      ],
+      "original_sha256": "6b74c015c48f0ef4826888b3b56b30525b74a1999babc3027bf84b64c43babcf",
+      "sanitization": {
+        "procedure": "Retain OSM bounds, attribution/license, nodes referenced by walking ways, walking way node references, and highway/foot tags; remove contributor/change attributes, relations, non-walking ways, and all other tags.",
+        "retained_way_count": 163,
+        "retained_node_count": 1031,
+        "removed_way_count": 1608,
+        "removed_tag_count": 309,
+        "removed_contact_tag_keys": [],
+        "original_contact_tag_count": 26,
+        "original_contact_tag_keys": [
+          "email",
+          "emergency:phone",
+          "phone",
+          "website"
+        ],
+        "sanitized_has_user_uid": false,
+        "sanitized_contact_tag_count": 0
+      }
+    },
+    "modeled_scenario_note": "The pedestrian interruption and proposed connections are modeled hypothetical scenarios, not observed changes."
+  },
+  "osm_import": {
+    "journeys": [
+      {
+        "id": "junction-to-north-path",
+        "origin": "302664786",
+        "destination": "1020679221"
+      },
+      {
+        "id": "junction-to-further-path",
+        "origin": "302664786",
+        "destination": "1020679285"
+      }
+    ],
+    "closure": {
+      "way_id": "1482019890",
+      "from": "302664786",
+      "to": "13591294853"
+    },
+    "candidates": [
+      {
+        "id": "east-side-path-connector",
+        "from": "302664786",
+        "to": "1021077955",
+        "metres": 180,
+        "assumption": "Straight-line planning allowance between mapped nodes; exact alignment and surface are unverified.",
+        "site_check": "Check whether a safe, accessible connection can cross the junction area without recreating the interrupted crossing."
+      },
+      {
+        "id": "north-campus-connector",
+        "from": "302664786",
+        "to": "1020679234",
+        "metres": 260,
+        "assumption": "Straight-line planning allowance between mapped nodes; land access and alignment are unverified.",
+        "site_check": "Check land ownership, gradients, winter maintenance and a safe connection to the north path."
+      },
+      {
+        "id": "south-path-connector",
+        "from": "302664786",
+        "to": "13591294826",
+        "metres": 420,
+        "assumption": "Straight-line planning allowance between mapped nodes; route geometry is not mapped as a proposed link.",
+        "site_check": "Check the southern endpoint, crossing safety, surface and accessibility before considering this option."
+      }
+    ]
+  },
+  "network": [
+    {
+      "id": "modeled-furubergvegen-vehicle-link",
+      "from": "302664786",
+      "to": "304625827",
+      "metres": 100,
+      "modes": [
+        "vehicle"
+      ],
+      "source": "https://www.openstreetmap.org/way/27258453"
+    }
+  ],
+  "journeys": [
+    {
+      "id": "junction-to-north-path",
+      "origin": "302664786",
+      "destination": "1020679221",
+      "evidence": {
+        "origin": "https://www.openstreetmap.org/node/302664786",
+        "destination": "https://www.openstreetmap.org/node/1020679221",
+        "note": "Mapped walking/cycleway graph endpoints; accessibility not verified."
+      }
+    },
+    {
+      "id": "junction-to-further-path",
+      "origin": "302664786",
+      "destination": "1020679285",
+      "evidence": {
+        "origin": "https://www.openstreetmap.org/node/302664786",
+        "destination": "https://www.openstreetmap.org/node/1020679285",
+        "note": "Mapped walking/cycleway graph endpoint farther along the connected path."
+      }
+    }
+  ],
+  "alternatives": []
+}
