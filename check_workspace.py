@@ -99,6 +99,78 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual((ringgata["journeys"][0]["baseline_metres"], ringgata["journeys"][0]["metres"]),
                          (1384, 2332))
 
+    def custom(self, case=CASE, shift=0.0):
+        journey = self.ws.case_payload(case)["journeys"][0]
+        a, b = journey["origin"]["coordinates"], journey["destination"]["coordinates"]
+        return {"origin": {"lat": a[0] + shift, "lon": a[1]}, "destination": {"lat": b[0], "lon": b[1]}}
+
+    def custom_request(self, custom, **kwargs):
+        return {**request(**kwargs), "custom_journey": custom}
+
+    def test_custom_journey_matches_preset_and_keeps_presets(self):
+        plain = self.ws.assess(request())
+        self.assertIsNone(plain["custom_journey"])
+        for case, expected in ((CASE, (201, 362)), (RINGGATA, (1384, 2332))):
+            result = self.ws.assess(self.custom_request(self.custom(case), case=case))
+            self.assertEqual(result["journeys"][0]["baseline_metres"], expected[0])
+            row = result["custom_journey"]["row"]
+            self.assertEqual((row["baseline_metres"], row["metres"]), expected)
+            self.assertEqual(result["custom_journey"]["status"], "longer")
+        with_custom = self.ws.assess(self.custom_request(self.custom()))
+        self.assertEqual(with_custom["journeys"], plain["journeys"])
+
+    def test_custom_journey_snaps_nearby_point(self):
+        result = self.ws.assess(self.custom_request(self.custom(shift=0.0003)))
+        origin = result["custom_journey"]["origin"]
+        self.assertEqual(origin["status"], "snapped")
+        self.assertGreater(origin["snap_metres"], 0)
+
+    def test_custom_journey_outside_coverage_is_not_a_closure_result(self):
+        far = self.custom()
+        far["origin"] = {"lat": 60.9, "lon": 11.0}
+        result = self.ws.assess(self.custom_request(far))
+        view = result["custom_journey"]
+        self.assertEqual((view["status"], view["origin"]["reason"]), ("outside_coverage", "outside_extract"))
+        self.assertIsNone(view["row"])
+        self.assertEqual(len(result["journeys"]), 2)
+        resolved = self.ws.resolve_journey({"case_id": CASE, "custom_journey": far})
+        self.assertEqual(resolved["sections"], [])
+
+    def test_custom_journey_unreachable_under_closure_is_distinct(self):
+        journey = {"origin": self.custom()["origin"], "destination": {"lat": 60.8044664, "lon": 11.0490872}}
+        base = self.ws.resolve_journey({"case_id": CASE, "custom_journey": journey})
+        self.assertEqual(base["status"], "ready")
+        sections = [s["id"] for s in base["sections"]]
+        result = self.ws.assess(self.custom_request(journey, projects=[project(sections=sections)]))
+        view = result["custom_journey"]
+        self.assertEqual(view["status"], "unreachable_under_closures")
+        self.assertIsNone(view["row"]["metres"])
+        self.assertEqual(view["baseline_metres"], 190)
+        self.assertEqual(view["origin"]["status"], "snapped")
+        self.assertEqual(view["destination"]["status"], "snapped")
+
+    def test_custom_sections_rejected_without_matching_journey(self):
+        with self.assertRaises(ValueError):
+            self.ws.assess(request(projects=[project(sections=("custom-section-1",))]))
+
+    def test_custom_fingerprint_and_validation(self):
+        one = self.ws.fingerprint(self.custom_request(self.custom()))
+        two = self.ws.fingerprint(self.custom_request(self.custom(shift=0.0003)))
+        self.assertNotEqual(one["assessment_fingerprint"], two["assessment_fingerprint"])
+        self.assertNotEqual(one["assessment_fingerprint"], self.ws.fingerprint(request())["assessment_fingerprint"])
+        for bad in ({"origin": {"lat": "x", "lon": 1}, "destination": {"lat": 1, "lon": 1}},
+                    {"origin": {"lat": 1, "lon": 1}},
+                    {"origin": {"lat": float("nan"), "lon": 1}, "destination": {"lat": 1, "lon": 1}},
+                    {"origin": {"lat": 91, "lon": 1}, "destination": {"lat": 1, "lon": 1}},
+                    {"origin": {"lat": True, "lon": 1}, "destination": {"lat": 1, "lon": 1}}):
+            with self.assertRaises(ValueError):
+                self.ws.assess(self.custom_request(bad))
+
+    def test_same_node_custom_journey_is_flagged(self):
+        point = self.custom()["origin"]
+        result = self.ws.resolve_journey({"case_id": CASE, "custom_journey": {"origin": point, "destination": point}})
+        self.assertEqual(result["status"], "same_place")
+
     def test_inclusive_date_boundaries(self):
         for date, active in (("2026-04-30", 0), ("2026-05-01", 1), ("2026-05-31", 1), ("2026-06-01", 0)):
             result = self.ws.assess(request(date=date))
@@ -308,6 +380,13 @@ class StaticAssetTests(unittest.TestCase):
         self.assertNotRegex(html, r"\son\w+=")
         for text in ("Mapped Hamar case", "Compare options with AI", "Assess projects"):
             self.assertIn(text, html + script)
+
+    def test_client_distinguishes_outside_coverage_from_unreachable(self):
+        script = (ROOT / "workspace" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("/api/journey", script)
+        self.assertIn("Outside map coverage", script)
+        self.assertIn("Unreachable under closures", script)
+        self.assertIn("outside loaded map coverage", script)
 
     def test_client_uses_python_fingerprint_for_staleness(self):
         script = (ROOT / "workspace" / "app.js").read_text(encoding="utf-8")

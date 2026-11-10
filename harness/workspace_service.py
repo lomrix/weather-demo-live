@@ -8,6 +8,7 @@ bounded local Ollama request made by comparison mode.
 
 import hashlib
 import json
+import math
 import re
 import threading
 from datetime import date
@@ -35,7 +36,9 @@ MAX_PROJECTS = 4
 MAX_QUESTION = 400
 MAX_NAME = 60
 MAX_SECTIONS = 60
-REQUEST_KEYS = {"case_id", "assessment_date", "projects", "question"}
+MAX_SNAP_METRES = 75
+CUSTOM_ID = "custom"
+REQUEST_KEYS = {"case_id", "assessment_date", "projects", "question", "custom_journey"}
 PROJECT_KEYS = {"name", "start_date", "end_date", "sections", "hypothetical"}
 
 CASES = {
@@ -47,7 +50,7 @@ CASES = {
         "journeys": {
             "junction-area-to-ankerskogen": ("Ringgata crossing", "Ankerskogen park path"),
         },
-        "closure_label": "Verified closure: Ringgata cycleway section",
+        "closure_label": "Mapped section (basis for the hypothetical closure): Ringgata cycleway section",
     },
     "furubergvegen-masabekkvegen": {
         "scenario": "hamar-furubergvegen-masabekkvegen.json",
@@ -58,7 +61,7 @@ CASES = {
             "junction-to-north-path": ("Junction crossing", "North cycle path"),
             "junction-to-further-path": ("Junction crossing", "Further cycle path"),
         },
-        "closure_label": "Verified closure: mapped junction crossing",
+        "closure_label": "Mapped crossing (basis for the hypothetical closure): junction crossing",
     },
 }
 
@@ -116,6 +119,30 @@ def _clean_text(value, label, limit, required=True):
     return text
 
 
+def _parse_point(value, label):
+    if not isinstance(value, dict) or set(value) != {"lat", "lon"}:
+        raise ValueError(f"{label} must have lat and lon")
+    lat, lon = value["lat"], value["lon"]
+    for name, number, limit in (("lat", lat, 90), ("lon", lon, 180)):
+        if isinstance(number, bool) or not isinstance(number, (int, float)) \
+                or not math.isfinite(number) or abs(number) > limit:
+            raise ValueError(f"{label} {name} is not a valid coordinate")
+    return round(float(lat), 6), round(float(lon), 6)
+
+
+def _parse_custom(value):
+    if value is None:
+        return None
+    if not isinstance(value, dict) or set(value) != {"origin", "destination"}:
+        raise ValueError("Custom journey needs origin and destination")
+    return {key: _parse_point(value[key], f"Custom {key}") for key in ("origin", "destination")}
+
+
+def _distance_metres(a, b):
+    scale = math.cos(math.radians((a[0] + b[0]) / 2))
+    return math.hypot((b[0] - a[0]) * 111320, (b[1] - a[1]) * 111320 * scale)
+
+
 def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
@@ -166,12 +193,18 @@ class Workspace:
                 "evidence": journey.get("evidence", {}),
             })
         sections = self._sections(scenario, links, config)
+        bounds = extract["downloaded_input"]["bounds"]
+        coverage = {key: float(bounds[key]) for key in ("minlat", "minlon", "maxlat", "maxlon")}
+        coverage["walking_node_count"] = len(nodes)
+        coverage["walking_link_count"] = len(links)
+        coverage["walking_way_count"] = extract.get("walking_way_count")
         return {
             "id": case_id,
             "config": config,
             "scenario": scenario,
             "links": links,
             "nodes": nodes,
+            "coverage": coverage,
             "candidates": candidates,
             "journeys": journeys,
             "journey_ids": {journey["id"] for journey in journeys},
@@ -193,11 +226,7 @@ class Workspace:
             "link_ids": closure_ids,
             "metres": sum(links[link_id]["metres"] for link_id in closure_ids),
         }]
-        between = {}
-        for link in links.values():
-            for pair in ((link["from"], link["to"]), (link["to"], link["from"])):
-                if pair not in between or link["metres"] < between[pair]["metres"]:
-                    between[pair] = link
+        between = Workspace._link_between(links)
         taken = set(closure_ids)
         by_way = {}
         for journey in scenario["journeys"]:
@@ -223,6 +252,104 @@ class Workspace:
                 "metres": sum(link["metres"] for link in way_links),
             })
         return sections
+
+    @staticmethod
+    def _link_between(links):
+        between = {}
+        for link in links.values():
+            for pair in ((link["from"], link["to"]), (link["to"], link["from"])):
+                if pair not in between or link["metres"] < between[pair]["metres"]:
+                    between[pair] = link
+        return between
+
+    @staticmethod
+    def _custom_sections(case, path):
+        between = Workspace._link_between(case["links"])
+        by_way = {}
+        for pair in zip(path, path[1:]):
+            link = between[pair]
+            way = link["source"].rsplit("/", 1)[-1]
+            by_way.setdefault(way, {})[link["id"]] = link
+        sections = []
+        for index, (way, way_links) in enumerate(by_way.items(), 1):
+            if index > MAX_SECTIONS:
+                break
+            sections.append({
+                "id": f"custom-section-{index}",
+                "label": f"Your route, section {index}",
+                "verified": False,
+                "custom": True,
+                "way_id": way,
+                "link_ids": list(way_links),
+                "metres": sum(link["metres"] for link in way_links.values()),
+            })
+        return sections
+
+    @staticmethod
+    def _snap(case, point, label):
+        coverage = case["coverage"]
+        lat, lon = point
+        base = {"requested": [lat, lon]}
+        if not (coverage["minlat"] <= lat <= coverage["maxlat"]
+                and coverage["minlon"] <= lon <= coverage["maxlon"]):
+            return {**base, "status": "outside_coverage", "reason": "outside_extract",
+                    "message": f"{label} is outside the loaded map extract."}
+        node_id, best = None, None
+        for candidate, coordinates in case["nodes"].items():
+            distance = _distance_metres(point, coordinates)
+            if best is None or distance < best:
+                node_id, best = candidate, distance
+        if best is None or best > MAX_SNAP_METRES:
+            return {**base, "status": "outside_coverage", "reason": "no_walking_network_nearby",
+                    "message": f"{label} is inside the extract but more than {MAX_SNAP_METRES} m "
+                                                   "from the nearest mapped walking node."}
+        return {**base, "status": "snapped", "node_id": node_id,
+                "snapped": list(case["nodes"][node_id]), "snap_metres": round(best, 1),
+                "message": f"{label} snapped to the nearest mapped walking node ({round(best)} m away)."}
+
+    def resolve_custom(self, case, custom):
+        origin = self._snap(case, custom["origin"], "Start")
+        destination = self._snap(case, custom["destination"], "Destination")
+        result = {"id": CUSTOM_ID, "origin": origin, "destination": destination,
+                  "sections": [], "baseline_metres": None, "baseline_path": []}
+        if origin["status"] != "snapped" or destination["status"] != "snapped":
+            result["status"] = "outside_coverage"
+            result["message"] = (
+                "Not assessed: an endpoint is outside the loaded map coverage. "
+                "This is a map-data limit, not a closure result."
+            )
+        elif origin["node_id"] == destination["node_id"]:
+            result["status"] = "same_place"
+            result["message"] = "Start and destination snap to the same mapped node; choose points further apart."
+        else:
+            baseline = shortest_route(
+                case["scenario"]["network"], origin["node_id"], destination["node_id"]
+            )
+            if baseline["metres"] is None:
+                result["status"] = "no_baseline_route"
+                result["message"] = (
+                    "Both points are on the map, but the saved walking network has no route "
+                    "between them even without closures (disconnected or unmapped link)."
+                )
+            else:
+                result["status"] = "ready"
+                result["message"] = "Both endpoints are inside the map and connected without closures."
+                result["baseline_metres"] = baseline["metres"]
+                result["baseline_path"] = list(baseline["path"])
+                result["sections"] = self._custom_sections(case, baseline["path"])
+        return result
+
+    def resolve_journey(self, payload):
+        if not isinstance(payload, dict) or set(payload) != {"case_id", "custom_journey"}:
+            raise ValueError("Send case_id and custom_journey")
+        try:
+            case = self.get_case(payload["case_id"])
+        except LookupError:
+            raise ValueError("Choose one of the listed Hamar cases") from None
+        custom = _parse_custom(payload["custom_journey"])
+        if custom is None:
+            raise ValueError("Custom journey needs origin and destination")
+        return self.resolve_custom(case, custom)
 
     def get_case(self, case_id):
         case = self.cases.get(case_id) if isinstance(case_id, str) else None
@@ -281,6 +408,7 @@ class Workspace:
             "label": case["config"]["label"],
             "summary": case["config"]["summary"],
             "nodes": case["nodes"],
+            "coverage": {**case["coverage"], "snap_metres": MAX_SNAP_METRES},
             "links": [
                 [link["id"], link["from"], link["to"], link["metres"]]
                 for link in case["links"].values()
@@ -306,6 +434,11 @@ class Workspace:
         except LookupError:
             raise ValueError("Choose one of the listed Hamar cases") from None
         when = parse_date(payload.get("assessment_date"), "assessment date")
+        custom = _parse_custom(payload.get("custom_journey"))
+        resolved = self.resolve_custom(case, custom) if custom else None
+        section_ids = dict(case["section_ids"])
+        if resolved:
+            section_ids.update({s["id"]: s for s in resolved["sections"]})
         raw_projects = payload.get("projects")
         if not isinstance(raw_projects, list) or not 1 <= len(raw_projects) <= MAX_PROJECTS:
             raise ValueError(f"Add between 1 and {MAX_PROJECTS} projects")
@@ -323,11 +456,11 @@ class Workspace:
                 raise ValueError(f"Project names must be unique: {name}")
             names.add(name.casefold())
             sections = raw.get("sections")
-            if not isinstance(sections, list) or not sections or len(sections) > MAX_SECTIONS + 1:
+            if not isinstance(sections, list) or not sections or len(sections) > 2 * MAX_SECTIONS + 1:
                 raise ValueError(f"{name}: choose at least one closure section")
             unique = []
             for section_id in sections:
-                if not isinstance(section_id, str) or section_id not in case["section_ids"]:
+                if not isinstance(section_id, str) or section_id not in section_ids:
                     raise ValueError(f"{name}: unknown closure section")
                 if section_id not in unique:
                     unique.append(section_id)
@@ -343,7 +476,8 @@ class Workspace:
         question = ""
         if need_question or payload.get("question"):
             question = _clean_text(payload.get("question", ""), "Question", MAX_QUESTION, need_question)
-        return {"case": case, "date": when.isoformat(), "projects": projects, "question": question}
+        return {"case": case, "date": when.isoformat(), "projects": projects, "question": question,
+                "custom": resolved, "custom_request": custom, "section_ids": section_ids}
 
     @staticmethod
     def fingerprints(norm):
@@ -355,6 +489,8 @@ class Workspace:
                 key=_canonical,
             ),
         }
+        if norm["custom_request"]:
+            core["custom_journey"] = norm["custom_request"]
         assessment = hashlib.sha256(_canonical(core).encode()).hexdigest()
         comparison = hashlib.sha256(
             _canonical({**core, "question": norm["question"]}).encode()
@@ -374,24 +510,29 @@ class Workspace:
         case = norm["case"]
         projects = []
         for project in norm["projects"]:
-            link_ids = [
+            link_ids = list(dict.fromkeys(
                 link_id for section_id in project["section_ids"]
-                for link_id in case["section_ids"][section_id]["link_ids"]
-            ]
+                for link_id in norm["section_ids"][section_id]["link_ids"]
+            ))
             projects.append({
                 "id": project["id"], "label": project["label"], "hypothetical": True,
                 "start_date": project["start_date"], "end_date": project["end_date"],
                 "restrictions": [{"type": "close_links", "mode": "walking", "link_ids": link_ids}],
             })
         scenario = case["scenario"]
+        journeys = [
+            {"id": j["id"], "origin": j["origin"], "destination": j["destination"]}
+            for j in scenario["journeys"]
+        ]
+        custom = norm["custom"]
+        if custom and custom["status"] == "ready":
+            journeys.append({"id": CUSTOM_ID, "origin": custom["origin"]["node_id"],
+                             "destination": custom["destination"]["node_id"]})
         return {
             "metadata": {"id": scenario["metadata"]["id"], "label": case["config"]["label"],
                          "synthetic": False, "offline": True},
             "network": scenario["network"],
-            "journeys": [
-                {"id": j["id"], "origin": j["origin"], "destination": j["destination"]}
-                for j in scenario["journeys"]
-            ],
+            "journeys": journeys,
             "projects": projects,
         }
 
@@ -406,15 +547,15 @@ class Workspace:
             return {
                 "id": project["id"], "label": project["label"], "hypothetical": True,
                 "start_date": project["start_date"], "end_date": project["end_date"],
-                "sections": [case["section_ids"][s]["label"] for s in sections_by_project[project["id"]]],
+                "sections": [norm["section_ids"][s]["label"] for s in sections_by_project[project["id"]]],
                 "closed_link_ids": project["closed_walking_links"],
             }
 
         active = [describe(p) for p in info["active_projects"]]
         closed = sorted({link for p in active for link in p["closed_link_ids"]})
-        rows = []
+        rows, custom_row = [], None
         for row in result["comparison"]["alternatives"][0]["journeys"]:
-            rows.append({
+            item = {
                 "journey_id": row["journey_id"],
                 "baseline_metres": row["baseline"]["metres"],
                 "baseline_path": list(row["baseline"]["path"]),
@@ -425,7 +566,20 @@ class Workspace:
                 "contributing_projects": row["contributing_projects"],
                 "individual": row["individual_projects"],
                 "overlap_effect": row["overlap_effect"],
-            })
+            }
+            if row["journey_id"] == CUSTOM_ID:
+                custom_row = item
+            else:
+                rows.append(item)
+        custom_view = None
+        if norm["custom"]:
+            custom_view = {key: value for key, value in norm["custom"].items() if key != "sections"}
+            custom_view["row"] = custom_row
+            if custom_row:
+                custom_view["status"] = {
+                    "unreachable": "unreachable_under_closures",
+                    "longer": "longer", "unchanged": "unchanged",
+                }[custom_row["status"]]
         assessment_fp, _ = self.fingerprints(norm)
         return {
             "fingerprint": assessment_fp,
@@ -437,6 +591,7 @@ class Workspace:
             "inactive_projects": [describe(p) for p in info["inactive_projects"]],
             "closed_link_ids": closed,
             "journeys": rows,
+            "custom_journey": custom_view,
         }
 
     def assess(self, payload):

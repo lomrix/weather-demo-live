@@ -40,7 +40,8 @@
       <svg id="map" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
       <p class="stale-banner" id="map-stale" hidden>Outdated: inputs changed. Recalculate to refresh the map.</p>
     </div>
-    <p class="hint" id="map-help">Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms.</p>
+    <p class="hint" id="map-help">Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.</p>
+    <p class="hint" id="coverage-note"></p>
     <fieldset class="layers">
       <legend>Map layers</legend>
       <div id="layer-list" class="layer-list"></div>
@@ -57,6 +58,26 @@
         <p class="hint" id="case-summary"></p>
         <label for="journey-select">Journey</label>
         <select id="journey-select"></select>
+        <div class="custom-journey" id="custom-journey">
+          <p class="hint" id="pick-hint">Or choose your own start and destination on the map.</p>
+          <div class="pick-row">
+            <button type="button" class="btn btn-small" id="pick-start" aria-pressed="false">Choose start on map</button>
+            <button type="button" class="btn btn-small" id="pick-dest" aria-pressed="false">Choose destination on map</button>
+            <button type="button" class="btn btn-small" id="clear-custom">Clear</button>
+          </div>
+          <details>
+            <summary>Enter coordinates instead</summary>
+            <div class="date-pair">
+              <div><label for="cj-start-lat">Start latitude</label><input type="text" inputmode="decimal" id="cj-start-lat" autocomplete="off"></div>
+              <div><label for="cj-start-lon">Start longitude</label><input type="text" inputmode="decimal" id="cj-start-lon" autocomplete="off"></div>
+            </div>
+            <div class="date-pair">
+              <div><label for="cj-dest-lat">Destination latitude</label><input type="text" inputmode="decimal" id="cj-dest-lat" autocomplete="off"></div>
+              <div><label for="cj-dest-lon">Destination longitude</label><input type="text" inputmode="decimal" id="cj-dest-lon" autocomplete="off"></div>
+            </div>
+            <button type="button" class="btn btn-small" id="apply-coords">Use these coordinates</button>
+          </details>
+        </div>
       </section>
 
       <section class="group" aria-labelledby="g-projects">
