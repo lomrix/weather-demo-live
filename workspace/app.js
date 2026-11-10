@@ -3,6 +3,7 @@
 const SVGNS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
 const LAYERS = [
+  { key: "coverage", label: "Loaded map coverage (saved extract)", stroke: "#4a6a8a", width: 2, dash: "10 5" },
   { key: "context", label: "Mapped walking network", stroke: "#b4bcc4", width: 1.5, dash: "" },
   { key: "inactive", label: "Project sections not active on this date", stroke: "#e5a9a9", width: 3, dash: "3 3" },
   { key: "baseline", label: "Baseline route (no closures)", stroke: "#1d6fd1", width: 9, dash: "", opacity: 0.55 },
@@ -18,7 +19,11 @@ const st = {
   assessStale: false, compareStale: false, busy: false, seq: 0, timer: null,
   layers: Object.fromEntries(LAYERS.map((l) => [l.key, true])),
   view: null, bounds: null, proj: null, pendingCompare: false,
+  custom: { origin: null, destination: null }, customInfo: null, pick: null, customSeq: 0,
 };
+const CUSTOM = "custom";
+const isCustom = () => st.journeyId === CUSTOM;
+const allSections = () => st.data.sections.concat(st.customInfo ? st.customInfo.sections : []);
 
 function el(tag, attrs, ...kids) {
   const node = document.createElement(tag);
@@ -39,7 +44,7 @@ function svg(tag, attrs) {
 }
 const metres = (n) => (n === null || n === undefined ? "unreachable" : `${n} m`);
 const signed = (n) => (n === null || n === undefined ? "n/a" : n === 0 ? "no change" : `${n > 0 ? "+" : "−"}${Math.abs(n)} m`);
-const journeyLabel = (id) => (st.data.journeys.find((j) => j.id === id) || { label: id }).label;
+const journeyLabel = (id) => (id === CUSTOM ? "Your journey" : (st.data.journeys.find((j) => j.id === id) || { label: id }).label);
 
 async function api(path, body) {
   const options = body === undefined ? {} : {
@@ -64,6 +69,10 @@ function payload(withQuestion) {
     })),
   };
   if (withQuestion) body.question = $("question").value.trim();
+  if (st.custom.origin && st.custom.destination) {
+    const [olat, olon] = st.custom.origin, [dlat, dlon] = st.custom.destination;
+    body.custom_journey = { origin: { lat: olat, lon: olon }, destination: { lat: dlat, lon: dlon } };
+  }
   return body;
 }
 function showError(message) {
@@ -95,6 +104,7 @@ function renderProjects() {
       el("span", {}, `${s.label} (${s.metres} m)`));
     const verified = st.data.sections.filter((s) => s.verified);
     const others = st.data.sections.filter((s) => !s.verified);
+    const mine = st.customInfo ? st.customInfo.sections : [];
     host.append(el("fieldset", { class: "project" },
       el("legend", { class: "tag" }, "Hypothetical"),
       el("div", { class: "project-head" },
@@ -110,6 +120,7 @@ function renderProjects() {
       el("div", { class: "sections" },
         el("strong", {}, "Closed walking sections"),
         verified.map((s) => sec("v", s)),
+        mine.length ? el("div", {}, el("strong", { class: "hint" }, "Sections on your journey's route"), mine.map((s) => sec("c", s))) : null,
         others.length ? el("details", {}, el("summary", {}, `Other route sections (${others.length}, hypothetical)`),
           el("div", {}, others.map((s) => sec("o", s)))) : null)));
   });
@@ -208,6 +219,7 @@ function buildProjection() {
   lat0 /= ids.length; lon0 /= ids.length;
   const kx = Math.cos((lat0 * Math.PI) / 180) * 111320, ky = 110540;
   st.proj = (lat, lon) => [(lon - lon0) * kx, -(lat - lat0) * ky];
+  st.unproj = (x, y) => [lat0 - y / ky, lon0 + x / kx];
   st.xy = {};
   let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
   for (const id of ids) {
@@ -228,6 +240,20 @@ function fitBox(box, pad) {
   applyView();
 }
 function journeyBox() {
+  if (isCustom()) {
+    const pts = [];
+    for (const key of ["origin", "destination"]) {
+      const info = st.customInfo && st.customInfo[key], raw = st.custom[key];
+      if (raw) pts.push(st.proj(raw[0], raw[1]));
+      if (info && info.snapped) pts.push(st.proj(info.snapped[0], info.snapped[1]));
+    }
+    const row = selectedRow();
+    for (const p of [row && row.baseline_path, row && row.path]) pathPoints(p || []).forEach((q) => pts.push(q));
+    if (!pts.length) return st.bounds;
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    const x = Math.min(...xs), y = Math.min(...ys);
+    return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+  }
   const j = st.data.journeys.find((x) => x.id === st.journeyId);
   const ids = new Set([j.origin.id, j.destination.id]);
   const row = st.assessment && st.assessment.journeys.find((r) => r.journey_id === j.id);
@@ -264,9 +290,13 @@ function pathPoints(ids) { return ids.map((n) => st.xy[n]).filter(Boolean); }
 function linkSegments(linkIds) {
   return linkIds.map((id) => st.linkIndex[id]).filter(Boolean).map((l) => [st.xy[l[1]], st.xy[l[2]]]);
 }
-function selectedRow() { return st.assessment && st.assessment.journeys.find((r) => r.journey_id === st.journeyId); }
+function selectedRow() {
+  if (!st.assessment) return null;
+  if (isCustom()) return (!st.assessStale && st.assessment.custom_journey && st.assessment.custom_journey.row) || null;
+  return st.assessment.journeys.find((r) => r.journey_id === st.journeyId);
+}
 function selectedOptions() {
-  if (!st.compare || st.compare.state !== "success") return [];
+  if (isCustom() || !st.compare || st.compare.state !== "success") return [];
   return st.compare.options.map((o) => ({ option: o, row: o.journeys.find((r) => r.journey_id === st.journeyId) }));
 }
 
@@ -277,6 +307,13 @@ function drawMap() {
   const row = selectedRow();
   const group = (key) => { const g = svg("g", { "data-layer": key }); if (st.layers[key]) map.append(g); return g; };
 
+  const cov = st.data.coverage, covA = st.proj(cov.maxlat, cov.minlon), covB = st.proj(cov.minlat, cov.maxlon);
+  group("coverage").append(svg("rect", {
+    x: covA[0], y: covA[1], width: covB[0] - covA[0], height: covB[1] - covA[1], fill: "none",
+    stroke: L("coverage").stroke, "stroke-width": L("coverage").width, "stroke-dasharray": L("coverage").dash,
+    "vector-effect": "non-scaling-stroke",
+  }));
+
   const ctx = group("context");
   for (const l of st.data.links) { const a = st.xy[l[1]], b = st.xy[l[2]]; if (a && b) ctx.append(polyline([a, b], L("context"))); }
 
@@ -285,7 +322,7 @@ function drawMap() {
   const inactiveIds = new Set();
   for (const p of st.projects) {
     if (activeNames.has(p.name.trim())) continue;
-    for (const sid of p.sections) { const s = st.data.sections.find((x) => x.id === sid); if (s) s.link_ids.forEach((id) => inactiveIds.add(id)); }
+    for (const sid of p.sections) { const s = allSections().find((x) => x.id === sid); if (s) s.link_ids.forEach((id) => inactiveIds.add(id)); }
   }
   for (const seg of linkSegments([...inactiveIds])) inactive.append(polyline(seg, L("inactive")));
 
@@ -313,13 +350,38 @@ function drawMap() {
   if (st.assessment) for (const seg of linkSegments(st.assessment.closed_link_ids)) closure.append(polyline(seg, L("closure")));
 
   const markers = group("markers");
-  const j = st.data.journeys.find((x) => x.id === st.journeyId);
-  for (const [pt, text, fill] of [[j.origin, `Start: ${j.origin.label}`, "#14633a"], [j.destination, `Destination: ${j.destination.label}`, "#1c2530"]]) {
-    const p = st.xy[pt.id] || st.proj(pt.coordinates[0], pt.coordinates[1]);
-    markers.append(svg("circle", { cx: p[0], cy: p[1], r: 7, fill, stroke: "#fff", "stroke-width": 2, "vector-effect": "non-scaling-stroke" }));
+  const addMarker = (p, text, fill, ring) => {
+    markers.append(svg("circle", { cx: p[0], cy: p[1], r: 7, fill: ring ? "#fff" : fill, stroke: ring ? fill : "#fff", "stroke-width": ring ? 3 : 2, "vector-effect": "non-scaling-stroke" }));
     const t = svg("text", { x: p[0], y: p[1] - 12, class: "map-label", fill, "text-anchor": "middle" });
     t.textContent = text;
     markers.append(t);
+  };
+  if (isCustom()) {
+    for (const [key, name, fill] of [["origin", "Start", "#14633a"], ["destination", "Destination", "#1c2530"]]) {
+      const raw = st.custom[key];
+      if (!raw) continue;
+      const info = st.customInfo && st.customInfo[key];
+      const requested = st.proj(raw[0], raw[1]);
+      if (info && info.status === "outside_coverage") {
+        addMarker(requested, `${name}: outside loaded map coverage`, "#0b3d75", true);
+      } else {
+        if (info && info.snapped) {
+          const s = st.proj(info.snapped[0], info.snapped[1]);
+          markers.append(svg("line", { x1: requested[0], y1: requested[1], x2: s[0], y2: s[1], stroke: fill, "stroke-width": 2, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke" }));
+          addMarker(s, info.snap_metres > 3 ? `${name} (nearest mapped node)` : name, fill, false);
+        } else {
+          addMarker(requested, name, fill, false);
+        }
+        if (info && info.snapped && info.snap_metres > 3) {
+          markers.append(svg("circle", { cx: requested[0], cy: requested[1], r: 4, fill: "#fff", stroke: fill, "stroke-width": 2, "vector-effect": "non-scaling-stroke" }));
+        }
+      }
+    }
+  } else {
+    const j = st.data.journeys.find((x) => x.id === st.journeyId);
+    for (const [pt, text, fill] of [[j.origin, `Start: ${j.origin.label}`, "#14633a"], [j.destination, `Destination: ${j.destination.label}`, "#1c2530"]]) {
+      addMarker(st.xy[pt.id] || st.proj(pt.coordinates[0], pt.coordinates[1]), text, fill, false);
+    }
   }
   renderLegend();
   const sizeNote = st.assessment ? ` · assessed for ${st.assessment.assessment_date}` : " · not assessed yet";
@@ -330,7 +392,7 @@ function drawMap() {
 function renderLegend() {
   const host = $("layer-list");
   const has = {
-    context: true, inactive: st.projects.length > 0, baseline: Boolean(st.assessment), route: Boolean(st.assessment),
+    coverage: true, context: true, inactive: st.projects.length > 0, baseline: Boolean(st.assessment), route: Boolean(st.assessment),
     closure: Boolean(st.assessment), opt1: selectedOptions().length > 0, opt2: selectedOptions().length > 1, markers: true,
   };
   const existing = host.children.length === LAYERS.length;
@@ -438,9 +500,63 @@ function aiCard() {
     el("p", { class: "hint" }, "Connector lengths are planning allowances between mapped nodes; results apply to walking only."));
 }
 
+function endpointLine(label, info) {
+  if (!info) return el("li", {}, `${label}: not resolved yet.`);
+  if (info.status === "outside_coverage") {
+    return el("li", {}, el("strong", {}, `${label}: outside loaded map coverage. `),
+      info.reason === "outside_extract" ? "This point lies outside the saved map extract (dashed outline on the map)."
+        : `This point is inside the extract but more than ${st.data.coverage.snap_metres} m from the nearest mapped walking node.`,
+      ` (${info.requested[0].toFixed(5)}, ${info.requested[1].toFixed(5)})`);
+  }
+  return el("li", {}, `${label}: on the map, snapped to the nearest mapped walking node ${Math.round(info.snap_metres)} m away.`,
+    ` (${info.requested[0].toFixed(5)}, ${info.requested[1].toFixed(5)})`);
+}
+
+function customCard() {
+  if (!isCustom()) return null;
+  const info = st.customInfo;
+  const half = st.custom.origin || st.custom.destination;
+  if (!info) {
+    return el("article", { class: "card" }, el("h3", {}, "Your journey"),
+      el("p", { class: "hint" }, half ? "Choose the other endpoint to calculate your journey." : "Press “Choose start on map” and “Choose destination on map”, then click the map. You can also enter coordinates."));
+  }
+  const res = !st.assessStale && st.assessment && st.assessment.custom_journey ? st.assessment.custom_journey : null;
+  const row = res && res.row;
+  const status = res ? res.status : info.status;
+  let pillNode, cls = "card", text;
+  if (status === "outside_coverage") {
+    pillNode = pill("Outside map coverage", "pill-outside"); cls += " outside";
+    text = "Not assessed. At least one endpoint is outside the loaded map coverage, so no route or closure effect can be calculated. This is a limit of the saved map, not a result of the closures.";
+  } else if (status === "no_baseline_route") {
+    pillNode = pill("No mapped route", "pill-warn"); cls += " stale";
+    text = info.message;
+  } else if (status === "same_place") {
+    pillNode = pill("Same place", "pill-warn"); cls += " stale"; text = info.message;
+  } else if (status === "unreachable_under_closures") {
+    pillNode = pill("Unreachable under closures", "pill-bad"); cls += " fail";
+    text = `Both endpoints are on the map and connected in the baseline without closures (${metres(row.baseline_metres)}), but the active closures cut every mapped walking route between them.`;
+  } else if (status === "longer") {
+    pillNode = pill(`Longer: ${signed(row.change_metres)}`, "pill-warn"); cls += " stale";
+    text = `Reachable under the active closures: ${metres(row.baseline_metres)} without closures, ${metres(row.metres)} with them.`;
+  } else if (status === "unchanged") {
+    pillNode = pill("Unchanged", "pill-ok"); cls += " ok";
+    text = `Reachable and unaffected: ${metres(row.baseline_metres)} with or without the active closures.`;
+  } else {
+    pillNode = pill("Ready to assess", "pill-ok"); cls += " ok";
+    text = `Both endpoints are on the map and connected without closures (${metres(info.baseline_metres)}). Choose a date and closure sections, then select “Assess projects”.`;
+  }
+  return el("article", { class: cls },
+    el("div", { class: "card-title" }, el("h3", {}, "Your journey"), el("span", {}, pillNode)),
+    el("ul", { class: "endpoint-list" }, endpointLine("Start", info.origin), endpointLine("Destination", info.destination)),
+    el("p", {}, text),
+    st.assessStale && st.assessment ? staleNote() : null,
+    row && row.contributing_projects.length ? el("p", { class: "hint" }, `Caused by: ${row.contributing_projects.map((id) => (st.assessment.active_projects.find((p) => p.id === id) || { label: id }).label).join(", ")}.`) : null,
+    el("p", { class: "hint" }, "Walking only. The AI mitigation comparison covers only the saved preset journeys."));
+}
+
 function renderResults() {
   const host = $("result-cards");
-  host.replaceChildren(assessmentCard(), aiCard());
+  host.replaceChildren(...[customCard(), assessmentCard(), aiCard()].filter(Boolean));
 }
 
 function renderEvidence() {
@@ -454,6 +570,12 @@ function renderEvidence() {
       ["Licence", `${fx.license} · ${fx.attribution}`], ["Planning source", ev.planning_source]]),
     el("p", { class: "hint" }, "The fixture hash is computed on line-ending-normalised bytes so Windows checkouts verify."));
   if (ev.interrupted_way) body.append(el("h3", {}, "Interrupted way"), el("pre", { class: "raw" }, JSON.stringify(ev.interrupted_way, null, 2)));
+  body.append(el("h3", {}, "Loaded map coverage"), el("p", { class: "hint" }, coverageText()));
+  if (st.customInfo) {
+    body.append(el("h3", {}, "Your journey: snapped nodes"), el("pre", { class: "raw" }, JSON.stringify({
+      status: st.customInfo.status, origin: st.customInfo.origin, destination: st.customInfo.destination,
+      baseline_metres: st.customInfo.baseline_metres }, null, 2)));
+  }
   if (ev.unknowns) body.append(el("h3", {}, "Unknowns"), el("pre", { class: "raw" }, JSON.stringify(ev.unknowns, null, 2)));
   if (st.assessment) {
     body.append(el("h3", {}, "Current calculation"),
@@ -482,6 +604,79 @@ function renderDiagnostics() {
     el("h3", {}, "Raw model reply"), el("pre", { class: "raw" }, d.raw_model_reply === null || d.raw_model_reply === undefined ? "(no reply received)" : d.raw_model_reply));
 }
 
+/* ---------- custom journey ---------- */
+function coverageText() {
+  const c = st.data.coverage;
+  const km = (c.maxlat - c.minlat) * 110.54, kmx = (c.maxlon - c.minlon) * 111.32 * Math.cos(((c.minlat + c.maxlat) / 2) * Math.PI / 180);
+  return `Loaded coverage (saved extract): latitude ${c.minlat}–${c.maxlat}, longitude ${c.minlon}–${c.maxlon}, about ${kmx.toFixed(1)} × ${km.toFixed(1)} km; ${c.walking_node_count} walking nodes, ${c.walking_link_count} links. Points outside it, or more than ${c.snap_metres} m from the nearest mapped walking node, cannot be assessed.`;
+}
+function syncCoordInputs() {
+  const set = (id, value) => { $(id).value = value === undefined || value === null ? "" : String(value); };
+  set("cj-start-lat", st.custom.origin && st.custom.origin[0]); set("cj-start-lon", st.custom.origin && st.custom.origin[1]);
+  set("cj-dest-lat", st.custom.destination && st.custom.destination[0]); set("cj-dest-lon", st.custom.destination && st.custom.destination[1]);
+}
+function setPick(which) {
+  st.pick = st.pick === which ? null : which;
+  $("pick-start").setAttribute("aria-pressed", String(st.pick === "origin"));
+  $("pick-dest").setAttribute("aria-pressed", String(st.pick === "destination"));
+  $("map-frame").classList.toggle("picking", Boolean(st.pick));
+  $("pick-hint").textContent = st.pick
+    ? `Click the map to place the ${st.pick === "origin" ? "start" : "destination"}.`
+    : "Or choose your own start and destination on the map.";
+}
+function selectCustom() {
+  if (!$("journey-select").querySelector(`option[value="${CUSTOM}"]`)) $("journey-select").append(el("option", { value: CUSTOM }, "Your own journey"));
+  st.journeyId = CUSTOM; $("journey-select").value = CUSTOM;
+}
+async function resolveCustom() {
+  const seq = ++st.customSeq;
+  if (!(st.custom.origin && st.custom.destination)) {
+    st.customInfo = null;
+  } else {
+    try {
+      const info = await api("/api/journey", { case_id: st.caseId, custom_journey: {
+        origin: { lat: st.custom.origin[0], lon: st.custom.origin[1] },
+        destination: { lat: st.custom.destination[0], lon: st.custom.destination[1] } } });
+      if (seq !== st.customSeq) return;
+      st.customInfo = info;
+    } catch (e) { if (seq === st.customSeq) { st.customInfo = null; showError(e.message); } }
+  }
+  const valid = new Set(allSections().map((s) => s.id));
+  for (const p of st.projects) for (const id of [...p.sections]) if (!valid.has(id)) p.sections.delete(id);
+  renderProjects(); drawMap(); renderResults(); renderEvidence();
+  if (st.customInfo) fitBox(journeyBox(), 0.25);
+}
+function setPoint(which, lat, lon) {
+  st.custom[which] = [Math.round(lat * 1e6) / 1e6, Math.round(lon * 1e6) / 1e6];
+  selectCustom(); setPick(null); syncCoordInputs();
+  st.customInfo = null;
+  inputsChanged(); drawMap(); renderResults();
+  resolveCustom();
+}
+function clearCustom() {
+  st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
+  setPick(null); syncCoordInputs();
+  const valid = new Set(st.data.sections.map((s) => s.id));
+  for (const p of st.projects) for (const id of [...p.sections]) if (!valid.has(id)) p.sections.delete(id);
+  if (isCustom()) { st.journeyId = st.data.journeys[0].id; $("journey-select").value = st.journeyId; }
+  renderProjects(); inputsChanged(); drawMap(); renderResults(); renderEvidence();
+  fitBox(journeyBox(), 0.25);
+}
+function applyCoords() {
+  showError("");
+  const num = (id) => (/^\s*-?\d{1,3}(\.\d+)?\s*$/.test($(id).value) ? Number($(id).value) : NaN);
+  const values = ["cj-start-lat", "cj-start-lon", "cj-dest-lat", "cj-dest-lon"].map(num);
+  if (values.some((v) => Number.isNaN(v))) { showError("Enter all four coordinates as decimal numbers, for example 60.8044 and 11.0490."); return; }
+  st.custom.origin = [values[0], values[1]]; st.custom.destination = [values[2], values[3]];
+  setPoint("origin", values[0], values[1]);
+}
+function mapPoint(event) {
+  const map = $("map"), pt = map.createSVGPoint();
+  pt.x = event.clientX; pt.y = event.clientY;
+  const p = pt.matrixTransform(map.getScreenCTM().inverse());
+  return st.unproj(p.x, p.y);
+}
+
 /* ---------- case loading and wiring ---------- */
 async function loadCase(id) {
   setBusy("Loading saved map…");
@@ -489,10 +684,13 @@ async function loadCase(id) {
     st.data = await api(`/api/cases/${encodeURIComponent(id)}`);
     st.caseId = id;
     st.assessment = null; st.compare = null; st.assessStale = false; st.compareStale = false;
+    st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
+    setPick(null); syncCoordInputs();
     buildProjection();
     $("case-summary").textContent = st.data.summary;
+    $("coverage-note").textContent = coverageText();
     const js = $("journey-select");
-    js.replaceChildren(...st.data.journeys.map((j) => el("option", { value: j.id }, j.label)));
+    js.replaceChildren(...st.data.journeys.map((j) => el("option", { value: j.id }, j.label)), el("option", { value: CUSTOM }, "Your own journey (choose on map)"));
     st.journeyId = st.data.journeys[0].id; js.value = st.journeyId;
     st.nextProject = 1; defaultProjects(); renderProjects();
     $("layer-list").replaceChildren();
@@ -509,11 +707,15 @@ async function init() {
   } catch (e) { $("map-caption").textContent = e.message; return; }
   $("assess-date").value = st.index.today;
   $("date-rule").textContent = "Start and end dates are inclusive.";
-  $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not.`;
+  $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
   $("mode-badge").textContent = "Walking supported · other modes planned";
   $("case-select").replaceChildren(...st.index.cases.map((c) => el("option", { value: c.id }, c.label)));
   $("case-select").addEventListener("change", (e) => loadCase(e.target.value));
   $("journey-select").addEventListener("change", (e) => { st.journeyId = e.target.value; drawMap(); renderResults(); fitBox(journeyBox(), 0.25); });
+  $("pick-start").addEventListener("click", () => { selectCustom(); setPick("origin"); drawMap(); renderResults(); });
+  $("pick-dest").addEventListener("click", () => { selectCustom(); setPick("destination"); drawMap(); renderResults(); });
+  $("clear-custom").addEventListener("click", clearCustom);
+  $("apply-coords").addEventListener("click", applyCoords);
   $("assess-date").addEventListener("input", inputsChanged);
   $("question").addEventListener("input", () => { if (st.compare) { st.compareStale = true; applyStale(); clearTimeout(st.timer); st.timer = setTimeout(checkFingerprint, 150); } });
   $("assess-btn").addEventListener("click", assess);
@@ -548,13 +750,19 @@ async function init() {
     if (actions[e.key]) { e.preventDefault(); actions[e.key](); }
   });
   let drag = null;
-  frame.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; drag = { x: e.clientX, y: e.clientY }; frame.setPointerCapture(e.pointerId); });
+  frame.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false }; frame.setPointerCapture(e.pointerId); });
   frame.addEventListener("pointermove", (e) => {
     if (!drag) return;
+    if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 4) drag.moved = true;
+    if (st.pick && !drag.moved) return;
     const rect = frame.getBoundingClientRect(), s = Math.max(st.view.w / rect.width, st.view.h / rect.height);
-    st.view.x -= (e.clientX - drag.x) * s; st.view.y -= (e.clientY - drag.y) * s; drag = { x: e.clientX, y: e.clientY }; applyView();
+    st.view.x -= (e.clientX - drag.x) * s; st.view.y -= (e.clientY - drag.y) * s; drag = { ...drag, x: e.clientX, y: e.clientY }; applyView();
   });
-  frame.addEventListener("pointerup", () => { drag = null; });
+  frame.addEventListener("pointerup", (e) => {
+    const finished = drag;
+    drag = null;
+    if (finished && !finished.moved && st.pick) { const [lat, lon] = mapPoint(e); setPoint(st.pick, lat, lon); }
+  });
   frame.addEventListener("wheel", (e) => { if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 0.87); } }, { passive: false });
   window.addEventListener("resize", () => { if (st.data) fitBox(journeyBox(), 0.25); });
   await loadCase(st.index.cases[0].id);
