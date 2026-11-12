@@ -58,6 +58,51 @@
         "baseline": [[201, 241], [201, 241]],
         "closure_only": [[362, 402], [362, 402]]
       }
+    },
+    "hamar-wider.osm": {
+      "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.040,60.796,11.090,60.810 (downloaded as two tiles because the API refused the whole box with more than 50000 nodes; merged with harness/merge_osm_tiles.py)",
+      "source_tiles": {
+        "west.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.040,60.796,11.065,60.810",
+          "retrieved_at": "2026-11-10T11:47:42+01:00",
+          "sha256": "7fae32afe0d14894cafac358836dab97128317d9815a649cd4b66a2a1353400f"
+        },
+        "east.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.065,60.796,11.090,60.810",
+          "retrieved_at": "2026-11-10T11:47:44+01:00",
+          "sha256": "5bb2a236f2042aa4999e0462f949add937d62b8b1b2e4b3320305696d5efccac"
+        }
+      },
+      "retrieved_at": "2026-11-10T11:47:44+01:00",
+      "bounds": {"minlat": 60.796, "minlon": 11.040, "maxlat": 60.810, "maxlon": 11.090},
+      "merge_procedure": "harness/merge_osm_tiles.py",
+      "original_download_sha256": "3e6a3330f015e0e9c29f0195b651d8a75cfa9f35316a7cd311c73c1ed2b06bd6",
+      "sanitized_fixture_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+      "merged_node_count_before_sanitizing": 56792,
+      "merged_way_count_before_sanitizing": 7466,
+      "retained_way_count": 689,
+      "retained_node_count": 4013,
+      "removed_contact_tag_keys": [
+        "contact:email",
+        "contact:phone",
+        "email",
+        "emergency:phone",
+        "phone",
+        "website"
+      ],
+      "route_distances_metres_before_after": {
+        "note": "Preset journey lengths computed on the preset extract and on this extract.",
+        "baseline": {
+          "junction-area-to-ankerskogen": [1384, 1384],
+          "junction-to-north-path": [201, 201],
+          "junction-to-further-path": [241, 241]
+        },
+        "closure_only": {
+          "junction-area-to-ankerskogen": [2332, 2332],
+          "junction-to-north-path": [362, 362],
+          "junction-to-further-path": [402, 402]
+        }
+      }
     }
   }
 }

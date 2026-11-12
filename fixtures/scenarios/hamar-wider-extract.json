@@ -1,0 +1,222 @@
+{
+  "metadata": {
+    "id": "hamar-wider-extract-2026",
+    "label": "Wider Hamar extract: Ringgata to Furubergvegen",
+    "synthetic": false,
+    "offline": true,
+    "source_date": "2026-11-10",
+    "planning_case": "2026/20689",
+    "planning_source": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx",
+    "plan_area_map": "https://innlandetfylke.no/_f/p1/i5d040b2a-92c0-413b-898b-2fd7b7e05583/kart-over-planomrade_varsel-om-oppstart-ringgata.pdf",
+    "secondary_plan": {
+      "name": "Johannesenl\u00f8kka",
+      "id": "080400",
+      "source": "https://arealplaner.no/hamar3403/arealplaner/search?planStatusId=0%2C1%2C2%2C6",
+      "status": "geometry not located in public register extract"
+    },
+    "map_source": "https://www.openstreetmap.org/",
+    "map_license": "OpenStreetMap contributors, ODbL 1.0",
+    "map_bbox": "11.040,60.796,11.090,60.810",
+    "map_extract": {
+      "origin": {
+        "node_id": "3223998135",
+        "coordinates": [
+          60.7988246,
+          11.0881825
+        ],
+        "role": "mapped Ringgata crossing in the junction area"
+      },
+      "destination": {
+        "node_id": "331953301",
+        "coordinates": [
+          60.8031248,
+          11.0702252
+        ],
+        "park_way_id": "44330923",
+        "role": "mapped path node near Ankerskogen park"
+      },
+      "interrupted_link": {
+        "way_id": "1396077789",
+        "from": "1020583235",
+        "to": "12922053054",
+        "coordinates": {
+          "from": [
+            60.7987973,
+            11.0880717
+          ],
+          "to": [
+            60.7999568,
+            11.0861151
+          ]
+        },
+        "section_metres_geometry": 169.4,
+        "closure_segment_ids": [
+          "osm-way-1396077789-segment-7",
+          "osm-way-1396077789-segment-8",
+          "osm-way-1396077789-segment-9",
+          "osm-way-1396077789-segment-10",
+          "osm-way-1396077789-segment-11",
+          "osm-way-1396077789-segment-12",
+          "osm-way-1396077789-segment-13"
+        ],
+        "tags": {
+          "highway": "cycleway",
+          "foot": "designated",
+          "surface": "asphalt",
+          "source": "Bing"
+        }
+      },
+      "alternative_finding": "No alternative found in the saved walking network"
+    },
+    "modeled_scenario_note": "Vehicle-only restriction and the pedestrian interruptions are modeled hypothetical scenarios, not observed closures or measured effects.",
+    "unknowns": [
+      "The exact Ringgata-Disenvegen pedestrian junction node is not confirmed; the origin is a mapped Ringgata crossing in the junction area.",
+      "Rollsl\u00f8kken skole main entrance node 2284553352 is not connected to a mapped pedestrian way.",
+      "Accessibility, maintenance, legal access and temporary construction effects are unknown."
+    ],
+    "additional_planning_notice": {
+      "name": "Furubergvegen-Masabekkvegen petition",
+      "url": "https://minsak.no/sak/3723",
+      "role": "Reported pedestrian safety concern; not proof of a mapped crossing or access."
+    }
+  },
+  "osm_import": {
+    "journeys": [
+      {
+        "id": "junction-area-to-ankerskogen",
+        "origin": "3223998135",
+        "destination": "331953301"
+      },
+      {
+        "id": "junction-to-north-path",
+        "origin": "302664786",
+        "destination": "1020679221"
+      },
+      {
+        "id": "junction-to-further-path",
+        "origin": "302664786",
+        "destination": "1020679285"
+      }
+    ],
+    "closure": {
+      "way_id": "1396077789",
+      "from": "1020583235",
+      "to": "12922053054"
+    },
+    "candidates": [
+      {
+        "id": "junction-west-connector",
+        "from": "1020583128",
+        "to": "3223998172",
+        "metres": 203,
+        "assumption": "Straight-line estimate between mapped nodes; surface and crossing safety require a site check.",
+        "site_check": "Confirm a safe, accessible crossing and whether a temporary link can connect these mapped paths."
+      },
+      {
+        "id": "central-path-connector",
+        "from": "1025058025",
+        "to": "1025058322",
+        "metres": 575,
+        "assumption": "Straight-line estimate between mapped nodes; intervening land and surface require a site check.",
+        "site_check": "Confirm land access, gradient, surface and whether the two mapped paths can be connected."
+      },
+      {
+        "id": "park-side-connector",
+        "from": "331953330",
+        "to": "5904954401",
+        "metres": 400,
+        "assumption": "Straight-line estimate between mapped nodes; park-side access requires a site check.",
+        "site_check": "Confirm the park-side connection, accessibility and any boundary or entrance constraints."
+      },
+      {
+        "id": "east-side-path-connector",
+        "from": "302664786",
+        "to": "1021077955",
+        "metres": 180,
+        "assumption": "Straight-line planning allowance between mapped nodes; exact alignment and surface are unverified.",
+        "site_check": "Check whether a safe, accessible connection can cross the junction area without recreating the interrupted crossing."
+      },
+      {
+        "id": "north-campus-connector",
+        "from": "302664786",
+        "to": "1020679234",
+        "metres": 260,
+        "assumption": "Straight-line planning allowance between mapped nodes; land access and alignment are unverified.",
+        "site_check": "Check land ownership, gradients, winter maintenance and a safe connection to the north path."
+      },
+      {
+        "id": "south-path-connector",
+        "from": "302664786",
+        "to": "13591294826",
+        "metres": 420,
+        "assumption": "Straight-line planning allowance between mapped nodes; route geometry is not mapped as a proposed link.",
+        "site_check": "Check the southern endpoint, crossing safety, surface and accessibility before considering this option."
+      }
+    ]
+  },
+  "network": [
+    {
+      "id": "osm-ringgata-83129092",
+      "from": "276029085",
+      "to": "9724073868",
+      "metres": 519,
+      "modes": [
+        "vehicle"
+      ],
+      "source": "https://www.openstreetmap.org/way/83129092"
+    },
+    {
+      "id": "osm-disenvegen-25968696",
+      "from": "3214782868",
+      "to": "1020583141",
+      "metres": 201,
+      "modes": [
+        "vehicle"
+      ],
+      "source": "https://www.openstreetmap.org/way/25968696"
+    },
+    {
+      "id": "modeled-furubergvegen-vehicle-link",
+      "from": "302664786",
+      "to": "304625827",
+      "metres": 100,
+      "modes": [
+        "vehicle"
+      ],
+      "source": "https://www.openstreetmap.org/way/27258453"
+    }
+  ],
+  "journeys": [
+    {
+      "id": "junction-area-to-ankerskogen",
+      "origin": "3223998135",
+      "destination": "331953301",
+      "evidence": {
+        "origin": "https://www.openstreetmap.org/node/3223998135",
+        "destination": "https://www.openstreetmap.org/way/44330923",
+        "destination_note": "Mapped path node nearest the named Ankerskogen park polygon."
+      }
+    },
+    {
+      "id": "junction-to-north-path",
+      "origin": "302664786",
+      "destination": "1020679221",
+      "evidence": {
+        "origin": "https://www.openstreetmap.org/node/302664786",
+        "destination": "https://www.openstreetmap.org/node/1020679221",
+        "note": "Mapped walking/cycleway graph endpoints; accessibility not verified."
+      }
+    },
+    {
+      "id": "junction-to-further-path",
+      "origin": "302664786",
+      "destination": "1020679285",
+      "evidence": {
+        "origin": "https://www.openstreetmap.org/node/302664786",
+        "destination": "https://www.openstreetmap.org/node/1020679285",
+        "note": "Mapped walking/cycleway graph endpoint farther along the connected path."
+      }
+    }
+  ],
+  "alternatives": []
+}

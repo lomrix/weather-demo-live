@@ -83,7 +83,7 @@ class ServiceTests(unittest.TestCase):
     def test_both_cases_load_with_verified_fixture(self):
         index = self.ws.index()
         self.assertEqual(index["mode"]["supported"], ["walking"])
-        self.assertEqual(len(index["cases"]), 2)
+        self.assertEqual(len(index["cases"]), 3)
         for case in index["cases"]:
             data = self.ws.case_payload(case["id"])
             self.assertTrue(data["sections"][0]["verified"])
@@ -271,6 +271,54 @@ class ServiceTests(unittest.TestCase):
             ws._busy.release()
 
 
+class WiderExtractTests(unittest.TestCase):
+    WIDER = "hamar-wider-extract"
+    RINGGATA_JUNCTION = (60.7988246, 11.0881825)
+
+    @classmethod
+    def setUpClass(cls):
+        cls.ws = Workspace(ROOT, FakeOpener(draft(cls.WIDER)))
+        data = cls.ws.case_payload(cls.WIDER)
+        cls.furu = next(j for j in data["journeys"] if j["id"] == "junction-to-north-path")["origin"]["coordinates"]
+        cls.sections = {s["id"]: s for s in data["sections"]}
+
+    def cross(self, section_ids):
+        projects = [project(sections=section_ids)] if section_ids else []
+        body = request(self.WIDER, projects=projects)
+        body["custom_journey"] = {
+            "origin": {"lat": self.furu[0], "lon": self.furu[1]},
+            "destination": {"lat": self.RINGGATA_JUNCTION[0], "lon": self.RINGGATA_JUNCTION[1]},
+        }
+        return self.ws.assess(body)
+
+    def test_wider_extract_covers_both_areas_and_keeps_preset_numbers(self):
+        data = self.ws.case_payload(self.WIDER)
+        self.assertEqual((data["coverage"]["minlon"], data["coverage"]["maxlon"]), (11.04, 11.09))
+        self.assertGreater(data["coverage"]["walking_node_count"], 4000)
+        result = self.ws.assess(request(self.WIDER))
+        self.assertEqual([(r["baseline_metres"], r["metres"]) for r in result["journeys"]],
+                         [(1384, 2332), (201, 201), (241, 241)])
+        self.assertIn("furubergvegen-crossing", self.sections)
+
+    def test_closures_in_each_area_affect_the_cross_area_route(self):
+        results = {}
+        for name, ids in (("ringgata", ["verified-closure"]), ("furu", ["furubergvegen-crossing"]),
+                          ("both", ["verified-closure", "furubergvegen-crossing"])):
+            row = self.cross(ids)["custom_journey"]["row"]
+            results[name] = (row["baseline_metres"], row["metres"])
+        self.assertEqual(results["ringgata"], (2492, 3440))
+        self.assertEqual(results["furu"], (2492, 2653))
+        self.assertEqual(results["both"], (2492, 3601))
+
+    def test_point_between_areas_is_covered(self):
+        view = self.ws.resolve_journey({
+            "case_id": self.WIDER,
+            "custom_journey": {"origin": {"lat": self.furu[0], "lon": self.furu[1]},
+                               "destination": {"lat": 60.7988246, "lon": 11.0881825}}})
+        self.assertEqual(view["status"], "ready")
+        self.assertGreater(view["baseline_metres"], 2000)
+
+
 class HttpBoundaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -312,7 +360,7 @@ class HttpBoundaryTests(unittest.TestCase):
     def test_cases_api(self):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
-        self.assertEqual(len(json.loads(body)["cases"]), 2)
+        self.assertEqual(len(json.loads(body)["cases"]), 3)
         self.assertEqual(self.call("GET", "/api/cases/unknown")[0], 404)
 
     def test_post_boundary(self):

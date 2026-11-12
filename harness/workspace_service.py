@@ -63,6 +63,25 @@ CASES = {
         },
         "closure_label": "Mapped crossing (basis for the hypothetical closure): junction crossing",
     },
+    "hamar-wider-extract": {
+        "scenario": "hamar-wider-extract.json",
+        "osm": "hamar-wider.osm",
+        "label": "Wider Hamar extract: Ringgata to Furubergvegen",
+        "summary": "One walking extract covering both mapped areas and the land between them.",
+        "journeys": {
+            "junction-area-to-ankerskogen": ("Ringgata crossing", "Ankerskogen park path"),
+            "junction-to-north-path": ("Junction crossing", "North cycle path"),
+            "junction-to-further-path": ("Junction crossing", "Further cycle path"),
+        },
+        "closure_label": "Ringgata area: mapped cycleway section (basis for the hypothetical closure)",
+        "extra_closures": [{
+            "id": "furubergvegen-crossing",
+            "label": "Furubergvegen area: mapped junction crossing (basis for the hypothetical closure)",
+            "way_id": "1482019890",
+            "from": "302664786",
+            "to": "13591294853",
+        }],
+    },
 }
 
 
@@ -228,6 +247,16 @@ class Workspace:
         }]
         between = Workspace._link_between(links)
         taken = set(closure_ids)
+        for extra in config.get("extra_closures", []):
+            ids = Workspace._way_section(links, extra)
+            taken.update(ids)
+            sections.append({
+                "id": extra["id"],
+                "label": extra["label"],
+                "verified": True,
+                "link_ids": ids,
+                "metres": sum(links[link_id]["metres"] for link_id in ids),
+            })
         by_way = {}
         for journey in scenario["journeys"]:
             path = shortest_route(
@@ -252,6 +281,23 @@ class Workspace:
                 "metres": sum(link["metres"] for link in way_links),
             })
         return sections
+
+    @staticmethod
+    def _way_section(links, closure):
+        way_links = sorted(
+            (link for link in links.values()
+             if link["source"].rsplit("/", 1)[-1] == closure["way_id"]),
+            key=lambda link: int(link["id"].rsplit("-", 1)[-1]),
+        )
+        selected, active = [], False
+        for link in way_links:
+            if link["from"] == closure["from"]:
+                active = True
+            if active:
+                selected.append(link["id"])
+                if link["to"] == closure["to"]:
+                    return selected
+        raise ValueError(f"closure section on way {closure['way_id']} is missing")
 
     @staticmethod
     def _link_between(links):

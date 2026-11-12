@@ -24,3 +24,11 @@ policy as the importer: `highway=footway`, `path`, `pedestrian`, or
 `cycleway`, or `foot=yes`/`foot=designated`, with `foot=no` taking precedence.
 The checked hashes, source URLs, retained fields, removed fields, and route
 distance parity are recorded in [`manifest.json`](manifest.json).
+
+`hamar-wider.osm` covers both preset areas and the land between them
+(lat 60.796-60.810, lon 11.040-11.090). The OSM API refused that whole box
+(more than 50000 nodes), so it was downloaded as two unedited tiles, merged with
+[`harness/merge_osm_tiles.py`](../../harness/merge_osm_tiles.py) (de-duplicated by
+id, bounds unioned), then sanitized with the command above. The manifest records
+both tile URLs and hashes, the merged-file hash, the retrieval time and the
+sanitized hash.
