@@ -414,6 +414,28 @@ class BusImpactTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.ws.assess_bus({"scenario": "published", "destination_stop_id": destination["id"]})
 
+    def test_second_published_case_and_outside_stop_list(self):
+        case_id = "hamar-b23-2026-11-12"
+        scenario = self.ws.published_bus_scenario(case_id)
+        self.assertEqual((scenario["service"], scenario["trip_id"], scenario["service_date"]),
+                         ("B23", "INN:ServiceJourney:81731", "2026-11-12"))
+        result = self.ws.assess_bus({"scenario": case_id, "destination_stop_id": "NSR:Quay:18066"})
+        self.assertEqual((result["normal"]["stop_id"], result["normal"]["metres"]),
+                         ("NSR:Quay:18001", 484))
+        self.assertEqual((result["skipped"]["stop_id"], result["skipped"]["metres"]),
+                         ("NSR:Quay:17995", 906))
+        expected = [stop["id"] for stop in scenario["stops"][:25]]
+        self.assertEqual(result["outside_coverage_stop_ids"], expected)
+        self.assertEqual(result["outside_coverage_stops"], len(expected))
+        self.assertIsNone(result["bus_delay"])
+        with patch.dict(scenario["stops"][0], {"for_boarding": False}):
+            filtered = self.ws.assess_bus({"scenario": case_id, "destination_stop_id": "NSR:Quay:18066"})
+            self.assertEqual(filtered["outside_coverage_stop_ids"], expected[1:])
+        with self.assertRaises(ValueError):
+            self.ws.assess_bus({"scenario": case_id, "destination_stop_id": "NSR:Quay:105440"})
+        with self.assertRaises(ValueError):
+            self.ws.assess_bus({"scenario": "unknown", "destination_stop_id": "NSR:Quay:18066"})
+
 
 class HttpBoundaryTests(unittest.TestCase):
     @classmethod
@@ -456,7 +478,10 @@ class HttpBoundaryTests(unittest.TestCase):
     def test_cases_api(self):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
-        self.assertEqual(len(json.loads(body)["cases"]), 3)
+        index = json.loads(body)
+        self.assertEqual(len(index["cases"]), 3)
+        self.assertEqual([case["id"] for case in index["bus_cases"]],
+                         ["hamar-b21-2026-11-12", "hamar-b23-2026-11-12"])
         self.assertEqual(self.call("GET", "/api/cases/unknown")[0], 404)
 
     def test_bus_scenario_http_boundary(self):
@@ -478,6 +503,15 @@ class HttpBoundaryTests(unittest.TestCase):
                                     {"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["skipped"]["metres"], 933)
+        status, body, _ = self.call("GET", "/api/bus/published/hamar-b23-2026-11-12")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["trip_id"], "INN:ServiceJourney:81731")
+        status, body, _ = self.call("POST", "/api/bus/assess",
+                                    {"scenario": "hamar-b23-2026-11-12", "destination_stop_id": "NSR:Quay:18066"})
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["skipped"]["metres"], 906)
+        self.assertEqual(self.call("GET", "/api/bus/published/unknown")[0], 404)
+        self.assertEqual(self.call("GET", "/api/bus/published/..%2f..%2fREADME.md")[0], 404)
 
     def test_post_boundary(self):
         good = request(question="Help?")

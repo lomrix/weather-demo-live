@@ -622,7 +622,7 @@ function renderResults() {
   const host = $("result-cards");
   if (st.bus) {
     const scenario = st.bus.scenario, result = st.bus.result;
-    const kind = scenario.synthetic ? "Synthetic" : "Published B21";
+    const kind = scenario.synthetic ? "Synthetic" : `Published ${scenario.service}`;
     if (!result) {
       host.replaceChildren(el("article", { class: "card" }, el("h3", {}, `${kind} bus stop access`),
         el("p", {}, "No bus access calculation is available.")));
@@ -645,7 +645,14 @@ function renderResults() {
       alternative && result.normal.metres !== null ? el("p", {}, `Walking change: ${signed(result.skipped.metres - result.normal.metres)}${scenario.synthetic ? "" : " between snapped-node routes"}.`) : null,
       el("p", { class: "hint" }, scenario.synthetic
         ? "The alternative is the closest reachable stop still served by this same synthetic trip before the destination. Bus delay: unknown. No walking closures applied."
-        : `Closest reachable boardable stop within this saved map only; ${result.outside_coverage_stops} eligible earlier stops outside coverage were not assessed. Bus delay: unknown. No walking closures applied.`),
+        : `Closest reachable boardable stop within this saved map only; ${result.outside_coverage_stops} eligible earlier stops outside walking-map coverage were not assessed. Bus delay: unknown. No walking closures applied.`),
+      result.outside_coverage_stop_ids.length ? el("details", { open: true },
+        el("summary", {}, "Eligible stops outside walking-map coverage"),
+        el("ul", {}, result.outside_coverage_stop_ids.map((id) => {
+          const stop = busStop(id);
+          const reason = stop.snap_reason === "no_walking_network_nearby" ? "no mapped walking node within 75 m" : "outside extract";
+          return el("li", {}, `${stop.name} (${stop.id}) — ${reason}`);
+        }))) : null,
       scenario.synthetic ? null : el("p", { class: "hint" }, `Straight-line snap offsets, not included in the walks: ${usual.name} ${usual.snap_metres} m${alternative ? `; ${alternative.name} ${alternative.snap_metres} m` : ""}.`),
       scenario.synthetic ? el("p", { class: "hint" }, "The fictional trip and stops are not published service facts.") : null));
     return;
@@ -786,13 +793,13 @@ function mapPoint(event) {
 function setBusView(active) {
   for (const id of ["walking-case", "walking-projects", "walking-ai"]) $(id).hidden = active;
   $("load-bus").hidden = active;
-  $("load-published-bus").hidden = active;
+  $("published-bus-picker").hidden = active;
   $("bus-controls").hidden = !active;
   $("diagnostics").hidden = active;
   $("map-help").textContent = active
     ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
     : "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.";
-  $("mode-badge").textContent = active ? `${st.bus.scenario.synthetic ? "Synthetic" : "Dated B21"} bus scenario · walking access` : "Walking supported · other modes planned";
+  $("mode-badge").textContent = active ? `${st.bus.scenario.synthetic ? "Synthetic" : `Dated ${st.bus.scenario.service}`} bus scenario · walking access` : "Walking supported · other modes planned";
 }
 
 async function updateBus() {
@@ -802,7 +809,7 @@ async function updateBus() {
   applyStale(); drawMap();
   setBusy("Calculating bus stop access locally…");
   try {
-    st.bus.result = await api("/api/bus/assess", { destination_stop_id: $("bus-destination").value, scenario: st.bus.scenario.synthetic ? "synthetic" : "published" });
+    st.bus.result = await api("/api/bus/assess", { destination_stop_id: $("bus-destination").value, scenario: st.bus.scenario.synthetic ? "synthetic" : $("published-bus-case").value });
   } catch (e) {
     $("bus-summary").textContent = "Bus access could not be calculated; see the error below.";
     showError(e.message);
@@ -818,7 +825,7 @@ async function loadBus(published = false) {
   showError("");
   setBusy("Loading bus scenario…");
   try {
-    const scenario = await api(published ? "/api/bus/published" : "/api/bus");
+    const scenario = await api(published ? `/api/bus/published/${encodeURIComponent($("published-bus-case").value)}` : "/api/bus");
     st.layers = Object.fromEntries(LAYERS.map((layer) => [layer.key, true]));
     $("demo-controls").hidden = true;
     if (!await loadCase(scenario.case_id)) return;
@@ -938,6 +945,7 @@ async function init() {
   $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
   $("mode-badge").textContent = "Walking supported · other modes planned";
   $("case-select").replaceChildren(...st.index.cases.map((c) => el("option", { value: c.id }, c.label)));
+  $("published-bus-case").replaceChildren(...st.index.bus_cases.map((c) => el("option", { value: c.id }, c.label)));
   $("load-bus").addEventListener("click", () => loadBus());
   $("load-published-bus").addEventListener("click", () => loadBus(true));
   $("close-bus").addEventListener("click", closeBus);

@@ -100,6 +100,11 @@ class Handler(BaseHTTPRequestHandler):
             self._json(200, self.server.workspace.bus_scenario())
         elif path == "/api/bus/published":
             self._json(200, self.server.workspace.published_bus_scenario())
+        elif path.startswith("/api/bus/published/") and "/" not in path[len("/api/bus/published/"):]:
+            try:
+                self._json(200, self.server.workspace.published_bus_scenario(path[len("/api/bus/published/"):]))
+            except LookupError:
+                self._json(404, {"error": "Unknown published bus case"})
         elif path.startswith("/api/cases/") and "/" not in path[len("/api/cases/"):]:
             try:
                 self._json(200, self.server.workspace.case_payload(path[len("/api/cases/"):]))

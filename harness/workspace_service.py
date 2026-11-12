@@ -41,6 +41,11 @@ CUSTOM_ID = "custom"
 REQUEST_KEYS = {"case_id", "assessment_date", "projects", "question", "custom_journey"}
 PROJECT_KEYS = {"name", "start_date", "end_date", "sections", "hypothetical"}
 
+PUBLISHED_BUS_CASES = {
+    "hamar-b21-2026-11-12": "hamar-b21-2026-11-12.json",
+    "hamar-b23-2026-11-12": "hamar-b23-2026-11-12.json",
+}
+
 CASES = {
     "ringgata-ankerskogen": {
         "scenario": "hamar-ringgata-ankerskogen.json",
@@ -192,10 +197,17 @@ class Workspace:
         if any(node not in case["nodes"] for node in
                [self.bus["origin"]["node_id"]] + [stop["node_id"] for stop in stops]):
             raise ValueError("Synthetic bus points must be on the saved walking network")
-        self.published_bus = json.loads(
-            (self.root / "fixtures" / "scenarios" / "hamar-b21-2026-11-12.json").read_text(encoding="utf-8")
+        self.published_buses = {
+            case_id: self._load_published_bus(filename)
+            for case_id, filename in PUBLISHED_BUS_CASES.items()
+        }
+        self.default_published_bus_id = next(iter(self.published_buses))
+        self.published_bus = self.published_buses[self.default_published_bus_id]
+
+    def _load_published_bus(self, filename):
+        published = json.loads(
+            (self.root / "fixtures" / "scenarios" / filename).read_text(encoding="utf-8")
         )
-        published = self.published_bus
         case = self.get_case(published["case_id"])
         ids = [stop["id"] for stop in published["stops"]]
         if (published["synthetic"] is not False or len(ids) != len(set(ids))
@@ -210,11 +222,13 @@ class Workspace:
             snap = self._snap(case, point, "Bus stop")
             stop["node_id"] = snap.get("node_id")
             stop["snap_metres"] = snap.get("snap_metres")
+            stop["snap_reason"] = snap.get("reason")
         usual = published["stops"][ids.index(published["usual_stop_id"])]
         destination = published["stops"][ids.index(published["default_destination_stop_id"])]
         if (not usual["for_boarding"] or usual["timing_point"] or not usual["node_id"]
                 or not destination["for_alighting"] or destination["timing_point"] or not destination["node_id"]):
             raise ValueError("Published bus scenario needs a mapped boardable usual stop and alightable destination")
+        return published
 
     def _load_case(self, case_id, config, manifest):
         osm = self.root / "fixtures" / "maps" / config["osm"]
@@ -440,8 +454,15 @@ class Workspace:
             raise LookupError("Unknown case")
         return case
 
-    def bus_scenario(self, published=False):
-        bus = self.published_bus if published else self.bus
+    def bus_scenario(self, published=False, case_id=None):
+        if published:
+            if case_id is None:
+                case_id = self.default_published_bus_id
+            bus = self.published_buses.get(case_id) if isinstance(case_id, str) else None
+            if bus is None:
+                raise LookupError("Unknown published bus case")
+        else:
+            bus = self.bus
         case = self.get_case(bus["case_id"])
         origin = bus["origin"]
         return {
@@ -453,17 +474,23 @@ class Workspace:
             ],
         }
 
-    def published_bus_scenario(self):
-        return self.bus_scenario(published=True)
+    def published_bus_scenario(self, case_id=None):
+        return self.bus_scenario(published=True, case_id=case_id)
 
     def assess_bus(self, payload):
         if not isinstance(payload, dict) or set(payload) not in (
                 {"destination_stop_id"}, {"destination_stop_id", "scenario"}):
             raise ValueError("Choose a destination stop")
         scenario = payload.get("scenario", "synthetic")
-        if scenario not in ("synthetic", "published"):
+        if not isinstance(scenario, str):
             raise ValueError("Choose a listed bus scenario")
-        bus = self.published_bus if scenario == "published" else self.bus
+        if scenario == "synthetic":
+            bus = self.bus
+        else:
+            bus_id = self.default_published_bus_id if scenario == "published" else scenario
+            bus = self.published_buses.get(bus_id)
+            if bus is None:
+                raise ValueError("Choose a listed bus scenario")
         stops = bus["stops"]
         ids = [stop["id"] for stop in stops]
         destination = payload["destination_stop_id"]
@@ -472,23 +499,23 @@ class Workspace:
         usual_index, destination_index = ids.index(bus["usual_stop_id"]), ids.index(destination)
         if destination_index <= usual_index:
             raise ValueError("The destination must be after the usual stop")
-        if scenario == "published" and (not stops[destination_index]["for_alighting"]
-                                        or stops[destination_index]["timing_point"]
-                                        or not stops[destination_index]["node_id"]):
+        if not bus["synthetic"] and (not stops[destination_index]["for_alighting"]
+                                     or stops[destination_index]["timing_point"]
+                                     or not stops[destination_index]["node_id"]):
             raise ValueError("Choose an alightable destination within the walking map")
         case = self.get_case(bus["case_id"])
         network = case["scenario"]["network"]
         origin = bus["origin"]["node_id"]
         usual = stops[usual_index]
         normal = shortest_route(network, origin, usual["node_id"])
-        choices, outside_coverage = [], 0
+        choices, outside_coverage = [], []
         for index, stop in enumerate(stops[:destination_index]):
             if stop["id"] == usual["id"]:
                 continue
-            if scenario == "published" and (not stop["for_boarding"] or stop["timing_point"]):
+            if not bus["synthetic"] and (not stop["for_boarding"] or stop["timing_point"]):
                 continue
             if not stop["node_id"]:
-                outside_coverage += 1
+                outside_coverage.append(stop["id"])
                 continue
             route = shortest_route(network, origin, stop["node_id"])
             if route["metres"] is not None:
@@ -504,7 +531,8 @@ class Workspace:
                  "stop_id": None, "metres": None, "path": []}
             ),
             "bus_delay": None,
-            "outside_coverage_stops": outside_coverage,
+            "outside_coverage_stops": len(outside_coverage),
+            "outside_coverage_stop_ids": outside_coverage,
         }
 
     def index(self):
@@ -512,6 +540,10 @@ class Workspace:
             "today": date.today().isoformat(),
             "mode": {"supported": ["walking"], "note": "Walking only for now; other modes are planned."},
             "ai": {"model": MODEL, "endpoint": OLLAMA_URL, "timeout_seconds": TIMEOUT_SECONDS},
+            "bus_cases": [
+                {"id": case_id, "label": f"{bus['service']} · {bus['direction']} · {bus['service_date']}"}
+                for case_id, bus in self.published_buses.items()
+            ],
             "cases": [
                 {"id": case["id"], "label": case["config"]["label"],
                  "summary": case["config"]["summary"]}

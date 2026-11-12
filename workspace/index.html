@@ -55,7 +55,11 @@
       <section class="group" aria-labelledby="g-bus">
         <h2 id="g-bus">Bus stop access</h2>
         <button type="button" class="btn btn-small" id="load-bus">Load synthetic bus scenario</button>
-        <button type="button" class="btn btn-small" id="load-published-bus">Load dated B21 scenario</button>
+        <div id="published-bus-picker">
+          <label for="published-bus-case">Published dated bus trip</label>
+          <select id="published-bus-case"></select>
+          <button type="button" class="btn btn-small" id="load-published-bus">Load published bus scenario</button>
+        </div>
         <div id="bus-controls" hidden>
           <p id="bus-service"></p>
           <p class="hint" id="bus-disclaimer"></p>
