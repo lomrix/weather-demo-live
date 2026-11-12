@@ -20,6 +20,7 @@ const st = {
   layers: Object.fromEntries(LAYERS.map((l) => [l.key, true])),
   view: null, bounds: null, proj: null, pendingCompare: false,
   custom: { origin: null, destination: null }, customInfo: null, pick: null, customSeq: 0,
+  demoBusy: false,
 };
 const CUSTOM = "custom";
 const isCustom = () => st.journeyId === CUSTOM;
@@ -85,7 +86,7 @@ function setBusy(message) {
   const busy = $("busy");
   busy.hidden = !message;
   busy.textContent = message || "";
-  for (const id of ["assess-btn", "compare-btn"]) $(id).disabled = st.busy;
+  $("plan-fields").disabled = st.busy || st.demoBusy;
 }
 
 function defaultProjects() {
@@ -142,7 +143,7 @@ function onProjectInput(event) {
 /* ---------- stale handling: Python owns the fingerprint ---------- */
 function applyStale() {
   const anyResult = Boolean(st.assessment || st.compare);
-  const staleAny = st.assessStale || st.compareStale;
+  const staleAny = st.assessStale || (st.compareStale && $("demo-controls").hidden);
   $("map-stale").hidden = !staleAny;
   $("map-frame").classList.toggle("stale", staleAny);
   const chip = $("map-freshness");
@@ -151,6 +152,7 @@ function applyStale() {
   renderResults();
 }
 function inputsChanged() {
+  $("demo-controls").hidden = true;
   showError("");
   if (st.assessment) st.assessStale = true;
   if (st.compare) st.compareStale = true;
@@ -186,6 +188,12 @@ async function assess() {
   } finally {
     setBusy("");
     applyStale(); drawMap(); renderEvidence();
+    if (!$("demo-controls").hidden) {
+      const row = !st.assessStale && st.assessment && st.assessment.custom_journey && st.assessment.custom_journey.row;
+      $("demo-distance").textContent = row
+        ? `Walking distance: ${metres(row.metres)} (baseline ${metres(row.baseline_metres)})`
+        : "Demo route could not be calculated; see the error below.";
+    }
   }
 }
 async function compareWithAi() {
@@ -385,7 +393,9 @@ function drawMap() {
   }
   renderLegend();
   const sizeNote = st.assessment ? ` · assessed for ${st.assessment.assessment_date}` : " · not assessed yet";
-  $("map-caption").textContent = `${journeyLabel(st.journeyId)}${sizeNote}. Walking network only.`;
+  const demo = $("demo-controls").hidden ? "" : "Hypothetical demo · ";
+  const demoDistance = demo && row ? ` · ${metres(row.metres)}` : "";
+  $("map-caption").textContent = `${demo}${journeyLabel(st.journeyId)}${demoDistance}${sizeNote}. Walking network only.`;
   $("map").setAttribute("aria-label", `Map of ${journeyLabel(st.journeyId)}`);
 }
 
@@ -546,7 +556,8 @@ function customCard() {
     text = `Both endpoints are on the map and connected without closures (${metres(info.baseline_metres)}). Choose a date and closure sections, then select “Assess projects”.`;
   }
   return el("article", { class: cls },
-    el("div", { class: "card-title" }, el("h3", {}, "Your journey"), el("span", {}, pillNode)),
+    el("div", { class: "card-title" }, el("h3", {}, "Your journey"),
+      el("span", {}, $("demo-controls").hidden ? null : pill("Hypothetical demo", "pill-hyp"), " ", pillNode)),
     el("ul", { class: "endpoint-list" }, endpointLine("Start", info.origin), endpointLine("Destination", info.destination)),
     el("p", {}, text),
     st.assessStale && st.assessment ? staleNote() : null,
@@ -679,6 +690,7 @@ function mapPoint(event) {
 
 /* ---------- case loading and wiring ---------- */
 async function loadCase(id) {
+  clearTimeout(st.timer); st.seq++;
   setBusy("Loading saved map…");
   try {
     st.data = await api(`/api/cases/${encodeURIComponent(id)}`);
@@ -698,7 +710,58 @@ async function loadCase(id) {
     fitBox(st.bounds, 0.08);
     drawMap(); applyStale(); renderEvidence(); renderDiagnostics();
     fitBox(journeyBox(), 0.25);
-  } catch (e) { showError(e.message); } finally { setBusy(""); }
+    return true;
+  } catch (e) { showError(e.message); return false; } finally { setBusy(""); }
+}
+
+async function updateDemo() {
+  const choice = $("demo-closures").value;
+  $("demo-distance").textContent = "Calculating demo route locally…";
+  const active = {
+    ringgata: choice === "ringgata" || choice === "both",
+    furubergvegen: choice === "furubergvegen" || choice === "both",
+  };
+  const day = "2026-05-15", inactive = "2026-05-14";
+  $("assess-date").value = day;
+  st.projects = [
+    { uid: st.nextProject++, name: "Hypothetical Ringgata closure", start: active.ringgata ? day : inactive, end: active.ringgata ? day : inactive, sections: new Set(["verified-closure"]) },
+    { uid: st.nextProject++, name: "Hypothetical Furubergvegen closure", start: active.furubergvegen ? day : inactive, end: active.furubergvegen ? day : inactive, sections: new Set(["furubergvegen-crossing"]) },
+  ];
+  renderProjects();
+  if (st.assessment) st.assessStale = true;
+  if (st.compare) st.compareStale = true;
+  applyStale(); drawMap();
+  await assess();
+  const row = !st.assessStale && st.assessment && st.assessment.custom_journey && st.assessment.custom_journey.row;
+  if (row) fitBox(journeyBox(), 0.25);
+}
+
+async function loadDemo() {
+  st.demoBusy = true; $("plan-fields").disabled = true;
+  $("demo-controls").hidden = true;
+  showError("");
+  try {
+    st.layers = Object.fromEntries(LAYERS.map((layer) => [layer.key, true]));
+    if (!await loadCase("hamar-wider-extract")) return;
+    $("case-select").value = st.caseId;
+    const start = st.data.journeys.find((j) => j.id === "junction-to-north-path");
+    const end = st.data.journeys.find((j) => j.id === "junction-area-to-ankerskogen");
+    if (!start || !end || !st.data.sections.some((s) => s.id === "furubergvegen-crossing")) {
+      throw new Error("The saved demo journey or closure sections are unavailable.");
+    }
+    st.custom = { origin: [...start.origin.coordinates], destination: [...end.origin.coordinates] };
+    selectCustom(); syncCoordInputs();
+    await resolveCustom();
+    if (!st.customInfo) return;
+    if (st.customInfo.status !== "ready") throw new Error(`Demo journey cannot be assessed: ${st.customInfo.message}`);
+    $("demo-closures").value = "none";
+    $("demo-controls").hidden = false;
+    await updateDemo();
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    st.demoBusy = false; $("plan-fields").disabled = st.busy;
+  }
 }
 
 async function init() {
@@ -710,10 +773,12 @@ async function init() {
   $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
   $("mode-badge").textContent = "Walking supported · other modes planned";
   $("case-select").replaceChildren(...st.index.cases.map((c) => el("option", { value: c.id }, c.label)));
-  $("case-select").addEventListener("change", (e) => loadCase(e.target.value));
-  $("journey-select").addEventListener("change", (e) => { st.journeyId = e.target.value; drawMap(); renderResults(); fitBox(journeyBox(), 0.25); });
-  $("pick-start").addEventListener("click", () => { selectCustom(); setPick("origin"); drawMap(); renderResults(); });
-  $("pick-dest").addEventListener("click", () => { selectCustom(); setPick("destination"); drawMap(); renderResults(); });
+  $("load-demo").addEventListener("click", loadDemo);
+  $("demo-closures").addEventListener("change", updateDemo);
+  $("case-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; loadCase(e.target.value); });
+  $("journey-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; st.journeyId = e.target.value; drawMap(); renderResults(); fitBox(journeyBox(), 0.25); });
+  $("pick-start").addEventListener("click", () => { $("demo-controls").hidden = true; selectCustom(); setPick("origin"); drawMap(); renderResults(); });
+  $("pick-dest").addEventListener("click", () => { $("demo-controls").hidden = true; selectCustom(); setPick("destination"); drawMap(); renderResults(); });
   $("clear-custom").addEventListener("click", clearCustom);
   $("apply-coords").addEventListener("click", applyCoords);
   $("assess-date").addEventListener("input", inputsChanged);
