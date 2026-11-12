@@ -103,6 +103,128 @@
           "junction-to-further-path": [402, 402]
         }
       }
+    },
+    "hamar-urban.osm": {
+      "source_url": "https://api.openstreetmap.org/api/0.6/map (tiled bounding box)",
+      "source_tiles": {
+        "tile-000-000.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0200000,60.7800000,11.0400000,60.8000000",
+          "retrieved_at": "2026-11-12T16:42:11.676229+00:00",
+          "sha256": "9ed7f72878081c675b2b2565dfd9947f2ab0b054137bf99197a9245e77f2dbd6"
+        },
+        "tile-000-001.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0400000,60.7800000,11.0600000,60.8000000",
+          "retrieved_at": "2026-11-12T16:42:12.734272+00:00",
+          "sha256": "e687f92355ddab6b2c6c523b12f085c2a3d38ebefb5c86187f45ce8b537d7c8e"
+        },
+        "tile-000-002.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0600000,60.7800000,11.0800000,60.8000000",
+          "retrieved_at": "2026-11-12T16:42:14.038797+00:00",
+          "sha256": "8e76cbd8b9c5720d5ec6af3f2dd77fd70b5602ab051beeb02a32126483b73d9b"
+        },
+        "tile-000-003.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0800000,60.7800000,11.1000000,60.8000000",
+          "retrieved_at": "2026-11-12T16:42:15.819647+00:00",
+          "sha256": "1e2df5c6b9383dde3d3ace66018fc985e1c613441b67f49839f0dd2e92d7b69c"
+        },
+        "tile-000-004.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.1000000,60.7800000,11.1200000,60.8000000",
+          "retrieved_at": "2026-11-12T16:42:17.089525+00:00",
+          "sha256": "4be33f6ab527ce516c4c786e87617edd54e4cb25dcd8aef60916e16cbc1a1740"
+        },
+        "tile-000-005.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.1200000,60.7800000,11.1400000,60.8000000",
+          "retrieved_at": "2026-11-12T16:42:18.004159+00:00",
+          "sha256": "08c08989cb9e41481ad44b9721e72629f2906055f1f2841ecc426f8db014b717"
+        },
+        "tile-001-000.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0200000,60.8000000,11.0400000,60.8200000",
+          "retrieved_at": "2026-11-12T16:42:19.465680+00:00",
+          "sha256": "5b4ec92a411a8903244bf5fd8a9e8f4f03c29da5e797a0a22b0c27ef90575873"
+        },
+        "tile-001-001.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0400000,60.8000000,11.0600000,60.8200000",
+          "retrieved_at": "2026-11-12T16:42:21.532217+00:00",
+          "sha256": "444d4bccd8b54cf8400d889e034f012cbffe564cc1739f677492ca1248e36114"
+        },
+        "tile-001-002.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0600000,60.8000000,11.0800000,60.8200000",
+          "retrieved_at": "2026-11-12T16:42:23.106938+00:00",
+          "sha256": "ccc840e44c9f33a9b484aa0b1890067f41c93372ed80640d3562f5b12bc74dc0"
+        },
+        "tile-001-003.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0800000,60.8000000,11.1000000,60.8200000",
+          "retrieved_at": "2026-11-12T16:42:24.407559+00:00",
+          "sha256": "80e9cdd18e78fe5c912601739e1a8985417f5ca4bd623ba568802d2cf97629e3"
+        },
+        "tile-001-004.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.1000000,60.8000000,11.1200000,60.8200000",
+          "retrieved_at": "2026-11-12T16:42:25.188714+00:00",
+          "sha256": "d7f10e8538ef255e3d20b17d6e968a4e8fd9f2c2f06397318674e3a885b21b76"
+        },
+        "tile-001-005.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.1200000,60.8000000,11.1400000,60.8200000",
+          "retrieved_at": "2026-11-12T16:42:26.131707+00:00",
+          "sha256": "994c9b8bbc7eadc86e12f0d2a3d0174956a258d2d55df56931f3b90c66146bc0"
+        },
+        "tile-002-000.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0200000,60.8200000,11.0400000,60.8400000",
+          "retrieved_at": "2026-11-12T16:42:26.650949+00:00",
+          "sha256": "6d413a509a4bcbb9fbaa3c42b114d75106d5e85eb3373d92397764b8a8ba994c"
+        },
+        "tile-002-001.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0400000,60.8200000,11.0600000,60.8400000",
+          "retrieved_at": "2026-11-12T16:42:27.467244+00:00",
+          "sha256": "669a1be01ec32c1c29c1c20112bb93a17805ee5b696e52f9afae696aa1e503b9"
+        },
+        "tile-002-002.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0600000,60.8200000,11.0800000,60.8400000",
+          "retrieved_at": "2026-11-12T16:42:28.310424+00:00",
+          "sha256": "d5177d25ed47184d2289d3850159b862400f3175c6dfc0c8e9853fd52bfc6b77"
+        },
+        "tile-002-003.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.0800000,60.8200000,11.1000000,60.8400000",
+          "retrieved_at": "2026-11-12T16:42:28.908393+00:00",
+          "sha256": "0b288d26457d97daa9560a0caab62f1f14285c5b4f5b97ce3e00689b8fa92354"
+        },
+        "tile-002-004.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.1000000,60.8200000,11.1200000,60.8400000",
+          "retrieved_at": "2026-11-12T16:42:29.315178+00:00",
+          "sha256": "09ba67df6e334929390b056c268ba49f1e459d71be44b669d794854761ad02f7"
+        },
+        "tile-002-005.osm": {
+          "source_url": "https://api.openstreetmap.org/api/0.6/map?bbox=11.1200000,60.8200000,11.1400000,60.8400000",
+          "retrieved_at": "2026-11-12T16:42:29.998466+00:00",
+          "sha256": "b1b2080e0f3a7e76edc3bc240ab08ece4806cb3a12a57da88bfac95995edabb5"
+        }
+      },
+      "retrieved_at": "2026-11-12T16:42:29.998466+00:00",
+      "bounds": {
+        "minlat": 60.78,
+        "minlon": 11.02,
+        "maxlat": 60.84,
+        "maxlon": 11.14
+      },
+      "merge_procedure": "harness/merge_osm_tiles.py",
+      "original_download_sha256": "2b692056a4f7da23fe049fe03850466b10e329320b069889f668af093bb87afd",
+      "sanitized_fixture_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+      "merged_node_count_before_sanitizing": 208396,
+      "merged_way_count_before_sanitizing": 24971,
+      "retained_way_count": 2620,
+      "retained_node_count": 16321,
+      "removed_contact_tag_keys": [
+        "communication:mobile_phone",
+        "contact:email",
+        "contact:facebook",
+        "contact:instagram",
+        "contact:phone",
+        "contact:twr",
+        "contact:website",
+        "email",
+        "emergency:phone",
+        "phone",
+        "website"
+      ]
     }
   }
 }

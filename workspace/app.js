@@ -653,6 +653,12 @@ function renderResults() {
           const reason = stop.snap_reason === "no_walking_network_nearby" ? "no mapped walking node within 75 m" : "outside extract";
           return el("li", {}, `${stop.name} (${stop.id}) — ${reason}`);
         }))) : null,
+      result.unreachable_stop_ids.length ? el("details", { open: true },
+        el("summary", {}, "Eligible mapped stops with no walking route from the start"),
+        el("ul", {}, result.unreachable_stop_ids.map((id) => {
+          const stop = busStop(id);
+          return el("li", {}, `${stop.name} (${stop.id}) — disconnected or unmapped route`);
+        }))) : null,
       scenario.synthetic ? null : el("p", { class: "hint" }, `Straight-line snap offsets, not included in the walks: ${usual.name} ${usual.snap_metres} m${alternative ? `; ${alternative.name} ${alternative.snap_metres} m` : ""}.`),
       scenario.synthetic ? el("p", { class: "hint" }, "The fictional trip and stops are not published service facts.") : null));
     return;
@@ -843,7 +849,7 @@ async function loadBus(published = false) {
       : "Published scheduled trip and quay locations for the stated date; the walking start and skipped stop are hypothetical, not a reported closure.";
     $("bus-limits").textContent = scenario.synthetic
       ? "Synthetic stops are assumed boardable. Walking distance only; bus delay unknown. No walking closures or bus route are modeled."
-      : "Distances end at nearby snapped map nodes, not the quay. Physical connections and accessibility are unverified; offsets are excluded. Outside-map stops are unassessed. Bus delay unknown.";
+      : "Approximate platform connections: distances end at nearby snapped map nodes, not the quay. Physical connections and accessibility are unverified; offsets are excluded. Outside-map stops are unassessed. Bus delay unknown.";
     $("bus-sequence").textContent = `${scenario.synthetic ? "Synthetic" : "Published scheduled"} trip stop order: ` + scenario.stops.map((stop) => stop.name).join(" → ");
     setBusView(true);
     await updateBus();
