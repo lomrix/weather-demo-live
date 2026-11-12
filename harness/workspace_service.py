@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 try:
+    from .import_driving_osm import import_roads
     from .import_hamar_osm import import_scenario
     from .ollama_scenario import (
         MAX_RESPONSE_BYTES, MODEL, OLLAMA_URL, TIMEOUT_SECONDS, run_comparison,
@@ -23,6 +24,7 @@ try:
     from .project_scenario import DATE_RULE, assess_projects, parse_date
     from .scenario_compare import shortest_route
 except ImportError:
+    from import_driving_osm import import_roads
     from import_hamar_osm import import_scenario
     from ollama_scenario import (
         MAX_RESPONSE_BYTES, MODEL, OLLAMA_URL, TIMEOUT_SECONDS, run_comparison,
@@ -190,6 +192,7 @@ class Workspace:
             case_id: self._load_case(case_id, config, manifest)
             for case_id, config in CASES.items()
         }
+        self.cases["hamar-driving"] = self._load_driving_case(manifest)
         self.bus = json.loads(
             (self.root / "fixtures" / "scenarios" / "synthetic-hamar-bus.json").read_text(encoding="utf-8")
         )
@@ -210,6 +213,47 @@ class Workspace:
         }
         self.default_published_bus_id = next(iter(self.published_buses))
         self.published_bus = self.published_buses[self.default_published_bus_id]
+
+    def _load_driving_case(self, manifest):
+        filename = "hamar-urban-roads.osm"
+        path = self.root / "fixtures" / "maps" / filename
+        expected = manifest["fixtures"][filename]
+        digest = hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        if digest != expected["sanitized_fixture_sha256"]:
+            raise ValueError(f"{filename} does not match the manifest checksum")
+        graph = import_roads(path)
+        config = json.loads((self.root / "fixtures" / "scenarios" / "hamar-driving.json").read_text(encoding="utf-8"))
+        journey = config["journey"]
+        nodes = graph["nodes"]
+        links = {link["id"]: link for link in graph["network"]}
+        if journey["origin"] not in nodes or journey["destination"] not in nodes:
+            raise ValueError("Driving journey endpoints must be on the road network")
+        if not config["closure"]["link_ids"] or any(link not in links for link in config["closure"]["link_ids"]):
+            raise ValueError("Driving closure must reference mapped car links")
+        baseline = shortest_route(graph["network"], journey["origin"], journey["destination"], mode="vehicle")
+        if baseline["metres"] is None:
+            raise ValueError("Driving journey has no baseline route")
+        section = {**config["closure"], "verified": False,
+                   "metres": sum(links[link]["metres"] for link in config["closure"]["link_ids"])}
+        scenario = {
+            "metadata": {"id": config["id"]},
+            "network": graph["network"],
+            "journeys": [{"id": journey["id"], "origin": journey["origin"], "destination": journey["destination"]}],
+        }
+        return {
+            "id": "hamar-driving", "mode": "vehicle",
+            "config": {"label": config["label"], "summary": config["summary"], "osm": filename},
+            "scenario": scenario, "links": links, "nodes": nodes,
+            "coverage": {**graph["bounds"], "node_count": len(nodes), "link_count": len(links)},
+            "candidates": {}, "sections": [section], "section_ids": {section["id"]: section},
+            "journeys": [{
+                "id": journey["id"], "label": f"{journey['origin_label']} to {journey['destination_label']}",
+                "origin": {"id": journey["origin"], "label": journey["origin_label"], "coordinates": nodes[journey["origin"]]},
+                "destination": {"id": journey["destination"], "label": journey["destination_label"], "coordinates": nodes[journey["destination"]]},
+                "baseline_metres": baseline["metres"],
+            }],
+            "manifest": expected, "attribution": manifest["attribution"], "license": manifest["license"],
+        }
 
     def _load_published_bus(self, filename):
         published = json.loads(
@@ -450,6 +494,8 @@ class Workspace:
             case = self.get_case(payload["case_id"])
         except LookupError:
             raise ValueError("Choose one of the listed Hamar cases") from None
+        if case.get("mode") == "vehicle":
+            raise ValueError("Custom driving journeys are not supported")
         custom = _parse_custom(payload["custom_journey"])
         if custom is None:
             raise ValueError("Custom journey needs origin and destination")
@@ -548,7 +594,7 @@ class Workspace:
     def index(self):
         return {
             "today": date.today().isoformat(),
-            "mode": {"supported": ["walking"], "note": "Walking only for now; other modes are planned."},
+            "mode": {"supported": ["walking", "vehicle"], "note": "Walking and a fixed driving case are supported."},
             "ai": {"model": MODEL, "endpoint": OLLAMA_URL, "timeout_seconds": TIMEOUT_SECONDS},
             "bus_cases": [
                 {"id": case_id, "label": f"{bus['service']} · {bus['direction']} · {bus['service_date']}"}
@@ -563,6 +609,26 @@ class Workspace:
 
     def case_payload(self, case_id):
         case = self.get_case(case_id)
+        if case.get("mode") == "vehicle":
+            manifest = case["manifest"]
+            return {
+                "id": case_id, "mode": "vehicle", "label": case["config"]["label"],
+                "summary": case["config"]["summary"], "nodes": case["nodes"], "coverage": case["coverage"],
+                "links": [[link["id"], link["from"], link["to"], link["metres"]]
+                          for link in case["links"].values()],
+                "journeys": case["journeys"], "sections": case["sections"], "candidates": [],
+                "evidence": {
+                    "scenario_id": case["scenario"]["metadata"]["id"],
+                    "fixture": {"file": f"fixtures/maps/{case['config']['osm']}",
+                                "sha256": manifest["sanitized_fixture_sha256"],
+                                "original_download_sha256": manifest["original_download_sha256"],
+                                "source_url": manifest["source_url"], "retrieved_at": manifest["retrieved_at"],
+                                "license": case["license"], "attribution": case["attribution"]},
+                    "planning_source": "Hypothetical closure, not a published plan.",
+                    "unknowns": ["Turn restrictions and conditional rules are not modeled; legal access and road conditions are unverified."],
+                },
+                "date_rule": DATE_RULE,
+            }
         scenario = case["scenario"]
         metadata = scenario["metadata"]
         extract = metadata["map_extract"]
@@ -627,6 +693,8 @@ class Workspace:
             raise ValueError("Choose one of the listed Hamar cases") from None
         when = parse_date(payload.get("assessment_date"), "assessment date")
         custom = _parse_custom(payload.get("custom_journey"))
+        if custom and case.get("mode") == "vehicle":
+            raise ValueError("Custom driving journeys are not supported")
         resolved = self.resolve_custom(case, custom) if custom else None
         section_ids = dict(case["section_ids"])
         if resolved:
@@ -700,6 +768,7 @@ class Workspace:
 
     def _project_scenario(self, norm):
         case = norm["case"]
+        driving = case.get("mode") == "vehicle"
         projects = []
         for project in norm["projects"]:
             link_ids = list(dict.fromkeys(
@@ -709,7 +778,8 @@ class Workspace:
             projects.append({
                 "id": project["id"], "label": project["label"], "hypothetical": True,
                 "start_date": project["start_date"], "end_date": project["end_date"],
-                "restrictions": [{"type": "close_links", "mode": "walking", "link_ids": link_ids}],
+                "restrictions": [{"type": "restrict_links" if driving else "close_links",
+                                  "mode": "vehicle" if driving else "walking", "link_ids": link_ids}],
             })
         scenario = case["scenario"]
         journeys = [
@@ -724,6 +794,7 @@ class Workspace:
             "metadata": {"id": scenario["metadata"]["id"], "label": case["config"]["label"],
                          "synthetic": False, "offline": True},
             "network": scenario["network"],
+            "routing_mode": "vehicle" if driving else "walking",
             "journeys": journeys,
             "projects": projects,
         }
@@ -740,7 +811,8 @@ class Workspace:
                 "id": project["id"], "label": project["label"], "hypothetical": True,
                 "start_date": project["start_date"], "end_date": project["end_date"],
                 "sections": [norm["section_ids"][s]["label"] for s in sections_by_project[project["id"]]],
-                "closed_link_ids": project["closed_walking_links"],
+                "closed_link_ids": project["restricted_vehicle_links" if case.get("mode") == "vehicle"
+                                           else "closed_walking_links"],
             }
 
         active = [describe(p) for p in info["active_projects"]]
@@ -778,7 +850,7 @@ class Workspace:
             "assessment_date": info["assessment_date"],
             "hypothetical": info["hypothetical"],
             "date_rule": info["date_rule"],
-            "mode": "walking",
+            "mode": "vehicle" if case.get("mode") == "vehicle" else "walking",
             "active_projects": active,
             "inactive_projects": [describe(p) for p in info["inactive_projects"]],
             "closed_link_ids": closed,
@@ -791,6 +863,8 @@ class Workspace:
 
     def compare(self, payload):
         norm = self.normalize(payload, need_question=True)
+        if norm["case"].get("mode") == "vehicle":
+            raise ValueError("AI mitigation comparison is available only for walking")
         if not self._busy.acquire(blocking=False):
             raise BusyError("A model comparison is already running")
         try:

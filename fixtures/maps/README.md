@@ -1,11 +1,11 @@
 # Fixed OSM fixtures
 
 These are fixed OpenStreetMap XML extracts used by the demonstrated walking
-workflow. They retain the OSM `bounds` element and the root
+and driving workflows. They retain the OSM `bounds` element and the root
 `copyright`/`attribution`/`license` provenance:
 OpenStreetMap contributors, ODbL 1.0.
 
-The copies contain only nodes referenced by walking ways and the `highway` and
+The walking copies contain only nodes referenced by walking ways and the `highway` and
 `foot` tags used by [`harness/import_hamar_osm.py`](../../harness/import_hamar_osm.py).
 Contributor/change attributes (`user`, `uid`, `changeset`, `timestamp`, and
 `version`), relations, non-walking ways, and other tags were removed. No
@@ -39,3 +39,10 @@ which downloads a configurable grid, validates bounds, merges and sanitizes
 the tiles, checks references and emits a manifest entry. The rectangle is not
 an official administrative boundary and does not guarantee complete walking
 coverage. Individual tile hashes and retrieval times are in the manifest.
+
+`hamar-urban-roads.osm` covers the same rectangle but retains road ways and
+their car access, direction and junction tags, plus road-node barrier/access
+tags. Its separate sanitizer and retained fields are recorded in its manifest
+entry; the top-level walking policy does not apply to it. Contributor attributes,
+relations, unrelated tags and contact tags are removed. See the main README
+for supported rules, limitations and the configurable rebuild command.

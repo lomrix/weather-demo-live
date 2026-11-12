@@ -19,7 +19,7 @@ except ImportError:
     from sanitize_osm_fixture import sanitize
 
 
-def prepare(bounds, columns, rows, output, opener=urlopen):
+def prepare(bounds, columns, rows, output, opener=urlopen, sanitizer=sanitize):
     if not all(math.isfinite(value) for value in bounds):
         raise ValueError("Bounds must be finite")
     west, south, east, north = (round(value, 7) for value in bounds)
@@ -69,12 +69,12 @@ def prepare(bounds, columns, rows, output, opener=urlopen):
         merged = tmp / "merged.osm"
         merge_info = merge(paths, merged)
         sanitized = tmp / "sanitized.osm"
-        info = sanitize(merged, sanitized)
+        info = sanitizer(merged, sanitized)
         root = ET.parse(sanitized).getroot()
         node_ids = {node.attrib["id"] for node in root.findall("node")}
         missing = {node.attrib["ref"] for node in root.findall("way/nd")} - node_ids
         if missing:
-            raise ValueError(f"Walking ways reference {len(missing)} missing nodes")
+            raise ValueError(f"Retained ways reference {len(missing)} missing nodes")
         output = Path(output)
         output.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(sanitized, output)
