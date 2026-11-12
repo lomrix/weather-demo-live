@@ -263,6 +263,9 @@ function journeyBox() {
     if (result && result.skipped.stop_id) ids.add(busStop(result.skipped.stop_id).node_id);
     for (const route of result ? [result.normal, result.skipped] : []) route.path.forEach((id) => ids.add(id));
     const pts = [...ids].map((id) => st.xy[id]).filter(Boolean);
+    for (const id of [scenario.usual_stop_id, $("bus-destination").value, result && result.skipped.stop_id].filter(Boolean)) {
+      pts.push(st.proj(...busStop(id).coordinates));
+    }
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
     const x = Math.min(...xs), y = Math.min(...ys);
     return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
@@ -334,8 +337,8 @@ function drawBusMap(group) {
   const selected = result && result[st.bus.mode];
   if (selected && selected.path.length) route.append(polyline(pathPoints(selected.path), L("route")));
   const markers = group("markers");
-  const marker = (id, label, colour, ring, side) => addMarker(markers, st.xy[busStop(id).node_id], label, colour, ring, side);
-  addMarker(markers, st.xy[scenario.origin.node_id], "Synthetic walking start", "#14633a", false, "right");
+  const marker = (id, label, colour, ring, side) => addMarker(markers, st.proj(...busStop(id).coordinates), label, colour, ring, side);
+  addMarker(markers, st.xy[scenario.origin.node_id], scenario.origin.label, "#14633a", false, "right");
   marker(scenario.usual_stop_id, "Usual: " + busStop(scenario.usual_stop_id).name,
     st.bus.mode === "skipped" ? "#d02323" : "#1d6fd1", st.bus.mode === "skipped", "left");
   if (result && result.skipped.stop_id) marker(result.skipped.stop_id,
@@ -344,8 +347,8 @@ function drawBusMap(group) {
   marker(destination, "Destination: " + busStop(destination).name, "#1c2530", true, "right");
   renderLegend();
   const description = st.bus.mode === "normal" ? "normal service" : "hypothetical skipped stop";
-  $("map-caption").textContent = `${scenario.service} · ${scenario.direction} · ${description}. Synthetic trip; walking distance only.`;
-  $("map").setAttribute("aria-label", `Synthetic bus access map: ${scenario.service}, ${scenario.direction}`);
+  $("map-caption").textContent = `${scenario.service} · ${scenario.direction} · ${description}. ${scenario.synthetic ? "Synthetic trip" : "Published dated trip; hypothetical change"}; walking distance only.`;
+  $("map").setAttribute("aria-label", `${scenario.synthetic ? "Synthetic" : "Published"} bus access map: ${scenario.service}, ${scenario.direction}`);
 }
 function selectedRow() {
   if (!st.assessment) return null;
@@ -619,27 +622,32 @@ function renderResults() {
   const host = $("result-cards");
   if (st.bus) {
     const scenario = st.bus.scenario, result = st.bus.result;
+    const kind = scenario.synthetic ? "Synthetic" : "Published B21";
     if (!result) {
-      host.replaceChildren(el("article", { class: "card" }, el("h3", {}, "Synthetic bus stop access"),
+      host.replaceChildren(el("article", { class: "card" }, el("h3", {}, `${kind} bus stop access`),
         el("p", {}, "No bus access calculation is available.")));
       return;
     }
     const usual = busStop(result.normal.stop_id), destination = busStop(result.destination_stop_id);
     const alternative = result.skipped.stop_id && busStop(result.skipped.stop_id);
     const skipped = alternative
-      ? `${alternative.name}: ${metres(result.skipped.metres)} walking from the synthetic start.`
-      : "No reachable alternative stop remains before the selected destination on this synthetic trip.";
+      ? `${alternative.name}: ${metres(result.skipped.metres)} walking from the illustrative start${scenario.synthetic ? "" : " to its snapped node"}.`
+      : `No reachable alternative stop ${scenario.synthetic ? "remains before the selected destination on this synthetic trip" : "was found within the saved walking map"}.`;
     const selected = st.bus.mode === "normal"
       ? `Normal: ${usual.name}, ${metres(result.normal.metres)} walking.`
       : alternative ? `Hypothetical skip: ${alternative.name}, ${metres(result.skipped.metres)} walking.` : skipped;
     $("bus-summary").textContent = selected;
     host.replaceChildren(el("article", { class: "card" },
-      el("div", { class: "card-title" }, el("h3", {}, "Synthetic bus stop access"), pill("Synthetic / hypothetical", "pill-hyp")),
+      el("div", { class: "card-title" }, el("h3", {}, `${kind} bus stop access`), pill(scenario.synthetic ? "Synthetic / hypothetical" : "Hypothetical skip", "pill-hyp")),
       el("p", {}, `${scenario.service} · ${scenario.direction} · destination ${destination.name}.`),
-      el("p", {}, `Normal service: usual stop ${usual.name}, ${metres(result.normal.metres)} walking.`),
+      el("p", {}, `Normal service: usual stop ${usual.name}, ${metres(result.normal.metres)} walking${scenario.synthetic ? "" : " to its snapped node"}.`),
       el("p", {}, `Hypothetical skipped usual stop: ${skipped}`),
-      el("p", { class: "hint" }, "The alternative is the closest reachable stop still served by this same synthetic trip before the destination. Bus delay: unknown. No walking closures applied."),
-      el("p", { class: "hint" }, "Published-source context: the saved B21 inbound snapshot includes three selected ordered calls on 21 October 2026, but omits other calls and quay coordinates. It does not establish this fictional trip or its stops.")));
+      alternative && result.normal.metres !== null ? el("p", {}, `Walking change: ${signed(result.skipped.metres - result.normal.metres)}${scenario.synthetic ? "" : " between snapped-node routes"}.`) : null,
+      el("p", { class: "hint" }, scenario.synthetic
+        ? "The alternative is the closest reachable stop still served by this same synthetic trip before the destination. Bus delay: unknown. No walking closures applied."
+        : `Closest reachable boardable stop within this saved map only; ${result.outside_coverage_stops} eligible earlier stops outside coverage were not assessed. Bus delay: unknown. No walking closures applied.`),
+      scenario.synthetic ? null : el("p", { class: "hint" }, `Straight-line snap offsets, not included in the walks: ${usual.name} ${usual.snap_metres} m${alternative ? `; ${alternative.name} ${alternative.snap_metres} m` : ""}.`),
+      scenario.synthetic ? el("p", { class: "hint" }, "The fictional trip and stops are not published service facts.") : null));
     return;
   }
   host.replaceChildren(...[customCard(), assessmentCard(), aiCard()].filter(Boolean));
@@ -649,11 +657,14 @@ function renderEvidence() {
   const body = $("evidence-body");
   body.replaceChildren();
   if (st.bus) {
-    body.append(el("h3", {}, "Synthetic scenario and source limits"),
-      el("p", {}, "The S1 service, direction, trip, stops and walking start are invented; stop positions are saved walking-network nodes, not verified bus stop locations."),
-      el("p", {}, "The saved Entur B21 sample identifies selected ordered calls and a direction, but not a full trip stop sequence or stop coordinates linked to this map."),
-      el("p", {}, `Map fixture: ${st.data.evidence.fixture.file}; SHA-256: ${st.data.evidence.fixture.sha256}.`),
-      el("p", {}, "Bus delay and boarding accessibility are unknown."));
+    const scenario = st.bus.scenario;
+    body.append(el("h3", {}, scenario.synthetic ? "Synthetic scenario and source limits" : "Published trip and source limits"),
+      el("p", {}, scenario.synthetic
+        ? "The S1 service, direction, trip, stops and walking start are invented; stop positions are saved walking-network nodes, not verified bus stop locations."
+        : `Entur scheduled trip ${scenario.trip_id}, service date ${scenario.service_date}; quay locations verified against the national stop registry. The walking start and skipped stop are hypothetical.`));
+    if (!scenario.synthetic) body.append(el("p", {}, `Official sources: ${scenario.sources.timetable_url} and ${scenario.sources.stop_registry_url}. ${scenario.sources.attribution}`));
+    body.append(el("p", {}, `Map fixture: ${st.data.evidence.fixture.file}; SHA-256: ${st.data.evidence.fixture.sha256}.`),
+      el("p", {}, scenario.synthetic ? "Bus delay and boarding accessibility are unknown." : "Snapping is an approximation, not a verified physical connection; the offset and accessibility are not included in walking distances. Bus delay is unknown."));
     return;
   }
   const ev = st.data.evidence, fx = ev.fixture || {};
@@ -775,12 +786,13 @@ function mapPoint(event) {
 function setBusView(active) {
   for (const id of ["walking-case", "walking-projects", "walking-ai"]) $(id).hidden = active;
   $("load-bus").hidden = active;
+  $("load-published-bus").hidden = active;
   $("bus-controls").hidden = !active;
   $("diagnostics").hidden = active;
   $("map-help").textContent = active
     ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
     : "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.";
-  $("mode-badge").textContent = active ? "Synthetic bus scenario · walking access" : "Walking supported · other modes planned";
+  $("mode-badge").textContent = active ? `${st.bus.scenario.synthetic ? "Synthetic" : "Dated B21"} bus scenario · walking access` : "Walking supported · other modes planned";
 }
 
 async function updateBus() {
@@ -788,9 +800,9 @@ async function updateBus() {
   st.bus.result = null;
   $("bus-summary").textContent = "Calculating walking access locally…";
   applyStale(); drawMap();
-  setBusy("Calculating synthetic bus stop access locally…");
+  setBusy("Calculating bus stop access locally…");
   try {
-    st.bus.result = await api("/api/bus/assess", { destination_stop_id: $("bus-destination").value });
+    st.bus.result = await api("/api/bus/assess", { destination_stop_id: $("bus-destination").value, scenario: st.bus.scenario.synthetic ? "synthetic" : "published" });
   } catch (e) {
     $("bus-summary").textContent = "Bus access could not be calculated; see the error below.";
     showError(e.message);
@@ -801,23 +813,31 @@ async function updateBus() {
   }
 }
 
-async function loadBus() {
+async function loadBus(published = false) {
   st.demoBusy = true; $("plan-fields").disabled = true;
   showError("");
-  setBusy("Loading synthetic bus scenario…");
+  setBusy("Loading bus scenario…");
   try {
-    const scenario = await api("/api/bus");
+    const scenario = await api(published ? "/api/bus/published" : "/api/bus");
     st.layers = Object.fromEntries(LAYERS.map((layer) => [layer.key, true]));
     $("demo-controls").hidden = true;
     if (!await loadCase(scenario.case_id)) return;
     $("case-select").value = st.caseId;
     st.bus = { scenario, result: null, mode: "normal" };
     const usualIndex = scenario.stops.findIndex((stop) => stop.id === scenario.usual_stop_id);
-    $("bus-destination").replaceChildren(...scenario.stops.slice(usualIndex + 1).map((stop) => el("option", { value: stop.id }, stop.name)));
+    $("bus-destination").replaceChildren(...scenario.stops.slice(usualIndex + 1)
+      .filter((stop) => scenario.synthetic || (stop.node_id && stop.for_alighting && !stop.timing_point))
+      .map((stop) => el("option", { value: stop.id }, stop.name)));
     $("bus-destination").value = scenario.default_destination_stop_id;
     $("bus-mode").value = "normal";
-    $("bus-service").textContent = `${scenario.service} · ${scenario.direction} · ${scenario.trip_id}`;
-    $("bus-sequence").textContent = "Synthetic trip stop order: " + scenario.stops.map((stop) => stop.name).join(" → ");
+    $("bus-service").textContent = `${scenario.service} · ${scenario.direction} · ${scenario.trip_id}${scenario.service_date ? " · " + scenario.service_date : ""}`;
+    $("bus-disclaimer").textContent = scenario.synthetic
+      ? "Synthetic service, direction, trip and stops: not published bus service or actual stops. The skipped stop is hypothetical."
+      : "Published scheduled trip and quay locations for the stated date; the walking start and skipped stop are hypothetical, not a reported closure.";
+    $("bus-limits").textContent = scenario.synthetic
+      ? "Synthetic stops are assumed boardable. Walking distance only; bus delay unknown. No walking closures or bus route are modeled."
+      : "Distances end at nearby snapped map nodes, not the quay. Physical connections and accessibility are unverified; offsets are excluded. Outside-map stops are unassessed. Bus delay unknown.";
+    $("bus-sequence").textContent = `${scenario.synthetic ? "Synthetic" : "Published scheduled"} trip stop order: ` + scenario.stops.map((stop) => stop.name).join(" → ");
     setBusView(true);
     await updateBus();
   } catch (e) {
@@ -918,7 +938,8 @@ async function init() {
   $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
   $("mode-badge").textContent = "Walking supported · other modes planned";
   $("case-select").replaceChildren(...st.index.cases.map((c) => el("option", { value: c.id }, c.label)));
-  $("load-bus").addEventListener("click", loadBus);
+  $("load-bus").addEventListener("click", () => loadBus());
+  $("load-published-bus").addEventListener("click", () => loadBus(true));
   $("close-bus").addEventListener("click", closeBus);
   $("bus-destination").addEventListener("change", updateBus);
   $("bus-mode").addEventListener("change", (e) => {

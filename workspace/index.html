@@ -55,11 +55,12 @@
       <section class="group" aria-labelledby="g-bus">
         <h2 id="g-bus">Bus stop access</h2>
         <button type="button" class="btn btn-small" id="load-bus">Load synthetic bus scenario</button>
+        <button type="button" class="btn btn-small" id="load-published-bus">Load dated B21 scenario</button>
         <div id="bus-controls" hidden>
           <p id="bus-service"></p>
-          <p class="hint">Synthetic service, direction, trip and stops: not published bus service or actual stops. The skipped stop is hypothetical.</p>
+          <p class="hint" id="bus-disclaimer"></p>
           <p class="hint" id="bus-sequence"></p>
-          <label for="bus-destination">Destination stop on the same synthetic trip</label>
+          <label for="bus-destination">Destination stop on the same trip</label>
           <select id="bus-destination"></select>
           <label for="bus-mode">Map comparison</label>
           <select id="bus-mode">
@@ -67,7 +68,7 @@
             <option value="skipped">Hypothetical skipped usual stop</option>
           </select>
           <p class="demo-distance" id="bus-summary" role="status" aria-live="polite"></p>
-          <p class="hint">Synthetic stops are assumed boardable. Walking distance only; bus delay unknown. No walking closures or bus route are modeled.</p>
+          <p class="hint" id="bus-limits"></p>
           <button type="button" class="btn btn-small" id="close-bus">Return to walking workspace</button>
         </div>
       </section>

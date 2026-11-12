@@ -192,6 +192,29 @@ class Workspace:
         if any(node not in case["nodes"] for node in
                [self.bus["origin"]["node_id"]] + [stop["node_id"] for stop in stops]):
             raise ValueError("Synthetic bus points must be on the saved walking network")
+        self.published_bus = json.loads(
+            (self.root / "fixtures" / "scenarios" / "hamar-b21-2026-11-12.json").read_text(encoding="utf-8")
+        )
+        published = self.published_bus
+        case = self.get_case(published["case_id"])
+        ids = [stop["id"] for stop in published["stops"]]
+        if (published["synthetic"] is not False or len(ids) != len(set(ids))
+                or published["usual_stop_id"] not in ids or published["default_destination_stop_id"] not in ids
+                or ids.index(published["usual_stop_id"]) >= ids.index(published["default_destination_stop_id"])
+                or published["origin"]["node_id"] not in case["nodes"]):
+            raise ValueError("Invalid published bus scenario or stop order")
+        for stop in published["stops"]:
+            if any(type(stop[key]) is not bool for key in ("for_boarding", "for_alighting", "timing_point")):
+                raise ValueError("Published bus stop rules must be explicit")
+            point = _parse_point(dict(zip(("lat", "lon"), stop["coordinates"])), "Bus stop")
+            snap = self._snap(case, point, "Bus stop")
+            stop["node_id"] = snap.get("node_id")
+            stop["snap_metres"] = snap.get("snap_metres")
+        usual = published["stops"][ids.index(published["usual_stop_id"])]
+        destination = published["stops"][ids.index(published["default_destination_stop_id"])]
+        if (not usual["for_boarding"] or usual["timing_point"] or not usual["node_id"]
+                or not destination["for_alighting"] or destination["timing_point"] or not destination["node_id"]):
+            raise ValueError("Published bus scenario needs a mapped boardable usual stop and alightable destination")
 
     def _load_case(self, case_id, config, manifest):
         osm = self.root / "fixtures" / "maps" / config["osm"]
@@ -417,37 +440,55 @@ class Workspace:
             raise LookupError("Unknown case")
         return case
 
-    def bus_scenario(self):
-        case = self.get_case(self.bus["case_id"])
-        origin = self.bus["origin"]
+    def bus_scenario(self, published=False):
+        bus = self.published_bus if published else self.bus
+        case = self.get_case(bus["case_id"])
+        origin = bus["origin"]
         return {
-            **self.bus,
+            **bus,
             "origin": {**origin, "coordinates": case["nodes"][origin["node_id"]]},
             "stops": [
-                {**stop, "coordinates": case["nodes"][stop["node_id"]]}
-                for stop in self.bus["stops"]
+                stop if published else {**stop, "coordinates": case["nodes"][stop["node_id"]]}
+                for stop in bus["stops"]
             ],
         }
 
+    def published_bus_scenario(self):
+        return self.bus_scenario(published=True)
+
     def assess_bus(self, payload):
-        if not isinstance(payload, dict) or set(payload) != {"destination_stop_id"}:
+        if not isinstance(payload, dict) or set(payload) not in (
+                {"destination_stop_id"}, {"destination_stop_id", "scenario"}):
             raise ValueError("Choose a destination stop")
-        stops = self.bus["stops"]
+        scenario = payload.get("scenario", "synthetic")
+        if scenario not in ("synthetic", "published"):
+            raise ValueError("Choose a listed bus scenario")
+        bus = self.published_bus if scenario == "published" else self.bus
+        stops = bus["stops"]
         ids = [stop["id"] for stop in stops]
         destination = payload["destination_stop_id"]
         if not isinstance(destination, str) or destination not in ids:
-            raise ValueError("Choose a stop on the synthetic trip")
-        usual_index, destination_index = ids.index(self.bus["usual_stop_id"]), ids.index(destination)
+            raise ValueError("Choose a stop on the selected trip")
+        usual_index, destination_index = ids.index(bus["usual_stop_id"]), ids.index(destination)
         if destination_index <= usual_index:
             raise ValueError("The destination must be after the usual stop")
-        case = self.get_case(self.bus["case_id"])
+        if scenario == "published" and (not stops[destination_index]["for_alighting"]
+                                        or stops[destination_index]["timing_point"]
+                                        or not stops[destination_index]["node_id"]):
+            raise ValueError("Choose an alightable destination within the walking map")
+        case = self.get_case(bus["case_id"])
         network = case["scenario"]["network"]
-        origin = self.bus["origin"]["node_id"]
+        origin = bus["origin"]["node_id"]
         usual = stops[usual_index]
         normal = shortest_route(network, origin, usual["node_id"])
-        choices = []
+        choices, outside_coverage = [], 0
         for index, stop in enumerate(stops[:destination_index]):
             if stop["id"] == usual["id"]:
+                continue
+            if scenario == "published" and (not stop["for_boarding"] or stop["timing_point"]):
+                continue
+            if not stop["node_id"]:
+                outside_coverage += 1
                 continue
             route = shortest_route(network, origin, stop["node_id"])
             if route["metres"] is not None:
@@ -459,9 +500,11 @@ class Workspace:
             "skipped": (
                 {"status": "available", "stop_id": alternative[2], **alternative[3]}
                 if alternative else
-                {"status": "no_alternative", "stop_id": None, "metres": None, "path": []}
+                {"status": "coverage_limited" if outside_coverage else "no_alternative",
+                 "stop_id": None, "metres": None, "path": []}
             ),
             "bus_delay": None,
+            "outside_coverage_stops": outside_coverage,
         }
 
     def index(self):
