@@ -32,3 +32,10 @@ distance parity are recorded in [`manifest.json`](manifest.json).
 id, bounds unioned), then sanitized with the command above. The manifest records
 both tile URLs and hashes, the merged-file hash, the retrieval time and the
 sanitized hash.
+
+`hamar-urban.osm` is the larger rectangular study area documented in the
+main README. It was prepared with [`harness/prepare_walking_map.py`](../../harness/prepare_walking_map.py),
+which downloads a configurable grid, validates bounds, merges and sanitizes
+the tiles, checks references and emits a manifest entry. The rectangle is not
+an official administrative boundary and does not guarantee complete walking
+coverage. Individual tile hashes and retrieval times are in the manifest.

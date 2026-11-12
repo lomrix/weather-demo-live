@@ -89,6 +89,13 @@ CASES = {
     },
 }
 
+CASES["hamar-urban"] = {
+    **CASES["hamar-wider-extract"],
+    "osm": "hamar-urban.osm",
+    "label": "Hamar urban-area walking extract",
+    "summary": "A rectangular Hamar urban-area extract; not the municipal boundary.",
+}
+
 
 class BusyError(Exception):
     """A model comparison is already running."""
@@ -508,7 +515,7 @@ class Workspace:
         origin = bus["origin"]["node_id"]
         usual = stops[usual_index]
         normal = shortest_route(network, origin, usual["node_id"])
-        choices, outside_coverage = [], []
+        choices, outside_coverage, unreachable = [], [], []
         for index, stop in enumerate(stops[:destination_index]):
             if stop["id"] == usual["id"]:
                 continue
@@ -520,6 +527,8 @@ class Workspace:
             route = shortest_route(network, origin, stop["node_id"])
             if route["metres"] is not None:
                 choices.append((route["metres"], index, stop["id"], route))
+            else:
+                unreachable.append(stop["id"])
         alternative = min(choices) if choices else None
         return {
             "destination_stop_id": destination,
@@ -533,6 +542,7 @@ class Workspace:
             "bus_delay": None,
             "outside_coverage_stops": len(outside_coverage),
             "outside_coverage_stop_ids": outside_coverage,
+            "unreachable_stop_ids": unreachable,
         }
 
     def index(self):

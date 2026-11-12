@@ -4,6 +4,7 @@ These use saved fixtures and a fake Ollama opener; no live model call is made.
 """
 
 import json
+import copy
 import re
 import sys
 import threading
@@ -84,7 +85,7 @@ class ServiceTests(unittest.TestCase):
     def test_both_cases_load_with_verified_fixture(self):
         index = self.ws.index()
         self.assertEqual(index["mode"]["supported"], ["walking"])
-        self.assertEqual(len(index["cases"]), 3)
+        self.assertEqual(len(index["cases"]), 4)
         for case in index["cases"]:
             data = self.ws.case_payload(case["id"])
             self.assertTrue(data["sections"][0]["verified"])
@@ -396,23 +397,35 @@ class BusImpactTests(unittest.TestCase):
         self.assertEqual((result["normal"]["stop_id"], result["normal"]["metres"]),
                          ("NSR:Quay:101673", 597))
         self.assertEqual((result["skipped"]["stop_id"], result["skipped"]["metres"]),
-                         ("NSR:Quay:17994", 933))
-        self.assertEqual(result["outside_coverage_stops"], 14)
+                         ("NSR:Quay:18056", 770))
+        self.assertEqual(result["outside_coverage_stops"], 0)
+        self.assertIn("NSR:Quay:18084", result["unreachable_stop_ids"])
         self.assertIsNone(result["bus_delay"])
-        with patch.dict(stops["NSR:Quay:17994"], {"for_boarding": False}):
-            self.assertEqual(self.ws.assess_bus({"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})["skipped"]["status"], "coverage_limited")
+        with patch.dict(stops["NSR:Quay:18056"], {"for_boarding": False}):
+            filtered = self.ws.assess_bus({"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})
+            self.assertEqual((filtered["skipped"]["stop_id"], filtered["skipped"]["metres"]),
+                             ("NSR:Quay:101674", 814))
 
-    def test_published_no_mapped_alternative_and_invalid_destination(self):
-        result = self.ws.assess_bus({"scenario": "published", "destination_stop_id": "NSR:Quay:18002"})
-        self.assertEqual(result["skipped"]["status"], "coverage_limited")
-        self.assertEqual(result["outside_coverage_stops"], 14)
-        for destination in ("NSR:Quay:16438", "NSR:Quay:101673", "synthetic-stop-c"):
+    def test_published_invalid_destination(self):
+        for destination in ("NSR:Quay:101673", "synthetic-stop-c"):
             with self.assertRaises(ValueError):
                 self.ws.assess_bus({"scenario": "published", "destination_stop_id": destination})
         destination = next(stop for stop in self.ws.published_bus["stops"] if stop["id"] == "NSR:Quay:105440")
         with patch.dict(destination, {"for_alighting": False}):
             with self.assertRaises(ValueError):
                 self.ws.assess_bus({"scenario": "published", "destination_stop_id": destination["id"]})
+
+    def test_published_no_alternative_distinguishes_coverage_gap(self):
+        case_id = "hamar-b23-2026-11-12"
+        bus = copy.deepcopy(self.ws.published_buses[case_id])
+        for stop in bus["stops"]:
+            if stop["id"] != bus["usual_stop_id"]:
+                stop["for_boarding"] = False
+        payload = {"scenario": case_id, "destination_stop_id": bus["default_destination_stop_id"]}
+        with patch.dict(self.ws.published_buses, {case_id: bus}):
+            self.assertEqual(self.ws.assess_bus(payload)["skipped"]["status"], "no_alternative")
+            bus["stops"][0]["for_boarding"] = True
+            self.assertEqual(self.ws.assess_bus(payload)["skipped"]["status"], "coverage_limited")
 
     def test_second_published_case_and_outside_stop_list(self):
         case_id = "hamar-b23-2026-11-12"
@@ -424,7 +437,7 @@ class BusImpactTests(unittest.TestCase):
                          ("NSR:Quay:18001", 484))
         self.assertEqual((result["skipped"]["stop_id"], result["skipped"]["metres"]),
                          ("NSR:Quay:17995", 906))
-        expected = [stop["id"] for stop in scenario["stops"][:25]]
+        expected = [stop["id"] for stop in scenario["stops"][:17]]
         self.assertEqual(result["outside_coverage_stop_ids"], expected)
         self.assertEqual(result["outside_coverage_stops"], len(expected))
         self.assertIsNone(result["bus_delay"])
@@ -435,6 +448,33 @@ class BusImpactTests(unittest.TestCase):
             self.ws.assess_bus({"scenario": case_id, "destination_stop_id": "NSR:Quay:105440"})
         with self.assertRaises(ValueError):
             self.ws.assess_bus({"scenario": "unknown", "destination_stop_id": "NSR:Quay:18066"})
+
+    def test_coverage_change_compared_with_saved_wider_extract(self):
+        old_case = self.ws.get_case("hamar-wider-extract")
+        for case_id, old_count, gained, remaining in (
+                ("hamar-b21-2026-11-12", 14, 14, 0),
+                ("hamar-b23-2026-11-12", 25, 8, 17)):
+            current = self.ws.published_buses[case_id]
+            old = copy.deepcopy(current)
+            old["case_id"] = "hamar-wider-extract"
+            for stop in old["stops"]:
+                snap = self.ws._snap(old_case, stop["coordinates"], "Bus stop")
+                stop["node_id"] = snap.get("node_id")
+            payload = {"scenario": case_id, "destination_stop_id": old["default_destination_stop_id"]}
+            new_result = self.ws.assess_bus(payload)
+            with patch.dict(self.ws.published_buses, {case_id: old}):
+                old_result = self.ws.assess_bus(payload)
+            old_ids = set(old_result["outside_coverage_stop_ids"])
+            new_ids = set(new_result["outside_coverage_stop_ids"])
+            self.assertEqual((len(old_ids), len(old_ids - new_ids), len(new_ids)),
+                             (old_count, gained, remaining))
+            self.assertTrue(new_ids <= old_ids)
+            self.assertTrue(all(stop["snap_reason"] == "outside_extract"
+                                for stop in current["stops"] if stop["id"] in new_ids))
+            self.assertEqual(old_result["skipped"]["stop_id"],
+                             "NSR:Quay:17994" if remaining == 0 else "NSR:Quay:17995")
+            newly_unreachable = old_ids.intersection(new_result["unreachable_stop_ids"])
+            self.assertEqual(len(newly_unreachable), 3 if remaining == 0 else 0)
 
 
 class HttpBoundaryTests(unittest.TestCase):
@@ -479,7 +519,7 @@ class HttpBoundaryTests(unittest.TestCase):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
         index = json.loads(body)
-        self.assertEqual(len(index["cases"]), 3)
+        self.assertEqual(len(index["cases"]), 4)
         self.assertEqual([case["id"] for case in index["bus_cases"]],
                          ["hamar-b21-2026-11-12", "hamar-b23-2026-11-12"])
         self.assertEqual(self.call("GET", "/api/cases/unknown")[0], 404)
@@ -502,7 +542,7 @@ class HttpBoundaryTests(unittest.TestCase):
         status, body, _ = self.call("POST", "/api/bus/assess",
                                     {"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})
         self.assertEqual(status, 200)
-        self.assertEqual(json.loads(body)["skipped"]["metres"], 933)
+        self.assertEqual(json.loads(body)["skipped"]["metres"], 770)
         status, body, _ = self.call("GET", "/api/bus/published/hamar-b23-2026-11-12")
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["trip_id"], "INN:ServiceJourney:81731")
