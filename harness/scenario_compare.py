@@ -3,14 +3,17 @@
 import heapq
 
 
-def shortest_route(network, origin, destination, closed=None):
+def shortest_route(network, origin, destination, closed=None, mode="walking"):
     connections = {}
     for link in network:
         if link["id"] in (closed or set()):
             continue
-        if "walking" not in link["modes"]:
+        if mode not in link["modes"]:
             continue
-        for start, end in ((link["from"], link["to"]), (link["to"], link["from"])):
+        directions = [(link["from"], link["to"])]
+        if mode != "vehicle" or not link.get("oneway", False):
+            directions.append((link["to"], link["from"]))
+        for start, end in directions:
             connections.setdefault(start, []).append((link["metres"], end))
 
     queue = [(0, (origin,))]

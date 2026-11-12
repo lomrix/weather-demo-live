@@ -1,0 +1,17 @@
+{
+  "id": "hamar-driving-urban",
+  "label": "Hamar driving: Furubergvegen area to Ringgata",
+  "summary": "Illustrative road nodes between the Furubergvegen area and Ringgata; the road closure is hypothetical.",
+  "journey": {
+    "id": "furubergvegen-to-ringgata-driving",
+    "origin": "829426096",
+    "origin_label": "Road node near Furubergvegen",
+    "destination": "3223998135",
+    "destination_label": "Road node near Ringgata"
+  },
+  "closure": {
+    "id": "hypothetical-road-closure",
+    "label": "Hypothetical road segment closure",
+    "link_ids": ["osm-road-27339628-segment-11"]
+  }
+}

@@ -23,6 +23,7 @@ const st = {
   demoBusy: false, bus: null,
 };
 const CUSTOM = "custom";
+const isDriving = () => st.data && st.data.mode === "vehicle";
 const isCustom = () => st.journeyId === CUSTOM;
 const allSections = () => st.data.sections.concat(st.customInfo ? st.customInfo.sections : []);
 
@@ -103,8 +104,8 @@ function renderProjects() {
     const sec = (cls, s) => el("label", { class: "check" },
       el("input", { type: "checkbox", "data-uid": p.uid, "data-section": s.id, checked: p.sections.has(s.id) }),
       el("span", {}, `${s.label} (${s.metres} m)`));
-    const verified = st.data.sections.filter((s) => s.verified);
-    const others = st.data.sections.filter((s) => !s.verified);
+    const verified = st.data.sections.filter((s) => s.verified || isDriving());
+    const others = st.data.sections.filter((s) => !s.verified && !isDriving());
     const mine = st.customInfo ? st.customInfo.sections : [];
     host.append(el("fieldset", { class: "project" },
       el("legend", { class: "tag" }, "Hypothetical"),
@@ -119,7 +120,7 @@ function renderProjects() {
         el("div", {}, el("label", { for: `pend-${p.uid}` }, "End date"),
           el("input", { type: "date", id: `pend-${p.uid}`, value: p.end, "data-uid": p.uid, "data-field": "end" }))),
       el("div", { class: "sections" },
-        el("strong", {}, "Closed walking sections"),
+        el("strong", {}, isDriving() ? "Closed road sections" : "Closed walking sections"),
         verified.map((s) => sec("v", s)),
         mine.length ? el("div", {}, el("strong", { class: "hint" }, "Sections on your journey's route"), mine.map((s) => sec("c", s))) : null,
         others.length ? el("details", {}, el("summary", {}, `Other route sections (${others.length}, hypothetical)`),
@@ -442,7 +443,7 @@ function drawMap() {
   const sizeNote = st.assessment ? ` · assessed for ${st.assessment.assessment_date}` : " · not assessed yet";
   const demo = $("demo-controls").hidden ? "" : "Hypothetical demo · ";
   const demoDistance = demo && row ? ` · ${metres(row.metres)}` : "";
-  $("map-caption").textContent = `${demo}${journeyLabel(st.journeyId)}${demoDistance}${sizeNote}. Walking network only.`;
+  $("map-caption").textContent = `${demo}${journeyLabel(st.journeyId)}${demoDistance}${sizeNote}. ${isDriving() ? "Car road network; closure hypothetical." : "Walking network only."}`;
   $("map").setAttribute("aria-label", `Map of ${journeyLabel(st.journeyId)}`);
 }
 
@@ -472,7 +473,8 @@ function renderLegend() {
     }
     item.classList.toggle("disabled", !has[layer.key]);
     item.lastElementChild.textContent = st.bus && layer.key === "baseline" ? "Walking to usual stop"
-      : st.bus && layer.key === "route" ? "Selected walking route" : layer.label;
+      : st.bus && layer.key === "route" ? "Selected walking route"
+      : isDriving() && layer.key === "context" ? "Mapped car road network" : layer.label;
     item.querySelector("input").title = has[layer.key] ? "" : "No data for this layer yet";
   });
 }
@@ -504,9 +506,11 @@ function assessmentCard() {
       ? `Active (${a.active_projects.length}): ${a.active_projects.map((p) => `${p.label} (${p.start_date} to ${p.end_date})`).join("; ")}.`
       : "No project is active on this date, so the routes equal the baseline."),
     a.inactive_projects.length ? el("p", { class: "hint" }, `Not active: ${a.inactive_projects.map((p) => `${p.label} (${p.start_date} to ${p.end_date})`).join("; ")}.`) : null,
-    el("p", { class: "hint" }, `${a.closed_link_ids.length} walking link(s) closed together. ${a.date_rule}`),
+    el("p", { class: "hint" }, `${a.closed_link_ids.length} ${a.mode === "vehicle" ? "road" : "walking"} link(s) closed together. ${a.date_rule}`),
     el("table", {}, el("thead", {}, el("tr", {}, ["Journey", "Baseline", "With closures", "Effect", "Caused by"].map((h) => el("th", { scope: "col" }, h)))), el("tbody", {}, rows)),
-    el("p", { class: "hint" }, "Walking only. Calculated by Python from the saved map; not an official closure plan."));
+    el("p", { class: "hint" }, a.mode === "vehicle"
+      ? "Driving distance only. Some direction and car access tags are modeled; turn restrictions, conditional rules and live conditions are not. Not an official closure plan."
+      : "Walking only. Calculated by Python from the saved map; not an official closure plan."));
 }
 
 function savedText(row) {
@@ -663,7 +667,7 @@ function renderResults() {
       scenario.synthetic ? el("p", { class: "hint" }, "The fictional trip and stops are not published service facts.") : null));
     return;
   }
-  host.replaceChildren(...[customCard(), assessmentCard(), aiCard()].filter(Boolean));
+  host.replaceChildren(...[customCard(), assessmentCard(), isDriving() ? null : aiCard()].filter(Boolean));
 }
 
 function renderEvidence() {
@@ -726,6 +730,7 @@ function renderDiagnostics() {
 function coverageText() {
   const c = st.data.coverage;
   const km = (c.maxlat - c.minlat) * 110.54, kmx = (c.maxlon - c.minlon) * 111.32 * Math.cos(((c.minlat + c.maxlat) / 2) * Math.PI / 180);
+  if (isDriving()) return `Loaded road extract: latitude ${c.minlat}–${c.maxlat}, longitude ${c.minlon}–${c.maxlon}, about ${kmx.toFixed(1)} × ${km.toFixed(1)} km; ${c.node_count} car-road nodes, ${c.link_count} links. Only the fixed driving journey is supported.`;
   return `Loaded coverage (saved extract): latitude ${c.minlat}–${c.maxlat}, longitude ${c.minlon}–${c.maxlon}, about ${kmx.toFixed(1)} × ${km.toFixed(1)} km; ${c.walking_node_count} walking nodes, ${c.walking_link_count} links. Points outside it, or more than ${c.snap_metres} m from the nearest mapped walking node, cannot be assessed.`;
 }
 function syncCoordInputs() {
@@ -798,14 +803,16 @@ function mapPoint(event) {
 /* ---------- case loading and wiring ---------- */
 function setBusView(active) {
   for (const id of ["walking-case", "walking-projects", "walking-ai"]) $(id).hidden = active;
+  if (!active && isDriving()) $("walking-ai").hidden = true;
   $("load-bus").hidden = active;
   $("published-bus-picker").hidden = active;
   $("bus-controls").hidden = !active;
   $("diagnostics").hidden = active;
   $("map-help").textContent = active
     ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
-    : "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.";
-  $("mode-badge").textContent = active ? `${st.bus.scenario.synthetic ? "Synthetic" : `Dated ${st.bus.scenario.service}`} bus scenario · walking access` : "Walking supported · other modes planned";
+    : isDriving() ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
+      : "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.";
+  $("mode-badge").textContent = active ? `${st.bus.scenario.synthetic ? "Synthetic" : `Dated ${st.bus.scenario.service}`} bus scenario · walking access` : "Walking and driving supported";
 }
 
 async function updateBus() {
@@ -876,11 +883,18 @@ async function loadCase(id) {
     st.assessment = null; st.compare = null; st.assessStale = false; st.compareStale = false;
     st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
     setPick(null); syncCoordInputs();
+    $("custom-journey").hidden = isDriving();
+    $("walking-ai").hidden = isDriving();
+    $("diagnostics").hidden = isDriving();
+    $("map-help").textContent = isDriving()
+      ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
+      : "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.";
     buildProjection();
     $("case-summary").textContent = st.data.summary;
     $("coverage-note").textContent = coverageText();
     const js = $("journey-select");
-    js.replaceChildren(...st.data.journeys.map((j) => el("option", { value: j.id }, j.label)), el("option", { value: CUSTOM }, "Your own journey (choose on map)"));
+    js.replaceChildren(...st.data.journeys.map((j) => el("option", { value: j.id }, j.label)),
+      ...(isDriving() ? [] : [el("option", { value: CUSTOM }, "Your own journey (choose on map)")]));
     st.journeyId = st.data.journeys[0].id; js.value = st.journeyId;
     st.nextProject = 1; defaultProjects(); renderProjects();
     $("layer-list").replaceChildren();
@@ -949,7 +963,7 @@ async function init() {
   $("assess-date").value = st.index.today;
   $("date-rule").textContent = "Start and end dates are inclusive.";
   $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
-  $("mode-badge").textContent = "Walking supported · other modes planned";
+  $("mode-badge").textContent = "Walking and driving supported";
   $("case-select").replaceChildren(...st.index.cases.map((c) => el("option", { value: c.id }, c.label)));
   $("published-bus-case").replaceChildren(...st.index.bus_cases.map((c) => el("option", { value: c.id }, c.label)));
   $("load-bus").addEventListener("click", () => loadBus());

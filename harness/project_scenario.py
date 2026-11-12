@@ -108,18 +108,24 @@ def assess_projects(scenario, assessment_date):
     _validate_journeys(journeys, endpoints)
     projects = _validate_projects(scenario.get("projects"), link_ids)
     when = parse_date(assessment_date, "assessment date")
+    mode = scenario.get("routing_mode", "walking")
+    if mode not in ("walking", "vehicle"):
+        raise ValueError("routing_mode must be walking or vehicle")
 
     active = [p for p in projects if p["start"] <= when <= p["end"]]
     inactive = [p for p in projects if p not in active]
 
     def metres(origin, destination, chosen):
-        closed = {link for p in chosen for link in p["closed_walking_links"]}
-        return shortest_route(network, origin, destination, closed)
+        key = "closed_walking_links" if mode == "walking" else "restricted_vehicle_links"
+        closed = {link for p in chosen for link in p[key]}
+        if mode == "walking":
+            return shortest_route(network, origin, destination, closed)
+        return shortest_route(network, origin, destination, closed, mode="vehicle")
 
     baseline_rows, rows = [], []
     for journey in journeys:
         origin, destination = journey["origin"], journey["destination"]
-        baseline = shortest_route(network, origin, destination)
+        baseline = metres(origin, destination, [])
         if baseline["metres"] is None:
             raise ValueError(f"journey {journey['id']}: baseline destination is unreachable")
         baseline_rows.append({"journey_id": journey["id"], "route": baseline})

@@ -84,11 +84,11 @@ class ServiceTests(unittest.TestCase):
 
     def test_both_cases_load_with_verified_fixture(self):
         index = self.ws.index()
-        self.assertEqual(index["mode"]["supported"], ["walking"])
-        self.assertEqual(len(index["cases"]), 4)
+        self.assertEqual(index["mode"]["supported"], ["walking", "vehicle"])
+        self.assertEqual(len(index["cases"]), 5)
         for case in index["cases"]:
             data = self.ws.case_payload(case["id"])
-            self.assertTrue(data["sections"][0]["verified"])
+            self.assertEqual(data["sections"][0]["verified"], case["id"] != "hamar-driving")
             self.assertNotIn("path", data["evidence"].get("fixture", {}))
             self.assertNotIn(str(ROOT), json.dumps(data))
 
@@ -346,6 +346,46 @@ class WiderExtractTests(unittest.TestCase):
         self.assertGreater(view["baseline_metres"], 2000)
 
 
+class DrivingWorkspaceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.ws = Workspace(ROOT, FakeOpener())
+
+    def test_driving_case_uses_dated_road_closure(self):
+        case = self.ws.get_case("hamar-driving")
+        payload = request("hamar-driving", projects=[project(sections=("hypothetical-road-closure",))])
+        result = self.ws.assess(payload)
+        row = result["journeys"][0]
+        self.assertEqual((result["mode"], result["hypothetical"]), ("vehicle", True))
+        self.assertEqual((row["baseline_metres"], row["metres"], row["change_metres"]), (2449, 2854, 405))
+        closed = case["links"]["osm-road-27339628-segment-11"]
+        pair = (closed["from"], closed["to"])
+        baseline_pairs = set(zip(row["baseline_path"], row["baseline_path"][1:]))
+        route_pairs = set(zip(row["path"], row["path"][1:]))
+        self.assertTrue(pair in baseline_pairs or pair[::-1] in baseline_pairs)
+        self.assertFalse(pair in route_pairs or pair[::-1] in route_pairs)
+        allowed = set()
+        for link in case["links"].values():
+            allowed.add((link["from"], link["to"]))
+            if not link["oneway"]:
+                allowed.add((link["to"], link["from"]))
+        self.assertTrue(baseline_pairs <= allowed)
+        self.assertTrue(route_pairs <= allowed)
+        self.assertEqual(result["closed_link_ids"], [closed["id"]])
+        payload["assessment_date"] = "2026-06-01"
+        inactive = self.ws.assess(payload)
+        self.assertEqual(inactive["closed_link_ids"], [])
+        self.assertEqual(inactive["journeys"][0]["metres"], 2449)
+
+    def test_driving_rejects_walking_only_features(self):
+        payload = request("hamar-driving", projects=[project(sections=("hypothetical-road-closure",))])
+        with self.assertRaisesRegex(ValueError, "Custom driving"):
+            self.ws.assess({**payload, "custom_journey": {
+                "origin": {"lat": 60.8, "lon": 11.05}, "destination": {"lat": 60.8, "lon": 11.08}}})
+        with self.assertRaisesRegex(ValueError, "only for walking"):
+            self.ws.compare({**payload, "question": "What helps?"})
+
+
 class BusImpactTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -519,7 +559,7 @@ class HttpBoundaryTests(unittest.TestCase):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
         index = json.loads(body)
-        self.assertEqual(len(index["cases"]), 4)
+        self.assertEqual(len(index["cases"]), 5)
         self.assertEqual([case["id"] for case in index["bus_cases"]],
                          ["hamar-b21-2026-11-12", "hamar-b23-2026-11-12"])
         self.assertEqual(self.call("GET", "/api/cases/unknown")[0], 404)
