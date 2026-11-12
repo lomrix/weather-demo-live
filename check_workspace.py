@@ -384,6 +384,36 @@ class BusImpactTests(unittest.TestCase):
             earlier = self.ws.assess_bus({"destination_stop_id": "synthetic-stop-c"})
             self.assertEqual(earlier["skipped"]["status"], "no_alternative")
 
+    def test_published_trip_uses_boardable_mapped_stops(self):
+        scenario = self.ws.published_bus_scenario()
+        self.assertFalse(scenario["synthetic"])
+        self.assertEqual((scenario["trip_id"], scenario["service_date"]),
+                         ("INN:ServiceJourney:53561", "2026-11-12"))
+        stops = {stop["id"]: stop for stop in scenario["stops"]}
+        self.assertEqual((stops["NSR:Quay:101673"]["snap_metres"],
+                          stops["NSR:Quay:17994"]["snap_metres"]), (0.7, 3.5))
+        result = self.ws.assess_bus({"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})
+        self.assertEqual((result["normal"]["stop_id"], result["normal"]["metres"]),
+                         ("NSR:Quay:101673", 597))
+        self.assertEqual((result["skipped"]["stop_id"], result["skipped"]["metres"]),
+                         ("NSR:Quay:17994", 933))
+        self.assertEqual(result["outside_coverage_stops"], 14)
+        self.assertIsNone(result["bus_delay"])
+        with patch.dict(stops["NSR:Quay:17994"], {"for_boarding": False}):
+            self.assertEqual(self.ws.assess_bus({"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})["skipped"]["status"], "coverage_limited")
+
+    def test_published_no_mapped_alternative_and_invalid_destination(self):
+        result = self.ws.assess_bus({"scenario": "published", "destination_stop_id": "NSR:Quay:18002"})
+        self.assertEqual(result["skipped"]["status"], "coverage_limited")
+        self.assertEqual(result["outside_coverage_stops"], 14)
+        for destination in ("NSR:Quay:16438", "NSR:Quay:101673", "synthetic-stop-c"):
+            with self.assertRaises(ValueError):
+                self.ws.assess_bus({"scenario": "published", "destination_stop_id": destination})
+        destination = next(stop for stop in self.ws.published_bus["stops"] if stop["id"] == "NSR:Quay:105440")
+        with patch.dict(destination, {"for_alighting": False}):
+            with self.assertRaises(ValueError):
+                self.ws.assess_bus({"scenario": "published", "destination_stop_id": destination["id"]})
+
 
 class HttpBoundaryTests(unittest.TestCase):
     @classmethod
@@ -441,6 +471,13 @@ class HttpBoundaryTests(unittest.TestCase):
                                    {"destination_stop_id": "other-trip"})[0], 400)
         self.assertEqual(self.call("POST", "/api/bus/assess",
                                    {"destination_stop_id": "synthetic-stop-c", "path": "x"})[0], 400)
+        status, body, _ = self.call("GET", "/api/bus/published")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["service_date"], "2026-11-12")
+        status, body, _ = self.call("POST", "/api/bus/assess",
+                                    {"scenario": "published", "destination_stop_id": "NSR:Quay:105440"})
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["skipped"]["metres"], 933)
 
     def test_post_boundary(self):
         good = request(question="Help?")
