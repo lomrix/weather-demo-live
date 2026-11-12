@@ -10,6 +10,7 @@ import threading
 import unittest
 import urllib.request
 from pathlib import Path
+from unittest.mock import patch
 from urllib.error import HTTPError, URLError
 
 ROOT = Path(__file__).resolve().parent
@@ -18,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "harness"))
 
 import hamar_workspace
-from workspace_service import Workspace
+from workspace_service import Workspace, shortest_route
 
 CASE = "furubergvegen-masabekkvegen"
 RINGGATA = "ringgata-ankerskogen"
@@ -344,6 +345,46 @@ class WiderExtractTests(unittest.TestCase):
         self.assertGreater(view["baseline_metres"], 2000)
 
 
+class BusImpactTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.ws = Workspace(ROOT, FakeOpener())
+
+    def test_closest_reachable_same_trip_stop_before_destination(self):
+        scenario = self.ws.bus_scenario()
+        self.assertTrue(scenario["synthetic"])
+        self.assertEqual(len(scenario["stops"]), 4)
+        calls = self.ws.opener.calls
+        result = self.ws.assess_bus({"destination_stop_id": "synthetic-stop-d"})
+        self.assertEqual((result["normal"]["stop_id"], result["normal"]["metres"]),
+                         ("synthetic-stop-a", 110))
+        self.assertEqual((result["skipped"]["stop_id"], result["skipped"]["metres"]),
+                         ("synthetic-stop-b", 201))
+        self.assertIsNone(result["bus_delay"])
+        self.assertEqual(self.ws.opener.calls, calls)
+
+    def test_no_alternative_before_destination_and_invalid_destination(self):
+        result = self.ws.assess_bus({"destination_stop_id": "synthetic-stop-b"})
+        self.assertEqual(result["skipped"],
+                         {"status": "no_alternative", "stop_id": None, "metres": None, "path": []})
+        for destination in ("synthetic-stop-a", "other-trip", None):
+            with self.assertRaises(ValueError):
+                self.ws.assess_bus({"destination_stop_id": destination})
+
+    def test_unreachable_stop_is_not_selected(self):
+        def disconnected(network, origin, destination, closed=None):
+            if destination == "1020679221":
+                return {"metres": None, "path": []}
+            return shortest_route(network, origin, destination, closed)
+
+        with patch("workspace_service.shortest_route", side_effect=disconnected):
+            later = self.ws.assess_bus({"destination_stop_id": "synthetic-stop-d"})
+            self.assertEqual((later["skipped"]["stop_id"], later["skipped"]["metres"]),
+                             ("synthetic-stop-c", 241))
+            earlier = self.ws.assess_bus({"destination_stop_id": "synthetic-stop-c"})
+            self.assertEqual(earlier["skipped"]["status"], "no_alternative")
+
+
 class HttpBoundaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -387,6 +428,19 @@ class HttpBoundaryTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(len(json.loads(body)["cases"]), 3)
         self.assertEqual(self.call("GET", "/api/cases/unknown")[0], 404)
+
+    def test_bus_scenario_http_boundary(self):
+        status, body, _ = self.call("GET", "/api/bus")
+        self.assertEqual(status, 200)
+        self.assertTrue(json.loads(body)["synthetic"])
+        status, body, _ = self.call("POST", "/api/bus/assess",
+                                    {"destination_stop_id": "synthetic-stop-c"})
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["skipped"]["stop_id"], "synthetic-stop-b")
+        self.assertEqual(self.call("POST", "/api/bus/assess",
+                                   {"destination_stop_id": "other-trip"})[0], 400)
+        self.assertEqual(self.call("POST", "/api/bus/assess",
+                                   {"destination_stop_id": "synthetic-stop-c", "path": "x"})[0], 400)
 
     def test_post_boundary(self):
         good = request(question="Help?")

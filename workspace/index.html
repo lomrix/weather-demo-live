@@ -52,7 +52,27 @@
   <aside class="controls" id="controls" aria-label="Planning controls" tabindex="-1">
     <form id="plan-form" novalidate>
       <fieldset id="plan-fields" class="plan-fields" disabled>
-      <section class="group" aria-labelledby="g-case">
+      <section class="group" aria-labelledby="g-bus">
+        <h2 id="g-bus">Bus stop access</h2>
+        <button type="button" class="btn btn-small" id="load-bus">Load synthetic bus scenario</button>
+        <div id="bus-controls" hidden>
+          <p id="bus-service"></p>
+          <p class="hint">Synthetic service, direction, trip and stops: not published bus service or actual stops. The skipped stop is hypothetical.</p>
+          <p class="hint" id="bus-sequence"></p>
+          <label for="bus-destination">Destination stop on the same synthetic trip</label>
+          <select id="bus-destination"></select>
+          <label for="bus-mode">Map comparison</label>
+          <select id="bus-mode">
+            <option value="normal">Normal service</option>
+            <option value="skipped">Hypothetical skipped usual stop</option>
+          </select>
+          <p class="demo-distance" id="bus-summary" role="status" aria-live="polite"></p>
+          <p class="hint">Synthetic stops are assumed boardable. Walking distance only; bus delay unknown. No walking closures or bus route are modeled.</p>
+          <button type="button" class="btn btn-small" id="close-bus">Return to walking workspace</button>
+        </div>
+      </section>
+      <p class="alert" id="form-error" role="alert" hidden></p>
+      <section class="group" id="walking-case" aria-labelledby="g-case">
         <h2 id="g-case"><span class="step" aria-hidden="true">1</span> Case and journey</h2>
         <button type="button" class="btn btn-small" id="load-demo">Load demo</button>
         <div id="demo-controls" hidden>
@@ -93,19 +113,18 @@
         </div>
       </section>
 
-      <section class="group" aria-labelledby="g-projects">
+      <section class="group" id="walking-projects" aria-labelledby="g-projects">
         <h2 id="g-projects"><span class="step" aria-hidden="true">2</span> Date and projects</h2>
         <label for="assess-date">Assessment date</label>
         <input type="date" id="assess-date" required>
         <p class="hint" id="date-rule"></p>
         <div id="projects"></div>
         <button type="button" class="btn btn-small" id="add-project">Add hypothetical project</button>
-        <p class="alert" id="form-error" role="alert" hidden></p>
         <button type="button" class="btn btn-primary" id="assess-btn">Assess projects</button>
         <p class="hint">Local calculation. Works without Ollama.</p>
       </section>
 
-      <section class="group" aria-labelledby="g-ai">
+      <section class="group" id="walking-ai" aria-labelledby="g-ai">
         <h2 id="g-ai"><span class="step" aria-hidden="true">3</span> Mitigation options</h2>
         <label for="question">Question for the planning assistant</label>
         <textarea id="question" rows="3" maxlength="400"></textarea>

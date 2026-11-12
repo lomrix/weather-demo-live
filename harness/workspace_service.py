@@ -178,6 +178,20 @@ class Workspace:
             case_id: self._load_case(case_id, config, manifest)
             for case_id, config in CASES.items()
         }
+        self.bus = json.loads(
+            (self.root / "fixtures" / "scenarios" / "synthetic-hamar-bus.json").read_text(encoding="utf-8")
+        )
+        case = self.get_case(self.bus["case_id"])
+        stops = self.bus["stops"]
+        ids = [stop["id"] for stop in stops]
+        if (self.bus["synthetic"] is not True or len(ids) < 3 or len(set(ids)) != len(ids)
+                or self.bus["usual_stop_id"] not in ids
+                or self.bus["default_destination_stop_id"] not in ids
+                or ids.index(self.bus["usual_stop_id"]) >= ids.index(self.bus["default_destination_stop_id"])):
+            raise ValueError("Invalid synthetic bus scenario or stop order")
+        if any(node not in case["nodes"] for node in
+               [self.bus["origin"]["node_id"]] + [stop["node_id"] for stop in stops]):
+            raise ValueError("Synthetic bus points must be on the saved walking network")
 
     def _load_case(self, case_id, config, manifest):
         osm = self.root / "fixtures" / "maps" / config["osm"]
@@ -402,6 +416,53 @@ class Workspace:
         if case is None:
             raise LookupError("Unknown case")
         return case
+
+    def bus_scenario(self):
+        case = self.get_case(self.bus["case_id"])
+        origin = self.bus["origin"]
+        return {
+            **self.bus,
+            "origin": {**origin, "coordinates": case["nodes"][origin["node_id"]]},
+            "stops": [
+                {**stop, "coordinates": case["nodes"][stop["node_id"]]}
+                for stop in self.bus["stops"]
+            ],
+        }
+
+    def assess_bus(self, payload):
+        if not isinstance(payload, dict) or set(payload) != {"destination_stop_id"}:
+            raise ValueError("Choose a destination stop")
+        stops = self.bus["stops"]
+        ids = [stop["id"] for stop in stops]
+        destination = payload["destination_stop_id"]
+        if not isinstance(destination, str) or destination not in ids:
+            raise ValueError("Choose a stop on the synthetic trip")
+        usual_index, destination_index = ids.index(self.bus["usual_stop_id"]), ids.index(destination)
+        if destination_index <= usual_index:
+            raise ValueError("The destination must be after the usual stop")
+        case = self.get_case(self.bus["case_id"])
+        network = case["scenario"]["network"]
+        origin = self.bus["origin"]["node_id"]
+        usual = stops[usual_index]
+        normal = shortest_route(network, origin, usual["node_id"])
+        choices = []
+        for index, stop in enumerate(stops[:destination_index]):
+            if stop["id"] == usual["id"]:
+                continue
+            route = shortest_route(network, origin, stop["node_id"])
+            if route["metres"] is not None:
+                choices.append((route["metres"], index, stop["id"], route))
+        alternative = min(choices) if choices else None
+        return {
+            "destination_stop_id": destination,
+            "normal": {"stop_id": usual["id"], **normal},
+            "skipped": (
+                {"status": "available", "stop_id": alternative[2], **alternative[3]}
+                if alternative else
+                {"status": "no_alternative", "stop_id": None, "metres": None, "path": []}
+            ),
+            "bus_delay": None,
+        }
 
     def index(self):
         return {
