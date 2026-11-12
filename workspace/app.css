@@ -120,6 +120,7 @@ pre.raw { white-space: pre-wrap; word-break: break-word; background: #11202f; co
 .kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
 code { font-size: .85em; background: #eef1f4; padding: 0 .25rem; border-radius: 3px; }
 .map-label { font: 600 13px system-ui, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 4px; }
+.bus-map-label { font: 600 5px system-ui, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 1.5px; }
 .custom-journey { margin-top: .6rem; border-top: 1px dashed var(--line); padding-top: .4rem; }
 .pick-row { display: flex; flex-wrap: wrap; gap: .4rem; }
 .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }

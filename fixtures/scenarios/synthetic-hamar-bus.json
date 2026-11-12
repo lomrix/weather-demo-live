@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "case_id": "hamar-wider-extract",
+  "service": "Synthetic Hamar demo bus S1",
+  "direction": "Synthetic direction A",
+  "trip_id": "synthetic-trip-s1-a",
+  "origin": {
+    "label": "Synthetic walking start",
+    "node_id": "302664786"
+  },
+  "usual_stop_id": "synthetic-stop-a",
+  "default_destination_stop_id": "synthetic-stop-c",
+  "stops": [
+    {"id": "synthetic-stop-a", "name": "Synthetic stop A", "node_id": "829426279"},
+    {"id": "synthetic-stop-b", "name": "Synthetic stop B", "node_id": "1020679221"},
+    {"id": "synthetic-stop-c", "name": "Synthetic stop C", "node_id": "1020679285"},
+    {"id": "synthetic-stop-d", "name": "Synthetic stop D", "node_id": "331953301"}
+  ]
+}

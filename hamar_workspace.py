@@ -25,7 +25,7 @@ STATIC = {
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
 }
 POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compare": "compare",
-         "/api/journey": "resolve_journey"}
+         "/api/journey": "resolve_journey", "/api/bus/assess": "assess_bus"}
 SECURITY_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
@@ -96,6 +96,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, body, content_type)
         elif path == "/api/cases":
             self._json(200, self.server.workspace.index())
+        elif path == "/api/bus":
+            self._json(200, self.server.workspace.bus_scenario())
         elif path.startswith("/api/cases/") and "/" not in path[len("/api/cases/"):]:
             try:
                 self._json(200, self.server.workspace.case_payload(path[len("/api/cases/"):]))

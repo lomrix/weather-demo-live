@@ -20,7 +20,7 @@ const st = {
   layers: Object.fromEntries(LAYERS.map((l) => [l.key, true])),
   view: null, bounds: null, proj: null, pendingCompare: false,
   custom: { origin: null, destination: null }, customInfo: null, pick: null, customSeq: 0,
-  demoBusy: false,
+  demoBusy: false, bus: null,
 };
 const CUSTOM = "custom";
 const isCustom = () => st.journeyId === CUSTOM;
@@ -142,6 +142,14 @@ function onProjectInput(event) {
 
 /* ---------- stale handling: Python owns the fingerprint ---------- */
 function applyStale() {
+  if (st.bus) {
+    $("map-stale").hidden = true;
+    $("map-frame").classList.remove("stale");
+    $("map-freshness").className = "chip " + (st.bus.result ? "chip-fresh" : "chip-idle");
+    $("map-freshness").textContent = st.bus.result ? "Results current" : "No results yet";
+    renderResults();
+    return;
+  }
   const anyResult = Boolean(st.assessment || st.compare);
   const staleAny = st.assessStale || (st.compareStale && $("demo-controls").hidden);
   $("map-stale").hidden = !staleAny;
@@ -248,6 +256,17 @@ function fitBox(box, pad) {
   applyView();
 }
 function journeyBox() {
+  if (st.bus) {
+    const scenario = st.bus.scenario, result = st.bus.result;
+    const ids = new Set([scenario.origin.node_id, busStop(scenario.usual_stop_id).node_id,
+      busStop($("bus-destination").value).node_id]);
+    if (result && result.skipped.stop_id) ids.add(busStop(result.skipped.stop_id).node_id);
+    for (const route of result ? [result.normal, result.skipped] : []) route.path.forEach((id) => ids.add(id));
+    const pts = [...ids].map((id) => st.xy[id]).filter(Boolean);
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    const x = Math.min(...xs), y = Math.min(...ys);
+    return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+  }
   if (isCustom()) {
     const pts = [];
     for (const key of ["origin", "destination"]) {
@@ -298,6 +317,36 @@ function pathPoints(ids) { return ids.map((n) => st.xy[n]).filter(Boolean); }
 function linkSegments(linkIds) {
   return linkIds.map((id) => st.linkIndex[id]).filter(Boolean).map((l) => [st.xy[l[1]], st.xy[l[2]]]);
 }
+function addMarker(markers, p, text, fill, ring, side) {
+  markers.append(svg("circle", { cx: p[0], cy: p[1], r: 7, fill: ring ? "#fff" : fill, stroke: ring ? fill : "#fff", "stroke-width": ring ? 3 : 2, "vector-effect": "non-scaling-stroke" }));
+  const t = svg("text", { x: p[0] + (side === "left" ? -9 : side === "right" ? 9 : 0),
+    y: p[1] - (side ? 2 : 12), class: side ? "bus-map-label" : "map-label", fill,
+    "text-anchor": side === "left" ? "end" : side === "right" ? "start" : "middle" });
+  t.textContent = text;
+  markers.append(t);
+}
+function busStop(id) { return st.bus.scenario.stops.find((stop) => stop.id === id); }
+function drawBusMap(group) {
+  const scenario = st.bus.scenario, result = st.bus.result;
+  group("inactive"); group("closure"); group("opt1"); group("opt2");
+  const baseline = group("baseline"), route = group("route");
+  if (result && result.normal.path.length) baseline.append(polyline(pathPoints(result.normal.path), L("baseline")));
+  const selected = result && result[st.bus.mode];
+  if (selected && selected.path.length) route.append(polyline(pathPoints(selected.path), L("route")));
+  const markers = group("markers");
+  const marker = (id, label, colour, ring, side) => addMarker(markers, st.xy[busStop(id).node_id], label, colour, ring, side);
+  addMarker(markers, st.xy[scenario.origin.node_id], "Synthetic walking start", "#14633a", false, "right");
+  marker(scenario.usual_stop_id, "Usual: " + busStop(scenario.usual_stop_id).name,
+    st.bus.mode === "skipped" ? "#d02323" : "#1d6fd1", st.bus.mode === "skipped", "left");
+  if (result && result.skipped.stop_id) marker(result.skipped.stop_id,
+    "Alternative: " + busStop(result.skipped.stop_id).name, "#8a4b00", false, "left");
+  const destination = $("bus-destination").value;
+  marker(destination, "Destination: " + busStop(destination).name, "#1c2530", true, "right");
+  renderLegend();
+  const description = st.bus.mode === "normal" ? "normal service" : "hypothetical skipped stop";
+  $("map-caption").textContent = `${scenario.service} · ${scenario.direction} · ${description}. Synthetic trip; walking distance only.`;
+  $("map").setAttribute("aria-label", `Synthetic bus access map: ${scenario.service}, ${scenario.direction}`);
+}
 function selectedRow() {
   if (!st.assessment) return null;
   if (isCustom()) return (!st.assessStale && st.assessment.custom_journey && st.assessment.custom_journey.row) || null;
@@ -324,6 +373,7 @@ function drawMap() {
 
   const ctx = group("context");
   for (const l of st.data.links) { const a = st.xy[l[1]], b = st.xy[l[2]]; if (a && b) ctx.append(polyline([a, b], L("context"))); }
+  if (st.bus) { drawBusMap(group); return; }
 
   const inactive = group("inactive");
   const activeNames = new Set(st.assessment ? st.assessment.active_projects.map((p) => p.label) : []);
@@ -358,12 +408,6 @@ function drawMap() {
   if (st.assessment) for (const seg of linkSegments(st.assessment.closed_link_ids)) closure.append(polyline(seg, L("closure")));
 
   const markers = group("markers");
-  const addMarker = (p, text, fill, ring) => {
-    markers.append(svg("circle", { cx: p[0], cy: p[1], r: 7, fill: ring ? "#fff" : fill, stroke: ring ? fill : "#fff", "stroke-width": ring ? 3 : 2, "vector-effect": "non-scaling-stroke" }));
-    const t = svg("text", { x: p[0], y: p[1] - 12, class: "map-label", fill, "text-anchor": "middle" });
-    t.textContent = text;
-    markers.append(t);
-  };
   if (isCustom()) {
     for (const [key, name, fill] of [["origin", "Start", "#14633a"], ["destination", "Destination", "#1c2530"]]) {
       const raw = st.custom[key];
@@ -371,14 +415,14 @@ function drawMap() {
       const info = st.customInfo && st.customInfo[key];
       const requested = st.proj(raw[0], raw[1]);
       if (info && info.status === "outside_coverage") {
-        addMarker(requested, `${name}: outside loaded map coverage`, "#0b3d75", true);
+        addMarker(markers, requested, `${name}: outside loaded map coverage`, "#0b3d75", true);
       } else {
         if (info && info.snapped) {
           const s = st.proj(info.snapped[0], info.snapped[1]);
           markers.append(svg("line", { x1: requested[0], y1: requested[1], x2: s[0], y2: s[1], stroke: fill, "stroke-width": 2, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke" }));
-          addMarker(s, info.snap_metres > 3 ? `${name} (nearest mapped node)` : name, fill, false);
+          addMarker(markers, s, info.snap_metres > 3 ? `${name} (nearest mapped node)` : name, fill, false);
         } else {
-          addMarker(requested, name, fill, false);
+          addMarker(markers, requested, name, fill, false);
         }
         if (info && info.snapped && info.snap_metres > 3) {
           markers.append(svg("circle", { cx: requested[0], cy: requested[1], r: 4, fill: "#fff", stroke: fill, "stroke-width": 2, "vector-effect": "non-scaling-stroke" }));
@@ -388,7 +432,7 @@ function drawMap() {
   } else {
     const j = st.data.journeys.find((x) => x.id === st.journeyId);
     for (const [pt, text, fill] of [[j.origin, `Start: ${j.origin.label}`, "#14633a"], [j.destination, `Destination: ${j.destination.label}`, "#1c2530"]]) {
-      addMarker(st.xy[pt.id] || st.proj(pt.coordinates[0], pt.coordinates[1]), text, fill, false);
+      addMarker(markers, st.xy[pt.id] || st.proj(pt.coordinates[0], pt.coordinates[1]), text, fill, false);
     }
   }
   renderLegend();
@@ -405,6 +449,10 @@ function renderLegend() {
     coverage: true, context: true, inactive: st.projects.length > 0, baseline: Boolean(st.assessment), route: Boolean(st.assessment),
     closure: Boolean(st.assessment), opt1: selectedOptions().length > 0, opt2: selectedOptions().length > 1, markers: true,
   };
+  if (st.bus) {
+    has.inactive = false; has.closure = false; has.opt1 = false; has.opt2 = false;
+    has.baseline = Boolean(st.bus.result); has.route = Boolean(st.bus.result);
+  }
   const existing = host.children.length === LAYERS.length;
   LAYERS.forEach((layer, i) => {
     let item = existing ? host.children[i] : null;
@@ -420,6 +468,8 @@ function renderLegend() {
       host.append(item);
     }
     item.classList.toggle("disabled", !has[layer.key]);
+    item.lastElementChild.textContent = st.bus && layer.key === "baseline" ? "Walking to usual stop"
+      : st.bus && layer.key === "route" ? "Selected walking route" : layer.label;
     item.querySelector("input").title = has[layer.key] ? "" : "No data for this layer yet";
   });
 }
@@ -567,12 +617,45 @@ function customCard() {
 
 function renderResults() {
   const host = $("result-cards");
+  if (st.bus) {
+    const scenario = st.bus.scenario, result = st.bus.result;
+    if (!result) {
+      host.replaceChildren(el("article", { class: "card" }, el("h3", {}, "Synthetic bus stop access"),
+        el("p", {}, "No bus access calculation is available.")));
+      return;
+    }
+    const usual = busStop(result.normal.stop_id), destination = busStop(result.destination_stop_id);
+    const alternative = result.skipped.stop_id && busStop(result.skipped.stop_id);
+    const skipped = alternative
+      ? `${alternative.name}: ${metres(result.skipped.metres)} walking from the synthetic start.`
+      : "No reachable alternative stop remains before the selected destination on this synthetic trip.";
+    const selected = st.bus.mode === "normal"
+      ? `Normal: ${usual.name}, ${metres(result.normal.metres)} walking.`
+      : alternative ? `Hypothetical skip: ${alternative.name}, ${metres(result.skipped.metres)} walking.` : skipped;
+    $("bus-summary").textContent = selected;
+    host.replaceChildren(el("article", { class: "card" },
+      el("div", { class: "card-title" }, el("h3", {}, "Synthetic bus stop access"), pill("Synthetic / hypothetical", "pill-hyp")),
+      el("p", {}, `${scenario.service} · ${scenario.direction} · destination ${destination.name}.`),
+      el("p", {}, `Normal service: usual stop ${usual.name}, ${metres(result.normal.metres)} walking.`),
+      el("p", {}, `Hypothetical skipped usual stop: ${skipped}`),
+      el("p", { class: "hint" }, "The alternative is the closest reachable stop still served by this same synthetic trip before the destination. Bus delay: unknown. No walking closures applied."),
+      el("p", { class: "hint" }, "Published-source context: the saved B21 inbound snapshot includes three selected ordered calls on 21 October 2026, but omits other calls and quay coordinates. It does not establish this fictional trip or its stops.")));
+    return;
+  }
   host.replaceChildren(...[customCard(), assessmentCard(), aiCard()].filter(Boolean));
 }
 
 function renderEvidence() {
   const body = $("evidence-body");
   body.replaceChildren();
+  if (st.bus) {
+    body.append(el("h3", {}, "Synthetic scenario and source limits"),
+      el("p", {}, "The S1 service, direction, trip, stops and walking start are invented; stop positions are saved walking-network nodes, not verified bus stop locations."),
+      el("p", {}, "The saved Entur B21 sample identifies selected ordered calls and a direction, but not a full trip stop sequence or stop coordinates linked to this map."),
+      el("p", {}, `Map fixture: ${st.data.evidence.fixture.file}; SHA-256: ${st.data.evidence.fixture.sha256}.`),
+      el("p", {}, "Bus delay and boarding accessibility are unknown."));
+    return;
+  }
   const ev = st.data.evidence, fx = ev.fixture || {};
   const kv = (pairs) => el("dl", { class: "kv" }, pairs.flatMap(([k, v]) => [el("dt", {}, k), el("dd", {}, v)]));
   body.append(el("h3", {}, "Provenance"),
@@ -689,6 +772,68 @@ function mapPoint(event) {
 }
 
 /* ---------- case loading and wiring ---------- */
+function setBusView(active) {
+  for (const id of ["walking-case", "walking-projects", "walking-ai"]) $(id).hidden = active;
+  $("load-bus").hidden = active;
+  $("bus-controls").hidden = !active;
+  $("diagnostics").hidden = active;
+  $("map-help").textContent = active
+    ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
+    : "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.";
+  $("mode-badge").textContent = active ? "Synthetic bus scenario · walking access" : "Walking supported · other modes planned";
+}
+
+async function updateBus() {
+  showError("");
+  st.bus.result = null;
+  $("bus-summary").textContent = "Calculating walking access locally…";
+  applyStale(); drawMap();
+  setBusy("Calculating synthetic bus stop access locally…");
+  try {
+    st.bus.result = await api("/api/bus/assess", { destination_stop_id: $("bus-destination").value });
+  } catch (e) {
+    $("bus-summary").textContent = "Bus access could not be calculated; see the error below.";
+    showError(e.message);
+  } finally {
+    setBusy("");
+    applyStale(); drawMap(); renderEvidence();
+    fitBox(journeyBox(), 0.25);
+  }
+}
+
+async function loadBus() {
+  st.demoBusy = true; $("plan-fields").disabled = true;
+  showError("");
+  setBusy("Loading synthetic bus scenario…");
+  try {
+    const scenario = await api("/api/bus");
+    st.layers = Object.fromEntries(LAYERS.map((layer) => [layer.key, true]));
+    $("demo-controls").hidden = true;
+    if (!await loadCase(scenario.case_id)) return;
+    $("case-select").value = st.caseId;
+    st.bus = { scenario, result: null, mode: "normal" };
+    const usualIndex = scenario.stops.findIndex((stop) => stop.id === scenario.usual_stop_id);
+    $("bus-destination").replaceChildren(...scenario.stops.slice(usualIndex + 1).map((stop) => el("option", { value: stop.id }, stop.name)));
+    $("bus-destination").value = scenario.default_destination_stop_id;
+    $("bus-mode").value = "normal";
+    $("bus-service").textContent = `${scenario.service} · ${scenario.direction} · ${scenario.trip_id}`;
+    $("bus-sequence").textContent = "Synthetic trip stop order: " + scenario.stops.map((stop) => stop.name).join(" → ");
+    setBusView(true);
+    await updateBus();
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    st.demoBusy = false; setBusy("");
+  }
+}
+
+function closeBus() {
+  st.bus = null;
+  setBusView(false); showError("");
+  applyStale(); drawMap(); renderEvidence(); renderDiagnostics();
+  fitBox(journeyBox(), 0.25);
+}
+
 async function loadCase(id) {
   clearTimeout(st.timer); st.seq++;
   setBusy("Loading saved map…");
@@ -773,6 +918,13 @@ async function init() {
   $("ai-note").textContent = `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
   $("mode-badge").textContent = "Walking supported · other modes planned";
   $("case-select").replaceChildren(...st.index.cases.map((c) => el("option", { value: c.id }, c.label)));
+  $("load-bus").addEventListener("click", loadBus);
+  $("close-bus").addEventListener("click", closeBus);
+  $("bus-destination").addEventListener("change", updateBus);
+  $("bus-mode").addEventListener("change", (e) => {
+    st.bus.mode = e.target.value;
+    renderResults(); drawMap(); fitBox(journeyBox(), 0.25);
+  });
   $("load-demo").addEventListener("click", loadDemo);
   $("demo-closures").addEventListener("change", updateDemo);
   $("case-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; loadCase(e.target.value); });
