@@ -51,8 +51,21 @@
 
   <aside class="controls" id="controls" aria-label="Planning controls" tabindex="-1">
     <form id="plan-form" novalidate>
+      <fieldset id="plan-fields" class="plan-fields" disabled>
       <section class="group" aria-labelledby="g-case">
         <h2 id="g-case"><span class="step" aria-hidden="true">1</span> Case and journey</h2>
+        <button type="button" class="btn btn-small" id="load-demo">Load demo</button>
+        <div id="demo-controls" hidden>
+          <label for="demo-closures">Hypothetical demo: Furubergvegen to Ringgata</label>
+          <select id="demo-closures">
+            <option value="none">No closures</option>
+            <option value="ringgata">Ringgata only</option>
+            <option value="furubergvegen">Furubergvegen only</option>
+            <option value="both">Both closures</option>
+          </select>
+          <p class="demo-distance" id="demo-distance" role="status" aria-live="polite"></p>
+          <p class="hint">Hypothetical closures, not an observed or official closure plan. Selecting an option recalculates the map and distance locally.</p>
+        </div>
         <label for="case-select">Mapped Hamar case</label>
         <select id="case-select"></select>
         <p class="hint" id="case-summary"></p>
@@ -99,6 +112,7 @@
         <button type="button" class="btn btn-secondary" id="compare-btn">Compare options with AI</button>
         <p class="hint" id="ai-note"></p>
       </section>
+      </fieldset>
     </form>
     <p class="busy" id="busy" role="status" aria-live="polite" hidden></p>
   </aside>

@@ -54,6 +54,8 @@ select, input[type=date], input[type=text], textarea { width: 100%; font: inheri
   border: 1px solid #8794a2; border-radius: 6px; background: #fff; color: var(--ink); }
 textarea { resize: vertical; }
 .group { border-bottom: 1px solid var(--line); padding-bottom: .9rem; margin-bottom: .9rem; }
+.plan-fields { border: 0; margin: 0; padding: 0; min-width: 0; }
+.demo-distance { font-weight: 700; margin: .4rem 0; font-variant-numeric: tabular-nums; }
 .group:last-of-type { border-bottom: 0; margin-bottom: 0; }
 .step { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%;
   background: var(--accent); color: #fff; font-size: .85rem; margin-right: .3rem; }

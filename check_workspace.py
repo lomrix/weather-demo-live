@@ -310,6 +310,31 @@ class WiderExtractTests(unittest.TestCase):
         self.assertEqual(results["furu"], (2492, 2653))
         self.assertEqual(results["both"], (2492, 3601))
 
+    def test_demo_project_dates_select_each_hypothetical_closure_without_ollama(self):
+        body = request(self.WIDER)
+        body["custom_journey"] = {
+            "origin": {"lat": self.furu[0], "lon": self.furu[1]},
+            "destination": {"lat": self.RINGGATA_JUNCTION[0], "lon": self.RINGGATA_JUNCTION[1]},
+        }
+        calls = self.ws.opener.calls
+        paths = []
+        for ringgata, furu, distance in ((False, False, 2492), (True, False, 3440),
+                                         (False, True, 2653), (True, True, 3601)):
+            body["projects"] = [
+                project("Hypothetical Ringgata closure", "2026-05-15" if ringgata else "2026-05-14",
+                        "2026-05-15" if ringgata else "2026-05-14", ["verified-closure"]),
+                project("Hypothetical Furubergvegen closure", "2026-05-15" if furu else "2026-05-14",
+                        "2026-05-15" if furu else "2026-05-14", ["furubergvegen-crossing"]),
+            ]
+            result = self.ws.assess(body)
+            self.assertEqual(result["hypothetical"], ringgata or furu)
+            self.assertEqual(len(result["active_projects"]), ringgata + furu)
+            row = result["custom_journey"]["row"]
+            self.assertEqual((row["baseline_metres"], row["metres"]), (2492, distance))
+            paths.append(row["path"])
+        self.assertEqual(len({tuple(path) for path in paths}), 4)
+        self.assertEqual(self.ws.opener.calls, calls)
+
     def test_point_between_areas_is_covered(self):
         view = self.ws.resolve_journey({
             "case_id": self.WIDER,
