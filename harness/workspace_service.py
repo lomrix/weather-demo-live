@@ -98,6 +98,23 @@ CASES["hamar-urban"] = {
     "summary": "A rectangular Hamar urban-area extract; not the municipal boundary.",
 }
 
+CASES["koigen-demo"] = {
+    "scenario": "hamar-koigen-demo.json",
+    "osm": "hamar-urban.osm",
+    "label": "Koigen–Tjuvholmen waterfront footpath (modeled demo)",
+    "summary": "Modeled candidate closure on the Hamar urban walking map. The notice does not establish exact closure extent or dates.",
+    "journeys": {
+        "koigen-footpath-candidate": (
+            "Candidate endpoint node 302372908",
+            "Candidate endpoint node 1023215093",
+        ),
+    },
+    "closure_section_id": "koigen-candidate-closure",
+    "closure_label": "Candidate section on OSM way 112510399, nodes 302372908–1023215093 (extent unknown)",
+    "closure_verified": False,
+    "closure_modeled": True,
+}
+
 
 class BusyError(Exception):
     """A model comparison is already running."""
@@ -341,9 +358,10 @@ class Workspace:
         extract = scenario["metadata"]["map_extract"]
         closure_ids = list(extract["interrupted_link"]["closure_segment_ids"])
         sections = [{
-            "id": "verified-closure",
+            "id": config.get("closure_section_id", "verified-closure"),
             "label": config["closure_label"],
-            "verified": True,
+            "verified": config.get("closure_verified", True),
+            "modeled": config.get("closure_modeled", False),
             "link_ids": closure_ids,
             "metres": sum(links[link_id]["metres"] for link_id in closure_ids),
         }]
@@ -646,6 +664,7 @@ class Workspace:
                 "attribution": case["attribution"],
             },
             "planning_source": metadata.get("planning_source") or metadata.get("petition", {}).get("url"),
+            "planning_source_label": metadata.get("planning_source_label"),
             "interrupted_way": {
                 "way_id": interrupted["way_id"],
                 "from_node": interrupted["from"],
