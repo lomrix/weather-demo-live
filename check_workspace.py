@@ -85,12 +85,42 @@ class ServiceTests(unittest.TestCase):
     def test_both_cases_load_with_verified_fixture(self):
         index = self.ws.index()
         self.assertEqual(index["mode"]["supported"], ["walking", "vehicle"])
-        self.assertEqual(len(index["cases"]), 5)
+        self.assertEqual(len(index["cases"]), 6)
         for case in index["cases"]:
             data = self.ws.case_payload(case["id"])
-            self.assertEqual(data["sections"][0]["verified"], case["id"] != "hamar-driving")
+            self.assertEqual(data["sections"][0]["verified"], case["id"] not in {"hamar-driving", "koigen-demo"})
+            self.assertEqual(data["sections"][0].get("modeled", False), case["id"] == "koigen-demo")
             self.assertNotIn("path", data["evidence"].get("fixture", {}))
             self.assertNotIn(str(ROOT), json.dumps(data))
+
+    def test_koigen_modeled_candidate_assessment_and_unknowns(self):
+        data = self.ws.case_payload("koigen-demo")
+        self.assertEqual(data["journeys"][0]["origin"]["id"], "302372908")
+        self.assertEqual(data["journeys"][0]["destination"]["id"], "1023215093")
+        self.assertEqual(data["evidence"]["interrupted_way"]["way_id"], "112510399")
+        self.assertEqual(data["evidence"]["planning_source"],
+                         "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen")
+        self.assertEqual(data["sections"][0]["id"], "koigen-candidate-closure")
+        self.assertFalse(data["sections"][0]["verified"])
+        self.assertTrue(data["sections"][0]["modeled"])
+        self.assertEqual(len(data["sections"][0]["link_ids"]), 25)
+        unknowns = " ".join(data["evidence"]["unknowns"]).lower()
+        for condition in ("exact footpath closure extent", "exact start date", "slope", "surface", "steps"):
+            self.assertIn(condition, unknowns)
+
+        result = self.ws.assess({
+            "case_id": "koigen-demo",
+            "assessment_date": "2026-10-27",
+            "projects": [project(
+                name="Modeled Koigen candidate closure",
+                start="2026-10-27",
+                end="2026-10-27",
+                sections=("koigen-candidate-closure",),
+            )],
+        })
+        row = result["journeys"][0]
+        self.assertEqual((row["baseline_metres"], row["metres"], row["change_metres"]), (323, 593, 270))
+        self.assertTrue(result["hypothetical"])
 
     def test_known_assessment_numbers(self):
         result = self.ws.assess(request())
@@ -559,7 +589,8 @@ class HttpBoundaryTests(unittest.TestCase):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
         index = json.loads(body)
-        self.assertEqual(len(index["cases"]), 5)
+        self.assertEqual(len(index["cases"]), 6)
+        self.assertIn("koigen-demo", [case["id"] for case in index["cases"]])
         self.assertEqual([case["id"] for case in index["bus_cases"]],
                          ["hamar-b21-2026-11-12", "hamar-b23-2026-11-12"])
         self.assertEqual(self.call("GET", "/api/cases/unknown")[0], 404)

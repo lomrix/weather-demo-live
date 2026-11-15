@@ -103,9 +103,10 @@ function renderProjects() {
   st.projects.forEach((p, i) => {
     const sec = (cls, s) => el("label", { class: "check" },
       el("input", { type: "checkbox", "data-uid": p.uid, "data-section": s.id, checked: p.sections.has(s.id) }),
-      el("span", {}, `${s.label} (${s.metres} m)`));
+      el("span", {}, `${s.label}${s.modeled ? " (modeled)" : ""} (${s.metres} m)`));
     const verified = st.data.sections.filter((s) => s.verified || isDriving());
-    const others = st.data.sections.filter((s) => !s.verified && !isDriving());
+    const modeled = st.data.sections.filter((s) => s.modeled && !isDriving());
+    const others = st.data.sections.filter((s) => !s.verified && !s.modeled && !isDriving());
     const mine = st.customInfo ? st.customInfo.sections : [];
     host.append(el("fieldset", { class: "project" },
       el("legend", { class: "tag" }, "Hypothetical"),
@@ -122,6 +123,7 @@ function renderProjects() {
       el("div", { class: "sections" },
         el("strong", {}, isDriving() ? "Closed road sections" : "Closed walking sections"),
         verified.map((s) => sec("v", s)),
+        modeled.length ? el("div", {}, el("strong", { class: "hint" }, "Modeled candidate sections"), modeled.map((s) => sec("m", s))) : null,
         mine.length ? el("div", {}, el("strong", { class: "hint" }, "Sections on your journey's route"), mine.map((s) => sec("c", s))) : null,
         others.length ? el("details", {}, el("summary", {}, `Other route sections (${others.length}, hypothetical)`),
           el("div", {}, others.map((s) => sec("o", s)))) : null)));
@@ -197,11 +199,17 @@ async function assess() {
   } finally {
     setBusy("");
     applyStale(); drawMap(); renderEvidence();
-    if (!$("demo-controls").hidden) {
+    if (!$("demo-controls").hidden && !$("ringgata-demo-controls").hidden) {
       const row = !st.assessStale && st.assessment && st.assessment.custom_journey && st.assessment.custom_journey.row;
       $("demo-distance").textContent = row
         ? `Walking distance: ${metres(row.metres)} (baseline ${metres(row.baseline_metres)})`
         : "Demo route could not be calculated; see the error below.";
+    }
+    if (!$("demo-controls").hidden && !$("koigen-demo-controls").hidden) {
+      const row = !st.assessStale && st.assessment && st.assessment.journeys[0];
+      $("koigen-distance").textContent = row
+        ? `Modeled comparison: ${metres(row.baseline_metres)} with the candidate section open; ${metres(row.metres)} with it closed (${signed(row.change_metres)}).`
+        : "Modeled route comparison could not be calculated; see the error below.";
     }
   }
 }
@@ -490,6 +498,9 @@ function assessmentCard() {
       el("p", { class: "hint" }, "Choose a date and projects, then select “Assess projects”. This runs locally and does not need Ollama."));
   }
   const names = Object.fromEntries(a.active_projects.concat(a.inactive_projects).map((p) => [p.id, p.label]));
+  const projectDates = (p) => st.caseId === "koigen-demo"
+    ? `${p.label} (model date inputs only; notice dates unknown)`
+    : `${p.label} (${p.start_date} to ${p.end_date})`;
   const rows = a.journeys.map((r) => el("tr", { class: r.journey_id === st.journeyId ? "selected" : null },
     el("td", {}, journeyLabel(r.journey_id), r.journey_id === st.journeyId ? " ◂" : ""),
     el("td", { class: "num" }, metres(r.baseline_metres)),
@@ -503,14 +514,16 @@ function assessmentCard() {
       el("span", {}, a.hypothetical ? pill("Hypothetical", "pill-hyp") : null, " ", pill(st.assessStale ? "Outdated" : "Current", st.assessStale ? "pill-warn" : "pill-ok"))),
     st.assessStale ? staleNote() : null,
     el("p", {}, a.active_projects.length
-      ? `Active (${a.active_projects.length}): ${a.active_projects.map((p) => `${p.label} (${p.start_date} to ${p.end_date})`).join("; ")}.`
+      ? `Active (${a.active_projects.length}): ${a.active_projects.map(projectDates).join("; ")}.`
       : "No project is active on this date, so the routes equal the baseline."),
-    a.inactive_projects.length ? el("p", { class: "hint" }, `Not active: ${a.inactive_projects.map((p) => `${p.label} (${p.start_date} to ${p.end_date})`).join("; ")}.`) : null,
+    a.inactive_projects.length ? el("p", { class: "hint" }, `Not active: ${a.inactive_projects.map(projectDates).join("; ")}.`) : null,
     el("p", { class: "hint" }, `${a.closed_link_ids.length} ${a.mode === "vehicle" ? "road" : "walking"} link(s) closed together. ${a.date_rule}`),
     el("table", {}, el("thead", {}, el("tr", {}, ["Journey", "Baseline", "With closures", "Effect", "Caused by"].map((h) => el("th", { scope: "col" }, h)))), el("tbody", {}, rows)),
     el("p", { class: "hint" }, a.mode === "vehicle"
       ? "Driving distance only. Some direction and car access tags are modeled; turn restrictions, conditional rules and live conditions are not. Not an official closure plan."
-      : "Walking only. Calculated by Python from the saved map; not an official closure plan."));
+      : st.caseId === "koigen-demo"
+        ? "Walking only. The candidate section and calculated detour are modeled; exact closure extent and dates are unknown. The assessment date only activates the hypothetical calculation."
+        : "Walking only. Calculated by Python from the saved map; not an official closure plan."));
 }
 
 function savedText(row) {
@@ -541,6 +554,10 @@ function optionBlock(entry, i) {
 }
 
 function aiCard() {
+  if (st.data.candidates.length < 3) {
+    return el("article", { class: "card" }, el("h3", {}, "AI mitigation options"),
+      el("p", { class: "hint" }, "No AI comparison is available for this case: fewer than three modeled mitigation candidates are configured."));
+  }
   const c = st.compare;
   if (st.busy && st.pendingCompare) return el("article", { class: "card" }, el("h3", {}, "AI mitigation options"), el("p", {}, "Waiting for the local model…"));
   if (!c) {
@@ -686,12 +703,18 @@ function renderEvidence() {
   }
   const ev = st.data.evidence, fx = ev.fixture || {};
   const kv = (pairs) => el("dl", { class: "kv" }, pairs.flatMap(([k, v]) => [el("dt", {}, k), el("dd", {}, v)]));
+  const planningSource = ev.planning_source && /^https?:\/\//.test(ev.planning_source)
+    ? el("a", { href: ev.planning_source, target: "_blank", rel: "noopener noreferrer" },
+      ev.planning_source_label || ev.planning_source)
+    : ev.planning_source || "Not provided";
   body.append(el("h3", {}, "Provenance"),
     kv([["Scenario ID", el("code", {}, ev.scenario_id)], ["Fixture", el("code", {}, fx.file)], ["Fixture SHA-256", el("code", {}, fx.sha256)],
       ["Original download SHA-256", el("code", {}, fx.original_download_sha256)], ["Source", fx.source_url], ["Retrieved", fx.retrieved_at],
-      ["Licence", `${fx.license} · ${fx.attribution}`], ["Planning source", ev.planning_source]]),
+      ["Licence", `${fx.license} · ${fx.attribution}`], ["Planning source", planningSource]]),
     el("p", { class: "hint" }, "The fixture hash is computed on line-ending-normalised bytes so Windows checkouts verify."));
-  if (ev.interrupted_way) body.append(el("h3", {}, "Interrupted way"), el("pre", { class: "raw" }, JSON.stringify(ev.interrupted_way, null, 2)));
+  if (ev.interrupted_way) body.append(
+    el("h3", {}, st.data.sections.some((s) => s.modeled) ? "Modeled candidate section" : "Interrupted way"),
+    el("pre", { class: "raw" }, JSON.stringify(ev.interrupted_way, null, 2)));
   body.append(el("h3", {}, "Loaded map coverage"), el("p", { class: "hint" }, coverageText()));
   if (st.customInfo) {
     body.append(el("h3", {}, "Your journey: snapped nodes"), el("pre", { class: "raw" }, JSON.stringify({
@@ -885,6 +908,10 @@ async function loadCase(id) {
     setPick(null); syncCoordInputs();
     $("custom-journey").hidden = isDriving();
     $("walking-ai").hidden = isDriving();
+    $("compare-btn").disabled = st.data.candidates.length < 3;
+    $("ai-note").textContent = st.data.candidates.length < 3
+      ? "No AI comparison is available for this case: fewer than three modeled mitigation candidates are configured."
+      : `Runs one request to ${st.index.ai.model} on this computer (${st.index.ai.timeout_seconds} s limit). Needs Ollama to be running; the assessment above does not. AI comparison applies only to the preset journeys, not to your own journey.`;
     $("diagnostics").hidden = isDriving();
     $("map-help").textContent = isDriving()
       ? "Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms."
@@ -931,6 +958,8 @@ async function updateDemo() {
 async function loadDemo() {
   st.demoBusy = true; $("plan-fields").disabled = true;
   $("demo-controls").hidden = true;
+  $("ringgata-demo-controls").hidden = false;
+  $("koigen-demo-controls").hidden = true;
   showError("");
   try {
     st.layers = Object.fromEntries(LAYERS.map((layer) => [layer.key, true]));
@@ -949,6 +978,46 @@ async function loadDemo() {
     $("demo-closures").value = "none";
     $("demo-controls").hidden = false;
     await updateDemo();
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    st.demoBusy = false; $("plan-fields").disabled = st.busy;
+  }
+}
+
+async function loadKoigenDemo() {
+  st.demoBusy = true; $("plan-fields").disabled = true;
+  $("demo-controls").hidden = true;
+  showError("");
+  try {
+    st.layers = Object.fromEntries(LAYERS.map((layer) => [layer.key, true]));
+    if (!await loadCase("koigen-demo")) return;
+    $("case-select").value = st.caseId;
+    const section = st.data.sections.find((s) => s.id === "koigen-candidate-closure" && s.modeled);
+    const journey = st.data.journeys.find((j) => j.id === "koigen-footpath-candidate");
+    if (!section || !journey || journey.origin.id !== "302372908" || journey.destination.id !== "1023215093") {
+      throw new Error("The modeled Koigen candidate section or journey is unavailable.");
+    }
+    const source = st.data.evidence.planning_source;
+    if (!source) throw new Error("The Hamar municipality notice link is unavailable.");
+    $("koigen-source-link").replaceChildren(el("a", {
+      href: source, target: "_blank", rel: "noopener noreferrer",
+    }, st.data.evidence.planning_source_label || "Hamar municipality notice"));
+    const day = st.index.today;
+    $("assess-date").value = day;
+    st.projects = [{
+      uid: st.nextProject++,
+      name: "Modeled Koigen candidate closure (dates unknown)",
+      start: day,
+      end: day,
+      sections: new Set([section.id]),
+    }];
+    renderProjects();
+    $("ringgata-demo-controls").hidden = true;
+    $("koigen-demo-controls").hidden = false;
+    $("demo-controls").hidden = false;
+    await assess();
+    if (st.assessment && !st.assessStale) fitBox(journeyBox(), 0.25);
   } catch (e) {
     showError(e.message);
   } finally {
@@ -975,6 +1044,7 @@ async function init() {
     renderResults(); drawMap(); fitBox(journeyBox(), 0.25);
   });
   $("load-demo").addEventListener("click", loadDemo);
+  $("load-koigen-demo").addEventListener("click", loadKoigenDemo);
   $("demo-closures").addEventListener("change", updateDemo);
   $("case-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; loadCase(e.target.value); });
   $("journey-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; st.journeyId = e.target.value; drawMap(); renderResults(); fitBox(journeyBox(), 0.25); });
