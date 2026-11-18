@@ -122,6 +122,15 @@ code { font-size: .85em; background: #eef1f4; padding: 0 .25rem; border-radius: 
 .map-label { font: 600 13px system-ui, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 4px; }
 .bus-map-label { font: 600 5px system-ui, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 1.5px; }
 .custom-journey { margin-top: .6rem; border-top: 1px dashed var(--line); padding-top: .4rem; }
+.place-search, .saved-journeys { margin: .65rem 0; padding-top: .45rem; border-top: 1px dashed var(--line); }
+.place-results { display: grid; gap: .25rem; }
+.place-result { text-align: left; width: 100%; }
+.place-result small { display: block; color: var(--muted); font-weight: 400; }
+.search-status:empty, .hint:empty { display: none; }
+.saved-item { display: flex; gap: .4rem; align-items: flex-start; justify-content: space-between;
+  border: 1px solid var(--line); border-radius: 6px; padding: .45rem .55rem; margin: .3rem 0; }
+.saved-item p { margin: 0; }
+.saved-item .btn { flex: none; }
 .confirm-box { display: flex; align-items: flex-start; gap: .5rem; background: var(--warn-bg);
   border: 1px solid #e0b070; border-radius: 6px; padding: .6rem; }
 .confirm-box input { width: auto; margin-top: .3rem; }

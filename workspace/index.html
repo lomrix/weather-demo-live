@@ -114,6 +114,18 @@
         <label for="journey-select">Journey</label>
         <select id="journey-select"></select>
         <div class="custom-journey" id="custom-journey">
+          <div class="place-search">
+            <h3>Search walking endpoints</h3>
+            <p class="hint" id="place-search-scope"></p>
+            <label for="place-from">From</label>
+            <input type="search" id="place-from" maxlength="80" autocomplete="off" placeholder="Bus stop or named place">
+            <p class="search-status hint" id="place-from-status" role="status"></p>
+            <div class="place-results" id="place-from-results"></div>
+            <label for="place-to">To</label>
+            <input type="search" id="place-to" maxlength="80" autocomplete="off" placeholder="Bus stop or named place">
+            <p class="search-status hint" id="place-to-status" role="status"></p>
+            <div class="place-results" id="place-to-results"></div>
+          </div>
           <p class="hint" id="pick-hint">Or choose your own start and destination on the map.</p>
           <div class="pick-row">
             <button type="button" class="btn btn-small" id="pick-start" aria-pressed="false">Choose start on map</button>
@@ -132,6 +144,15 @@
             </div>
             <button type="button" class="btn btn-small" id="apply-coords">Use these coordinates</button>
           </details>
+          <div class="saved-journeys">
+            <h3>Save this journey on this browser</h3>
+            <label for="saved-journey-name">Journey name</label>
+            <input type="text" id="saved-journey-name" maxlength="60" autocomplete="off" placeholder="Morning walk">
+            <button type="button" class="btn btn-small" id="save-journey">Save selected journey</button>
+            <p class="hint" id="saved-journey-message" role="status"></p>
+            <div id="saved-journey-list"></div>
+            <button type="button" class="btn btn-small" id="discard-saved-data" hidden>Discard invalid saved data</button>
+          </div>
         </div>
       </section>
 

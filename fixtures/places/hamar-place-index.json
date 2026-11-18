@@ -1,0 +1,2677 @@
+{
+  "id": "hamar-local-place-index-v1",
+  "generated_from_saved_data_only": true,
+  "search_normalization": "Unicode casefold, whitespace and Norwegian diacritics preserved; substring match",
+  "walking_scope": "Search results cover the saved Hamar fixtures, not a live geocoder. Coordinates outside the selected walking extract are reported as outside coverage; points are snapped to a walking node within 75 m.",
+  "sources": [
+    {
+      "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+      "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+      "provider": "Entur AS",
+      "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+      "licence_url": "https://data.norge.no/nlod/no/2.0",
+      "service": "B21",
+      "service_date": "2026-11-12",
+      "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+      "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+    },
+    {
+      "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+      "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+      "provider": "Entur AS",
+      "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+      "licence_url": "https://data.norge.no/nlod/no/2.0",
+      "service": "B23",
+      "service_date": "2026-11-12",
+      "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+      "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+    },
+    {
+      "file": "fixtures/scenarios/hamar-ringgata-ankerskogen.json",
+      "sha256": "f8ad4af90f24c67791f0ab39755faa98f58713269ae7a762bf7984ba1ae32d14",
+      "map_file": "fixtures/maps/ringgata.osm",
+      "map_sha256": "34fc48afb838805e299f41c2df8dfb9952137639ed733295094aeda6f3b24355",
+      "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+      "attribution": "OpenStreetMap contributors, ODbL 1.0",
+      "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+    },
+    {
+      "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
+      "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+      "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
+      "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+      "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+      "attribution": "OpenStreetMap contributors, ODbL 1.0",
+      "source_url": "https://www.openstreetmap.org/"
+    },
+    {
+      "file": "fixtures/scenarios/hamar-wider-extract.json",
+      "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+      "map_file": "fixtures/maps/hamar-wider.osm",
+      "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+      "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+      "attribution": "OpenStreetMap contributors, ODbL 1.0",
+      "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+    },
+    {
+      "file": "fixtures/scenarios/hamar-wider-extract.json",
+      "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+      "map_file": "fixtures/maps/hamar-urban.osm",
+      "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+      "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+      "attribution": "OpenStreetMap contributors, ODbL 1.0",
+      "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+    },
+    {
+      "file": "fixtures/scenarios/hamar-koigen-demo.json",
+      "sha256": "e3d17dd56422d7f24dd2744d47e7c16e1673e74141fa2569ab645c868b589fa1",
+      "map_file": "fixtures/maps/hamar-urban.osm",
+      "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+      "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+      "attribution": "OpenStreetMap contributors, ODbL 1.0",
+      "source_url": "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen"
+    }
+  ],
+  "places": [
+    {
+      "id": "preset-hamar-urban-junction-area-to-ankerskogen-destination",
+      "name": "Ankerskogen park path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8031248,
+        11.0702252
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "331953301",
+      "case_id": "hamar-urban"
+    },
+    {
+      "id": "preset-hamar-wider-extract-junction-area-to-ankerskogen-destination",
+      "name": "Ankerskogen park path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8031248,
+        11.0702252
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-wider.osm",
+        "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "331953301",
+      "case_id": "hamar-wider-extract"
+    },
+    {
+      "id": "preset-ringgata-ankerskogen-junction-area-to-ankerskogen-destination",
+      "name": "Ankerskogen park path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8031248,
+        11.0702252
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-ringgata-ankerskogen.json",
+        "sha256": "f8ad4af90f24c67791f0ab39755faa98f58713269ae7a762bf7984ba1ae32d14",
+        "map_file": "fixtures/maps/ringgata.osm",
+        "map_sha256": "34fc48afb838805e299f41c2df8dfb9952137639ed733295094aeda6f3b24355",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "331953301",
+      "case_id": "ringgata-ankerskogen"
+    },
+    {
+      "id": "entur-18046-65",
+      "name": "Bellevue",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.809362,
+        11.055658
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18046",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16556-76",
+      "name": "Bergshøgda",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.856357,
+        10.990115
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16556",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12930-49",
+      "name": "Bessa",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.771895,
+        11.119623
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12930",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-105872-50",
+      "name": "Breidablikk",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.774416,
+        11.116013
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:105872",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18089-2",
+      "name": "Breidablikk Aluvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.815511,
+        11.05201
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18089",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17914-25",
+      "name": "Briskeby stadion",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.796497,
+        11.092372
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17914",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16577-82",
+      "name": "Brumunddal sentrum",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.883336,
+        10.94106
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16577",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16436-60",
+      "name": "Bryggeriet",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.794767,
+        11.061406
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16436",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16438-18",
+      "name": "Bryggeriet",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.794674,
+        11.062098
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16438",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16571-81",
+      "name": "Buttekvern",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.882986,
+        10.946843
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16571",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "preset-koigen-demo-koigen-footpath-candidate-destination",
+      "name": "Candidate endpoint node 1023215093",
+      "kind": "named_place",
+      "coordinates": [
+        60.7928302,
+        11.0629328
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-koigen-demo.json",
+        "sha256": "e3d17dd56422d7f24dd2744d47e7c16e1673e74141fa2569ab645c868b589fa1",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen"
+      },
+      "source_id": "1023215093",
+      "case_id": "koigen-demo"
+    },
+    {
+      "id": "preset-koigen-demo-koigen-footpath-candidate-origin",
+      "name": "Candidate endpoint node 302372908",
+      "kind": "named_place",
+      "coordinates": [
+        60.7938093,
+        11.0580768
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-koigen-demo.json",
+        "sha256": "e3d17dd56422d7f24dd2744d47e7c16e1673e74141fa2569ab645c868b589fa1",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen"
+      },
+      "source_id": "302372908",
+      "case_id": "koigen-demo"
+    },
+    {
+      "id": "entur-17900-23",
+      "name": "CC Hamar",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.795516,
+        11.080211
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17900",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-101675-11",
+      "name": "E.J. Berghs veg",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.804543,
+        11.032746
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:101675",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17991-56",
+      "name": "Espern",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.789652,
+        11.092965
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17991",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17844-87",
+      "name": "Fossumfeltet snuplass",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.907433,
+        10.960772
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17844",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18094-1",
+      "name": "Fredtun",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.818394,
+        11.05241
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18094",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "preset-furubergvegen-masabekkvegen-junction-to-further-path-destination",
+      "name": "Further cycle path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8046773,
+        11.0534996
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
+        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
+        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://www.openstreetmap.org/"
+      },
+      "source_id": "1020679285",
+      "case_id": "furubergvegen-masabekkvegen"
+    },
+    {
+      "id": "preset-hamar-urban-junction-to-further-path-destination",
+      "name": "Further cycle path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8046773,
+        11.0534996
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "1020679285",
+      "case_id": "hamar-urban"
+    },
+    {
+      "id": "preset-hamar-wider-extract-junction-to-further-path-destination",
+      "name": "Further cycle path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8046773,
+        11.0534996
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-wider.osm",
+        "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "1020679285",
+      "case_id": "hamar-wider-extract"
+    },
+    {
+      "id": "entur-18078-8",
+      "name": "Furuberget",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.811575,
+        11.026811
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18078",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18082-6",
+      "name": "Furuberget barnehage",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.811029,
+        11.03751
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18082",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12909-53",
+      "name": "Hagavegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.780595,
+        11.112869
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12909",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-101585-57",
+      "name": "Hamar skysstasjon",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.791373,
+        11.080149
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:101585",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17861-21",
+      "name": "Hamar skysstasjon",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.791412,
+        11.079457
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17861",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18173-0",
+      "name": "Hedmarktoppen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.820553,
+        11.048521
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18173",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17833-85",
+      "name": "Hempa",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.897821,
+        10.954595
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17833",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17977-32",
+      "name": "Hjellum",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.79273,
+        11.150072
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17977",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17981-33",
+      "name": "Hjellum sør",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.788215,
+        11.14997
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17981",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17970-31",
+      "name": "Hjellumkrysset",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.800416,
+        11.148183
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17970",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18054-3",
+      "name": "Hol gravlund",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.815304,
+        11.046796
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18054",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13480-43",
+      "name": "Hosmestad",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.745994,
+        11.166951
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13480",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12921-51",
+      "name": "Håkenstadvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.775981,
+        11.115745
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12921",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "preset-furubergvegen-masabekkvegen-junction-to-further-path-origin",
+      "name": "Junction crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.8058695,
+        11.0505925
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
+        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
+        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://www.openstreetmap.org/"
+      },
+      "source_id": "302664786",
+      "case_id": "furubergvegen-masabekkvegen"
+    },
+    {
+      "id": "preset-furubergvegen-masabekkvegen-junction-to-north-path-origin",
+      "name": "Junction crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.8058695,
+        11.0505925
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
+        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
+        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://www.openstreetmap.org/"
+      },
+      "source_id": "302664786",
+      "case_id": "furubergvegen-masabekkvegen"
+    },
+    {
+      "id": "preset-hamar-urban-junction-to-further-path-origin",
+      "name": "Junction crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.8058695,
+        11.0505925
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "302664786",
+      "case_id": "hamar-urban"
+    },
+    {
+      "id": "preset-hamar-urban-junction-to-north-path-origin",
+      "name": "Junction crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.8058695,
+        11.0505925
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "302664786",
+      "case_id": "hamar-urban"
+    },
+    {
+      "id": "preset-hamar-wider-extract-junction-to-further-path-origin",
+      "name": "Junction crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.8058695,
+        11.0505925
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-wider.osm",
+        "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "302664786",
+      "case_id": "hamar-wider-extract"
+    },
+    {
+      "id": "preset-hamar-wider-extract-junction-to-north-path-origin",
+      "name": "Junction crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.8058695,
+        11.0505925
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-wider.osm",
+        "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "302664786",
+      "case_id": "hamar-wider-extract"
+    },
+    {
+      "id": "entur-17918-26",
+      "name": "Just Brochs gate",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.797094,
+        11.099997
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17918",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-101674-13",
+      "name": "Jønsrudløkka",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.802499,
+        11.039857
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:101674",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12901-54",
+      "name": "Kjonerud",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.782828,
+        11.110069
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12901",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16563-79",
+      "name": "Kongelhol",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.875116,
+        10.961861
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16563",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18013-12",
+      "name": "Kornsiloen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.803163,
+        11.03445
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18013",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-100633-70",
+      "name": "Krokvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.82638,
+        11.063519
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:100633",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-110117-58",
+      "name": "Kvartal 48",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.793759,
+        11.071805
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:110117",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17877-20",
+      "name": "Kvartal 48",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.793514,
+        11.072078
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17877",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17771-83",
+      "name": "Lillevegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.887226,
+        10.940835
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17771",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13491-42",
+      "name": "Lillevold",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.742109,
+        11.176564
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13491",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13509-39",
+      "name": "Lunde",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.72338,
+        11.191107
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13509",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17994-16",
+      "name": "Maxi",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.798838,
+        11.048325
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17994",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17995-62",
+      "name": "Maxi",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.799029,
+        11.048309
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17995",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17928-27",
+      "name": "Midtstranda",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.798929,
+        11.11262
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17928",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16546-75",
+      "name": "Myrvoll",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.851197,
+        11.013652
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16546",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16568-80",
+      "name": "Mørkvedvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.880318,
+        10.952194
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16568",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13503-40",
+      "name": "Nesten",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.730502,
+        11.187427
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13503",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "preset-furubergvegen-masabekkvegen-junction-to-north-path-destination",
+      "name": "North cycle path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8045626,
+        11.0527975
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
+        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
+        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://www.openstreetmap.org/"
+      },
+      "source_id": "1020679221",
+      "case_id": "furubergvegen-masabekkvegen"
+    },
+    {
+      "id": "preset-hamar-urban-junction-to-north-path-destination",
+      "name": "North cycle path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8045626,
+        11.0527975
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "1020679221",
+      "case_id": "hamar-urban"
+    },
+    {
+      "id": "preset-hamar-wider-extract-junction-to-north-path-destination",
+      "name": "North cycle path",
+      "kind": "named_place",
+      "coordinates": [
+        60.8045626,
+        11.0527975
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-wider.osm",
+        "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "1020679221",
+      "case_id": "hamar-wider-extract"
+    },
+    {
+      "id": "entur-17946-73",
+      "name": "Nydal Furnesvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.839164,
+        11.048746
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17946",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17300-74",
+      "name": "Nydalsdumpa",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.847282,
+        11.030196
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17300",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18072-10",
+      "name": "Oline Holtmons veg",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.807296,
+        11.028109
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18072",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16527-71",
+      "name": "Olrud",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.830391,
+        11.069136
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16527",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12915-52",
+      "name": "Ottestad helse og mestring",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.778602,
+        11.115801
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12915",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12965-45",
+      "name": "Ottestad kirke",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.75836,
+        11.145557
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12965",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12956-46",
+      "name": "Ottestad prestegård",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.762417,
+        11.136661
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12956",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12948-47",
+      "name": "Ottestad sentral",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.764524,
+        11.132181
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12948",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17968-30",
+      "name": "Peder Olssøns veg",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.801915,
+        11.14055
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17968",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "preset-hamar-urban-junction-area-to-ankerskogen-origin",
+      "name": "Ringgata crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.7988246,
+        11.0881825
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-urban.osm",
+        "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "3223998135",
+      "case_id": "hamar-urban"
+    },
+    {
+      "id": "preset-hamar-wider-extract-junction-area-to-ankerskogen-origin",
+      "name": "Ringgata crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.7988246,
+        11.0881825
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-wider-extract.json",
+        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "map_file": "fixtures/maps/hamar-wider.osm",
+        "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "3223998135",
+      "case_id": "hamar-wider-extract"
+    },
+    {
+      "id": "preset-ringgata-ankerskogen-junction-area-to-ankerskogen-origin",
+      "name": "Ringgata crossing",
+      "kind": "named_place",
+      "coordinates": [
+        60.7988246,
+        11.0881825
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-ringgata-ankerskogen.json",
+        "sha256": "f8ad4af90f24c67791f0ab39755faa98f58713269ae7a762bf7984ba1ae32d14",
+        "map_file": "fixtures/maps/ringgata.osm",
+        "map_sha256": "34fc48afb838805e299f41c2df8dfb9952137639ed733295094aeda6f3b24355",
+        "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
+        "attribution": "OpenStreetMap contributors, ODbL 1.0",
+        "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
+      },
+      "source_id": "3223998135",
+      "case_id": "ringgata-ankerskogen"
+    },
+    {
+      "id": "entur-17837-86",
+      "name": "Røyslivegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.902527,
+        10.957041
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17837",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17296-72",
+      "name": "Sandbakken",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.83646,
+        11.05491
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17296",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12884-35",
+      "name": "Sanderud sykehus",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.782422,
+        11.15947
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12884",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13903-34",
+      "name": "Sanderudkrysset",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.783984,
+        11.153006
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13903",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13496-41",
+      "name": "Skjelvenga",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.735581,
+        11.183226
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13496",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16455-7",
+      "name": "Skogbrynet",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.810933,
+        11.032639
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16455",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18076-9",
+      "name": "Snekkerstufeltet",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.808962,
+        11.026368
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18076",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13942-77",
+      "name": "Sollerud",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.860714,
+        10.979808
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13942",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-15922-37",
+      "name": "Stange rådhus",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.715992,
+        11.191203
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:15922",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13514-36",
+      "name": "Stange skole",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.717873,
+        11.188902
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13514",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-111494-38",
+      "name": "Stange skysstasjon",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.715967,
+        11.194965
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:111494",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17872-22",
+      "name": "Statens hus",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.793559,
+        11.079771
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17872",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16517-69",
+      "name": "Stavsberg",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.824068,
+        11.059303
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16517",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16559-78",
+      "name": "Stenbekk",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.864505,
+        10.976157
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16559",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16515-68",
+      "name": "Stenbergvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.820006,
+        11.062103
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16515",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-101673-14",
+      "name": "Storhamarsenteret",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.803066,
+        11.043953
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:101673",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16383-59",
+      "name": "Stortorget",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.794507,
+        11.068245
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16383",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-16386-19",
+      "name": "Stortorget",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.794418,
+        11.068372
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:16386",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18001-63",
+      "name": "Svartoldervegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.802247,
+        11.047069
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18001",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18002-15",
+      "name": "Svartoldervegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.801869,
+        11.046538
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18002",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-98654-84",
+      "name": "Sveum",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.891797,
+        10.944148
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:98654",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12938-48",
+      "name": "Tønseth",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.769783,
+        11.126819
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12938",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18056-4",
+      "name": "Utfarten",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.811744,
+        11.045573
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18056",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17903-24",
+      "name": "Utstillingsplassen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.796655,
+        11.089432
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17903",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17944-29",
+      "name": "Vang kirke",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.801173,
+        11.131578
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17944",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-13470-44",
+      "name": "Vevlakrysset",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.753173,
+        11.157867
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:13470",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-12896-55",
+      "name": "Vika",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.78455,
+        11.106078
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:12896",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18066-64",
+      "name": "Vognvegen/Furubergvegen",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.805675,
+        11.050068
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18066",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18120-67",
+      "name": "Voll",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.815484,
+        11.064453
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18120",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18134-66",
+      "name": "Volljordet",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.813008,
+        11.060778
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18134",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-17933-28",
+      "name": "Åker",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.800813,
+        11.122952
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:17933",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-18084-5",
+      "name": "Øvre Heggelia",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.811016,
+        11.040847
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:18084",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-105440-17",
+      "name": "Øysteins gate",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.796511,
+        11.054081
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
+        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B21",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:06:33.423504+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:105440",
+      "services": [
+        "B21"
+      ],
+      "service_date": "2026-11-12"
+    },
+    {
+      "id": "entur-105441-61",
+      "name": "Øysteins gate",
+      "kind": "bus_stop",
+      "coordinates": [
+        60.796841,
+        11.053381
+      ],
+      "source": {
+        "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
+        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "provider": "Entur AS",
+        "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
+        "licence_url": "https://data.norge.no/nlod/no/2.0",
+        "service": "B23",
+        "service_date": "2026-11-12",
+        "retrieved_at_utc": "2026-11-12T16:26:52.330203+00:00",
+        "source_url": "https://api.entur.io/journey-planner/v3/graphql"
+      },
+      "source_id": "NSR:Quay:105441",
+      "services": [
+        "B23"
+      ],
+      "service_date": "2026-11-12"
+    }
+  ]
+}
