@@ -111,6 +111,7 @@ class ServiceTests(unittest.TestCase):
         result = self.ws.assess({
             "case_id": "koigen-demo",
             "assessment_date": "2026-10-27",
+            "modeled_section_confirmation": True,
             "projects": [project(
                 name="Modeled Koigen candidate closure",
                 start="2026-10-27",
@@ -648,6 +649,64 @@ class HttpBoundaryTests(unittest.TestCase):
         self.assertEqual(json.loads(body)["state"], "success")
         self.assertEqual(self.opener.calls - before, 1)
 
+    def test_notice_endpoint_is_bounded_and_requires_saved_notice(self):
+        original = self.server.workspace.opener
+        notice = self.server.workspace.notice
+        opener = FakeOpener(notice["hand_reference"])
+        self.server.workspace.opener = opener
+        try:
+            status, body, _ = self.call(
+                "POST", "/api/notice/draft",
+                {"notice_id": notice["id"]},
+            )
+            self.assertEqual(status, 200)
+            result = json.loads(body)
+            self.assertEqual(result["state"], "success")
+            self.assertEqual(opener.calls, 1)
+            self.assertEqual(result["diagnostics"]["requests_made"], 1)
+            self.assertEqual(
+                self.call(
+                    "POST", "/api/notice/draft",
+                    {"notice_id": "invented"},
+                )[0],
+                400,
+            )
+            self.assertEqual(
+                self.call(
+                    "POST", "/api/notice/draft",
+                    {"notice_id": notice["id"], "text": "untrusted"},
+                )[0],
+                400,
+            )
+            self.assertEqual(opener.calls, 1)
+        finally:
+            self.server.workspace.opener = original
+
+    def test_koigen_http_assessment_requires_explicit_confirmation(self):
+        unconfirmed = {
+            "case_id": "koigen-demo",
+            "assessment_date": "2026-10-27",
+            "modeled_section_confirmation": False,
+            "projects": [{
+                "name": "Modeled Koigen candidate closure",
+                "start_date": "2026-10-27",
+                "end_date": "2026-10-27",
+                "sections": ["koigen-candidate-closure"],
+                "hypothetical": True,
+            }],
+        }
+        status, body, _ = self.call("POST", "/api/assess", unconfirmed)
+        self.assertEqual(status, 400)
+        self.assertIn("explicitly confirm", json.loads(body)["error"])
+        unconfirmed["modeled_section_confirmation"] = True
+        status, body, _ = self.call("POST", "/api/assess", unconfirmed)
+        self.assertEqual(status, 200)
+        row = json.loads(body)["journeys"][0]
+        self.assertEqual(
+            (row["baseline_metres"], row["metres"]),
+            (323, 593),
+        )
+
 
 class StaticAssetTests(unittest.TestCase):
     def test_ankerskogen_regression_figures(self):
@@ -702,6 +761,19 @@ class StaticAssetTests(unittest.TestCase):
         self.assertIn("/api/fingerprint", script)
         self.assertIn("assessment_fingerprint", script)
         self.assertIn("comparison_fingerprint", script)
+
+    def test_notice_client_actions_are_top_level(self):
+        script = (ROOT / "workspace" / "app.js").read_text(encoding="utf-8")
+        for name, caller in (
+            ("draftFromNotice", "$(\"draft-koigen-notice\").addEventListener"),
+            ("noticeDraftCard", "noticeDraftCard()"),
+        ):
+            self.assertRegex(
+                script,
+                rf"(?m)^(?:async )?function {name}\(",
+                name,
+            )
+            self.assertIn(caller, script)
 
 
 if __name__ == "__main__":

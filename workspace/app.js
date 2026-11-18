@@ -20,7 +20,7 @@ const st = {
   layers: Object.fromEntries(LAYERS.map((l) => [l.key, true])),
   view: null, bounds: null, proj: null, pendingCompare: false,
   custom: { origin: null, destination: null }, customInfo: null, pick: null, customSeq: 0,
-  demoBusy: false, bus: null,
+  demoBusy: false, bus: null, noticeDraft: null, modeledConfirmed: false,
 };
 const CUSTOM = "custom";
 const isDriving = () => st.data && st.data.mode === "vehicle";
@@ -75,6 +75,7 @@ function payload(withQuestion) {
     const [olat, olon] = st.custom.origin, [dlat, dlon] = st.custom.destination;
     body.custom_journey = { origin: { lat: olat, lon: olon }, destination: { lat: dlat, lon: dlon } };
   }
+  if (st.caseId === "koigen-demo") body.modeled_section_confirmation = st.modeledConfirmed;
   return body;
 }
 function showError(message) {
@@ -88,6 +89,11 @@ function setBusy(message) {
   busy.hidden = !message;
   busy.textContent = message || "";
   $("plan-fields").disabled = st.busy || st.demoBusy;
+  syncAssessmentGate();
+}
+
+function syncAssessmentGate() {
+  $("assess-btn").disabled = st.busy || (st.caseId === "koigen-demo" && !st.modeledConfirmed);
 }
 
 function defaultProjects() {
@@ -211,6 +217,20 @@ async function assess() {
         ? `Modeled comparison: ${metres(row.baseline_metres)} with the candidate section open; ${metres(row.metres)} with it closed (${signed(row.change_metres)}).`
         : "Modeled route comparison could not be calculated; see the error below.";
     }
+  }
+}
+async function draftFromNotice() {
+  showError("");
+  setBusy("Drafting from the saved notice with one local Ollama request…");
+  st.noticeDraft = null;
+  renderResults();
+  try {
+    st.noticeDraft = await api("/api/notice/draft", { notice_id: st.index.notice_draft.id });
+  } catch (e) {
+    st.noticeDraft = { state: "failed", failure: { kind: "request_failed", message: e.message } };
+  } finally {
+    setBusy("");
+    renderResults();
   }
 }
 async function compareWithAi() {
@@ -604,6 +624,7 @@ function customCard() {
     return el("article", { class: "card" }, el("h3", {}, "Your journey"),
       el("p", { class: "hint" }, half ? "Choose the other endpoint to calculate your journey." : "Press “Choose start on map” and “Choose destination on map”, then click the map. You can also enter coordinates."));
   }
+
   const res = !st.assessStale && st.assessment && st.assessment.custom_journey ? st.assessment.custom_journey : null;
   const row = res && res.row;
   const status = res ? res.status : info.status;
@@ -637,6 +658,45 @@ function customCard() {
     st.assessStale && st.assessment ? staleNote() : null,
     row && row.contributing_projects.length ? el("p", { class: "hint" }, `Caused by: ${row.contributing_projects.map((id) => (st.assessment.active_projects.find((p) => p.id === id) || { label: id }).label).join(", ")}.`) : null,
     el("p", { class: "hint" }, "Walking only. The AI mitigation comparison covers only the saved preset journeys."));
+}
+
+function noticeDraftCard() {
+  if (st.caseId !== "koigen-demo") return null;
+  const d = st.noticeDraft;
+  if (!d) {
+    return el("article", { class: "card" },
+      el("h3", {}, "Saved-notice review"),
+      el("p", { class: "hint" }, "Select “Draft from notice” to make one bounded local Ollama request. The saved source and hand-checked reference can still be used for manual review if Ollama is unavailable."));
+  }
+  if (d.state === "failed") {
+    return el("article", { class: "card fail" },
+      el("div", { class: "card-title" }, el("h3", {}, "Saved-notice draft"), pill("Unavailable", "pill-bad")),
+      el("p", { role: "alert" }, d.failure.message),
+      el("p", { class: "hint" }, "No notice draft was accepted. The manual Koigen demo remains available after explicit modeled-section confirmation."));
+  }
+  const f = d.fields, checks = d.evidence_checks;
+  const modes = f.travel_modes.length ? f.travel_modes.join(", ") : "unknown";
+  const review = [
+    ["Affected location", f.location || "unknown"],
+    ["Travel modes", modes],
+    ["Restriction", f.restriction || "unknown"],
+    ["Stated dates", f.stated_dates || "unknown for the footpath closure"],
+  ];
+  return el("article", { class: "card clar" },
+    el("div", { class: "card-title" }, el("h3", {}, "Saved-notice draft"), pill("Needs human review", "pill-hyp")),
+    el("p", { class: "hint" }, "Python verified that the displayed supporting sentence exists in the saved notice. This is not map evidence for the selected OSM section."),
+    el("dl", { class: "kv" }, review.flatMap(([k, v]) => [el("dt", {}, k), el("dd", {}, v)])),
+    el("h4", {}, "Supporting sentence"),
+    ...d.supporting_sentences.map((s) => el("blockquote", {}, `${s.sentence_id}. ${s.text}`)),
+    el("p", { class: "hint" }, `${checks.correct_fields.length} hand-checked field(s) matched; ${checks.omissions.length} omission(s); ${checks.unsupported_claims.length} unsupported claim(s).`),
+    checks.omissions.length ? el("p", {}, el("strong", {}, "Omissions: "), checks.omissions.join(" ")) : null,
+    checks.unsupported_claims.length ? el("p", {}, el("strong", {}, "Unsupported or out of scope: "), checks.unsupported_claims.join(" ")) : null,
+    checks.corrections.length ? el("p", {}, el("strong", {}, "Corrections: "), checks.corrections.join(" ")) : null,
+    el("details", {},
+      el("summary", {}, "Local model draft and diagnostics"),
+      el("p", { class: "hint" }, `${d.diagnostics.model}; ${d.diagnostics.requests_made} request; ${d.diagnostics.timeout_seconds} s limit; endpoint ${d.diagnostics.endpoint}.`),
+      el("pre", { class: "raw" }, d.diagnostics.raw_model_reply || JSON.stringify(d.model_draft, null, 2))),
+    el("p", { class: "hint" }, d.notice.attribution));
 }
 
 function renderResults() {
@@ -684,7 +744,7 @@ function renderResults() {
       scenario.synthetic ? el("p", { class: "hint" }, "The fictional trip and stops are not published service facts.") : null));
     return;
   }
-  host.replaceChildren(...[customCard(), assessmentCard(), isDriving() ? null : aiCard()].filter(Boolean));
+  host.replaceChildren(...[noticeDraftCard(), customCard(), assessmentCard(), isDriving() ? null : aiCard()].filter(Boolean));
 }
 
 function renderEvidence() {
@@ -904,6 +964,9 @@ async function loadCase(id) {
     st.data = await api(`/api/cases/${encodeURIComponent(id)}`);
     st.caseId = id;
     st.assessment = null; st.compare = null; st.assessStale = false; st.compareStale = false;
+    st.noticeDraft = null; st.modeledConfirmed = false;
+    $("confirm-koigen-model").checked = false;
+    syncAssessmentGate();
     st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
     setPick(null); syncCoordInputs();
     $("custom-journey").hidden = isDriving();
@@ -1016,8 +1079,9 @@ async function loadKoigenDemo() {
     $("ringgata-demo-controls").hidden = true;
     $("koigen-demo-controls").hidden = false;
     $("demo-controls").hidden = false;
-    await assess();
-    if (st.assessment && !st.assessStale) fitBox(journeyBox(), 0.25);
+    syncAssessmentGate();
+    renderResults();
+    fitBox(journeyBox(), 0.25);
   } catch (e) {
     showError(e.message);
   } finally {
@@ -1045,6 +1109,17 @@ async function init() {
   });
   $("load-demo").addEventListener("click", loadDemo);
   $("load-koigen-demo").addEventListener("click", loadKoigenDemo);
+  $("draft-koigen-notice").addEventListener("click", draftFromNotice);
+  $("confirm-koigen-model").addEventListener("change", (e) => {
+    st.modeledConfirmed = e.target.checked;
+    syncAssessmentGate();
+    if (st.assessment) {
+      st.assessStale = true;
+      st.compareStale = Boolean(st.compare);
+      applyStale();
+      drawMap();
+    }
+  });
   $("demo-closures").addEventListener("change", updateDemo);
   $("case-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; loadCase(e.target.value); });
   $("journey-select").addEventListener("change", (e) => { $("demo-controls").hidden = true; st.journeyId = e.target.value; drawMap(); renderResults(); fitBox(journeyBox(), 0.25); });

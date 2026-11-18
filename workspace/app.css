@@ -122,6 +122,11 @@ code { font-size: .85em; background: #eef1f4; padding: 0 .25rem; border-radius: 
 .map-label { font: 600 13px system-ui, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 4px; }
 .bus-map-label { font: 600 5px system-ui, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 1.5px; }
 .custom-journey { margin-top: .6rem; border-top: 1px dashed var(--line); padding-top: .4rem; }
+.confirm-box { display: flex; align-items: flex-start; gap: .5rem; background: var(--warn-bg);
+  border: 1px solid #e0b070; border-radius: 6px; padding: .6rem; }
+.confirm-box input { width: auto; margin-top: .3rem; }
+blockquote { margin: .5rem 0; padding: .45rem .7rem; border-left: 4px solid var(--accent);
+  background: #eef5fb; }
 .pick-row { display: flex; flex-wrap: wrap; gap: .4rem; }
 .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .map-frame.picking { cursor: crosshair; }

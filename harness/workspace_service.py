@@ -21,6 +21,9 @@ try:
     from .ollama_scenario import (
         MAX_RESPONSE_BYTES, MODEL, OLLAMA_URL, TIMEOUT_SECONDS, run_comparison,
     )
+    from .notice_draft import (
+        NOTICE_ID, TIMEOUT_SECONDS as NOTICE_TIMEOUT_SECONDS, draft_notice, load_notice,
+    )
     from .project_scenario import DATE_RULE, assess_projects, parse_date
     from .scenario_compare import shortest_route
 except ImportError:
@@ -28,6 +31,9 @@ except ImportError:
     from import_hamar_osm import import_scenario
     from ollama_scenario import (
         MAX_RESPONSE_BYTES, MODEL, OLLAMA_URL, TIMEOUT_SECONDS, run_comparison,
+    )
+    from notice_draft import (
+        NOTICE_ID, TIMEOUT_SECONDS as NOTICE_TIMEOUT_SECONDS, draft_notice, load_notice,
     )
     from project_scenario import DATE_RULE, assess_projects, parse_date
     from scenario_compare import shortest_route
@@ -40,7 +46,10 @@ MAX_NAME = 60
 MAX_SECTIONS = 60
 MAX_SNAP_METRES = 75
 CUSTOM_ID = "custom"
-REQUEST_KEYS = {"case_id", "assessment_date", "projects", "question", "custom_journey"}
+REQUEST_KEYS = {
+    "case_id", "assessment_date", "projects", "question", "custom_journey",
+    "modeled_section_confirmation",
+}
 PROJECT_KEYS = {"name", "start_date", "end_date", "sections", "hypothetical"}
 
 PUBLISHED_BUS_CASES = {
@@ -202,6 +211,7 @@ class Workspace:
         self.root = Path(root)
         self.opener = opener
         self._busy = threading.Lock()
+        self.notice = load_notice(self.root)
         manifest = json.loads(
             (self.root / "fixtures" / "maps" / "manifest.json").read_text(encoding="utf-8")
         )
@@ -614,6 +624,11 @@ class Workspace:
             "today": date.today().isoformat(),
             "mode": {"supported": ["walking", "vehicle"], "note": "Walking and a fixed driving case are supported."},
             "ai": {"model": MODEL, "endpoint": OLLAMA_URL, "timeout_seconds": TIMEOUT_SECONDS},
+            "notice_draft": {
+                "id": NOTICE_ID,
+                "model": "qwen2.5:3b",
+                "timeout_seconds": NOTICE_TIMEOUT_SECONDS,
+            },
             "bus_cases": [
                 {"id": case_id, "label": f"{bus['service']} · {bus['direction']} · {bus['service_date']}"}
                 for case_id, bus in self.published_buses.items()
@@ -710,6 +725,14 @@ class Workspace:
             case = self.get_case(payload.get("case_id"))
         except LookupError:
             raise ValueError("Choose one of the listed Hamar cases") from None
+        confirmation = payload.get("modeled_section_confirmation", False)
+        if type(confirmation) is not bool:
+            raise ValueError("Modeled section confirmation must be true or false")
+        if case["id"] == "koigen-demo" and confirmation is not True:
+            raise ValueError(
+                "Review the notice and explicitly confirm the Koigen modeled map "
+                "section before assessment"
+            )
         when = parse_date(payload.get("assessment_date"), "assessment date")
         custom = _parse_custom(payload.get("custom_journey"))
         if custom and case.get("mode") == "vehicle":
@@ -755,13 +778,17 @@ class Workspace:
         question = ""
         if need_question or payload.get("question"):
             question = _clean_text(payload.get("question", ""), "Question", MAX_QUESTION, need_question)
-        return {"case": case, "date": when.isoformat(), "projects": projects, "question": question,
-                "custom": resolved, "custom_request": custom, "section_ids": section_ids}
+        return {
+            "case": case, "date": when.isoformat(), "projects": projects,
+            "question": question, "custom": resolved, "custom_request": custom,
+            "section_ids": section_ids, "modeled_section_confirmation": confirmation,
+        }
 
     @staticmethod
     def fingerprints(norm):
         core = {
             "case": norm["case"]["id"], "date": norm["date"],
+            "modeled_section_confirmation": norm["modeled_section_confirmation"],
             "projects": sorted(
                 ({key: project[key] for key in ("label", "start_date", "end_date", "section_ids")}
                  for project in norm["projects"]),
@@ -866,6 +893,7 @@ class Workspace:
         assessment_fp, _ = self.fingerprints(norm)
         return {
             "fingerprint": assessment_fp,
+            "modeled_section_confirmation": norm["modeled_section_confirmation"],
             "assessment_date": info["assessment_date"],
             "hypothetical": info["hypothetical"],
             "date_rule": info["date_rule"],
@@ -879,6 +907,34 @@ class Workspace:
 
     def assess(self, payload):
         return self.assess_normalized(self.normalize(payload))
+
+    def draft_koigen_notice(self, payload):
+        if not isinstance(payload, dict) or set(payload) != {"notice_id"}:
+            raise ValueError("Send one saved notice_id")
+        if payload["notice_id"] != NOTICE_ID:
+            raise ValueError("Choose the saved Koigen notice")
+        if not self._busy.acquire(blocking=False):
+            raise BusyError("A local model request is already running")
+        recorder = Recorder(self.opener)
+        try:
+            try:
+                return {"state": "success", **draft_notice(self.notice, recorder)}
+            except RuntimeError as exc:
+                kind = "ollama_unavailable" if str(exc).startswith("Ollama unavailable") else "model_reply_invalid"
+                return {
+                    "state": "failed",
+                    "failure": {"kind": kind, "message": str(exc)},
+                    "diagnostics": {
+                        "model": "qwen2.5:3b",
+                        "endpoint": "http://127.0.0.1:11434/api/generate",
+                        "timeout_seconds": NOTICE_TIMEOUT_SECONDS,
+                        "requests_made": recorder.calls,
+                        "raw_model_reply": None,
+                        "error": str(exc),
+                    },
+                }
+        finally:
+            self._busy.release()
 
     def compare(self, payload):
         norm = self.normalize(payload, need_question=True)

@@ -1,0 +1,18 @@
+{
+  "id": "hamar-koigen-footpath",
+  "title": "Sjøledning skal på plass mellom Koigen og Tjuvholmen",
+  "source_url": "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen",
+  "saved_from": "Hamar municipality notice, published or updated 29 October 2026",
+  "retrieved_at": "2026-11-18",
+  "text": "En ny sjøledning mellom Koigen og Tjuvholmen skal gi Hamar en mer framtidsrettet avløpsløsning. Arbeidet er godt i gang, og ledningen skal etter planen legges på plass i Mjøsa før jul. Arbeidet påvirker p-plasser ved stupetårnet.\n\nPublisert/sist endret: 29.10.2026\n\nProsjektet er et samarbeid mellom Hias og Hamar kommune. Forberedelsene har pågått ved Hias renseanlegg, der den nye sjøledningen har blitt sveiset sammen. Totalt er det omtrent 2 kilometer sjøledning som skal legges ut i Mjøsa.\n\nMålet er å få legge sjøledningen på plass mellom Koigen og Tjuvholmen før jul. Deretter fortsetter arbeidet med tilkoblinger og reetablering av områdene våren 2027.\n\nI anleggsperioden vil Hias bruke deler av gressplenen øst for Koigen avløpspumpestasjon som riggplass for gjennomføringen av prosjektet. Parkeringsplassen sør for pumpestasjonen vil bi brukt som anleggsområde. Mens byggingen av nytt ledningsnett fra avløpspumpestasjon og ut i Mjøsa pågår, vil gangstien langs Mjøsa bli stengt, og omlegging av gangstien skal være skiltet. Hamar kommune skal også oppgradere sin avløpspumpestasjon med tilhørende avløpsnett inn og ut av stasjonen. Mens dette arbeidet pågår, vil veien langs brygga med tilhørende gang- og sykkelsti bli stengt i perioder. Omlegging av veien her blir også skiltet.\n\nI forbindelse med at sjøledningen skal på plass, kommer parkeringen ved Stupetårnet (pumpehuset P7) til å bli stengt i perioden oktober-november 2026 til sommeren 2027. Parkeringsplassen kommer til å bli brukt som riggplass og anleggsområde i forbindelse med prosjektet.\n\nProsjektet er ett av flere avløpstiltak som skal gjennomføres langs Hamars strandsone i årene framover. Målet er å sikre en robust og framtidsrettet infrastruktur som både ivaretar miljøet og legger til rette for videre utvikling av byen.",
+  "focus_quote": "Mens byggingen av nytt ledningsnett fra avløpspumpestasjon og ut i Mjøsa pågår, vil gangstien langs Mjøsa bli stengt, og omlegging av gangstien skal være skiltet.",
+  "focus": "Stenging av gangstien ved Koigen pumpestasjon",
+  "hand_reference": {
+    "location": "fra avløpspumpestasjon og ut i Mjøsa",
+    "travel_modes": ["walking"],
+    "restriction": "vil gangstien langs Mjøsa bli stengt, og omlegging av gangstien skal være skiltet",
+    "stated_dates": null,
+    "supporting_sentence_ids": null
+  },
+  "attribution": "Sentence-ID extraction approach adapted from Kai's draft PR #20, commit 408db94022cbf0a58d163921618fdddcf51dbc8c. Municipal source text: Hamar kommune."
+}
