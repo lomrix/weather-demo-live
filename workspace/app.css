@@ -131,6 +131,11 @@ code { font-size: .85em; background: #eef1f4; padding: 0 .25rem; border-radius: 
   border: 1px solid var(--line); border-radius: 6px; padding: .45rem .55rem; margin: .3rem 0; }
 .saved-item p { margin: 0; }
 .saved-item .btn { flex: none; }
+.alert-card { border-left-color: var(--warn); }
+.alert-card.confirmed { border-left-color: var(--ok); }
+.alert-card.synthetic { background: #fffaf2; }
+.alert-meta { font-size: .85rem; color: var(--muted); overflow-wrap: anywhere; }
+.alert-source { word-break: break-word; }
 .confirm-box { display: flex; align-items: flex-start; gap: .5rem; background: var(--warn-bg);
   border: 1px solid #e0b070; border-radius: 6px; padding: .6rem; }
 .confirm-box input { width: auto; margin-top: .3rem; }

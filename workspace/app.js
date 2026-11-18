@@ -26,9 +26,11 @@ const st = {
   placeMatches: { origin: [], destination: [] }, placeSeq: { origin: 0, destination: 0 },
   placeTimer: { origin: null, destination: null }, savedJourneys: [],
   invalidSavedData: false,
+  journeyAlerts: [], dismissedJourneyAlerts: [], alertSnapshot: null,
 };
 const CUSTOM = "custom";
 const SAVED_JOURNEYS_KEY = "hamar-access-lab.saved-journeys.v1";
+const JOURNEY_ALERT_STATE_KEY = "hamar-access-lab.journey-alert-state.v1";
 const isDriving = () => st.data && st.data.mode === "vehicle";
 const isCustom = () => st.journeyId === CUSTOM;
 const allSections = () => st.data.sections.concat(st.customInfo ? st.customInfo.sections : []);
@@ -1134,6 +1136,7 @@ function saveSelectedJourney() {
     $("saved-journey-name").value = "";
     savedJourneyError(`Saved “${name}” in this browser.`);
     renderSavedJourneys();
+    refreshJourneyAlerts();
   }
 }
 
@@ -1181,8 +1184,132 @@ function deleteSavedJourney(id) {
   if (writeSavedJourneys(st.savedJourneys.filter((item) => item.id !== id))) {
     savedJourneyError(`Deleted “${deleted.name}” from this browser.`);
     renderSavedJourneys();
+    refreshJourneyAlerts();
   }
 }
+
+function loadAlertState() {
+  try {
+    const raw = localStorage.getItem(JOURNEY_ALERT_STATE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.version !== 1
+        || !Array.isArray(parsed.dismissed_alerts)
+        || parsed.dismissed_alerts.length > 200
+        || parsed.dismissed_alerts.some((item) => typeof item !== "string")
+        || (parsed.snapshot && (!parsed.snapshot.projects || !Array.isArray(parsed.snapshot.projects)))) {
+      throw new Error("invalid");
+    }
+    st.dismissedJourneyAlerts = parsed.dismissed_alerts;
+    st.alertSnapshot = parsed.snapshot || null;
+  } catch (e) {
+    $("journey-alert-status").textContent =
+      "Saved alert state is invalid and was not loaded. Refresh will replace it with current saved project data.";
+    st.dismissedJourneyAlerts = [];
+    st.alertSnapshot = null;
+  }
+}
+
+function saveAlertState(snapshot) {
+  st.alertSnapshot = snapshot || st.alertSnapshot;
+  try {
+    localStorage.setItem(JOURNEY_ALERT_STATE_KEY, JSON.stringify({
+      version: 1,
+      dismissed_alerts: st.dismissedJourneyAlerts,
+      snapshot: st.alertSnapshot,
+    }));
+    return true;
+  } catch (e) {
+    $("journey-alert-status").textContent =
+      "The alert check completed, but browser-local alert state could not be saved.";
+    return false;
+  }
+}
+
+function alertLabel(kind) {
+  return {
+    approaching_works: "Approaching works",
+    active_impact: "Active route impact",
+    dates_changed: "Project dates changed",
+    reopening_confirmed: "Reopening confirmed",
+    reopening_unconfirmed: "Scheduled end passed",
+  }[kind] || kind;
+}
+
+function journeyAlertCard(alert) {
+  const source = alert.source;
+  const effect = alert.route_effect;
+  const routeText = effect ? effect.status === "unreachable"
+    ? `${alert.kind === "active_impact" ? "Current" : "Modeled historical"} effect: baseline ${metres(effect.baseline_metres)}; route becomes unreachable.`
+    : `${alert.kind === "active_impact" ? "Current" : "Modeled historical"} effect: baseline ${metres(effect.baseline_metres)}; affected route ${metres(effect.metres)} (${signed(effect.change_metres)}).`
+    : "";
+  return el("article", {
+    class: `card alert-card ${alert.kind === "reopening_confirmed" ? "confirmed" : ""} ${alert.synthetic ? "synthetic" : ""}`,
+  },
+  el("div", { class: "card-title" },
+    el("h3", {}, `${alertLabel(alert.kind)} · ${alert.journey_name}`),
+    el("span", {}, pill(alert.synthetic ? "Synthetic project" : "Saved project", alert.synthetic ? "pill-warn" : "pill-ok"))),
+  el("p", {}, alert.message),
+  routeText ? el("p", { class: "hint" }, routeText) : null,
+  el("p", {}, el("strong", {}, `${alert.project_label}. `),
+    `${alert.start_date} to ${alert.end_date}.`),
+  el("p", { class: "alert-meta alert-source" },
+    `Source: ${source.project_source_label}. ${source.project_source_url}. `,
+    `Saved data: ${source.snapshot_file}. Last checked: ${alert.checked_at}.`),
+  el("button", {
+    type: "button", class: "btn btn-small",
+    "data-dismiss-alert": alert.id,
+  }, "Dismiss"));
+}
+
+function renderJourneyAlerts() {
+  const host = $("journey-alerts");
+  const visible = st.journeyAlerts.filter(
+    (alert) => !st.dismissedJourneyAlerts.includes(alert.id)
+  );
+  if (!visible.length) {
+    host.replaceChildren();
+    host.hidden = true;
+    return;
+  }
+  host.hidden = false;
+  host.replaceChildren(
+    el("h2", {}, "Saved-journey alerts"),
+    el("p", { class: "hint" }, "Checks occur when the app opens or when you refresh; there is no continuous monitoring."),
+    ...visible.map(journeyAlertCard),
+  );
+}
+
+async function refreshJourneyAlerts() {
+  const status = $("journey-alert-status");
+  if (!st.savedJourneys.length) {
+    st.journeyAlerts = [];
+    status.textContent = "No saved walking journeys to check.";
+    renderJourneyAlerts();
+    return;
+  }
+  status.textContent = "Checking saved local project records…";
+  try {
+    const result = await api("/api/journey-alerts", {
+      saved_journeys: st.savedJourneys,
+      previous_projects: st.alertSnapshot && st.alertSnapshot.projects
+        ? st.alertSnapshot.projects : [],
+    });
+    st.journeyAlerts = result.alerts;
+    st.alertSnapshot = result.snapshot;
+    saveAlertState(result.snapshot);
+    const unavailable = result.unavailable || [];
+    status.textContent = unavailable.length
+      ? `${result.alerts.length} alert(s); ${unavailable.length} saved journey or project data item(s) unavailable. ${unavailable.map((item) => item.message).join(" ")}`
+      : `${result.alerts.length} alert(s) checked at ${result.checked_at}.`;
+    renderJourneyAlerts();
+  } catch (e) {
+    st.journeyAlerts = [];
+    status.textContent = `Project data unavailable: ${e.message}`;
+    renderJourneyAlerts();
+  }
+}
+
 function mapPoint(event) {
   const map = $("map"), pt = map.createSVGPoint();
   pt.x = event.clientX; pt.y = event.clientY;
@@ -1477,6 +1604,18 @@ async function init() {
       savedJourneyError("This browser could not remove the invalid saved data.");
     }
   });
+  $("refresh-journey-alerts").addEventListener("click", refreshJourneyAlerts);
+  $("journey-alerts").addEventListener("click", (e) => {
+    const button = e.target.closest && e.target.closest("[data-dismiss-alert]");
+    if (!button) return;
+    const id = button.getAttribute("data-dismiss-alert");
+    if (!st.dismissedJourneyAlerts.includes(id)) {
+      st.dismissedJourneyAlerts.push(id);
+    }
+    saveAlertState();
+    renderJourneyAlerts();
+  });
+  loadAlertState();
   loadSavedJourneys();
   $("assess-date").addEventListener("input", inputsChanged);
   $("question").addEventListener("input", () => { if (st.compare) { st.compareStale = true; applyStale(); clearTimeout(st.timer); st.timer = setTimeout(checkFingerprint, 150); } });
@@ -1528,6 +1667,7 @@ async function init() {
   frame.addEventListener("wheel", (e) => { if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 0.87); } }, { passive: false });
   window.addEventListener("resize", () => { if (st.data) fitBox(journeyBox(), 0.25); });
   await loadCase(st.index.cases[0].id);
+  await refreshJourneyAlerts();
 }
 init();
 })();

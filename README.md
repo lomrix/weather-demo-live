@@ -306,6 +306,27 @@ fixtures with:
 python harness\build_place_index.py
 ```
 
+Saved-journey alerts use the saved Hamar urban walking graph and two local,
+clearly labelled synthetic project snapshots. They are checked when the app
+opens or when **Refresh journey alerts** is selected; no continuous monitoring
+runs. Python resolves each saved journey and reuses the project assessment
+engine to report approaching works and active distance/unreachable effects.
+The browser retains the previous project snapshot and dismissed alert IDs in
+local storage, preventing duplicates on refresh while preserving saved
+journeys.
+
+Date changes are compared with the previously seen saved record. An expired
+scheduled end is shown as **Scheduled end passed; reopening unconfirmed**.
+Reopening is shown only when the saved source explicitly contains
+`reopening_confirmed: true`; it is never inferred from an elapsed end date.
+Date-change and reopening alerts are emitted only for saved journeys whose
+baseline route is changed by the project's modeled restriction. After the
+scheduled end, relevance is retained by reassessing the project at its start
+date rather than assuming an expired project remains active.
+Every alert includes its saved source, source URL, synthetic/public status and
+last-checked time. Missing project files, invalid snapshots and journeys that
+can no longer resolve are reported as unavailable.
+
 For the first car assessment, choose **Hamar driving: Furubergvegen area to Ringgata**. The fixed illustrative journey runs from OSM node `829426096` to `3223998135`; the selected project closes the 15 m segment `osm-road-27339628-segment-11` in both directions. Set the project dates to include the assessment date and select **Assess projects**: the saved graph gives **2,449 m** without the closure and **2,854 m** with it (+405 m). The closure is hypothetical, not a reported closure. Change the assessment date outside the project dates and reassess to see the baseline; the map draws both routes and the active closed segment. Only this fixed driving journey is offered; custom points and AI mitigation remain walking-only.
 
 The separate car graph uses the same study rectangle described below, saved as `fixtures\maps\hamar-urban-roads.osm` on 2026-11-12. Its manifest records each tile URL, retrieval time and hash, the merged hash and sanitized hash. The snapshot contains 23,409 graph nodes and 24,201 car links. Roads crossing the rectangle can retain nodes beyond it, but alternatives farther outside the extract are missing. Rebuild with another area's west, south, east, north coordinates and a suitable tile grid:

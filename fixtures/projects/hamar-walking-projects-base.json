@@ -1,0 +1,71 @@
+{
+  "id": "hamar-walking-projects-base-v1",
+  "generated_from": "Reproducible synthetic alert fixture for the saved Hamar urban walking graph",
+  "synthetic": true,
+  "case_id": "hamar-urban",
+  "source": {
+    "label": "Synthetic Hamar walking-project alert fixture",
+    "file": "fixtures/projects/hamar-walking-projects-base.json",
+    "kind": "saved_local_fixture",
+    "retrieved_at": "2026-11-18T12:00:00+01:00",
+    "attribution": "Weather demo project; invented dates and works, not municipal notices."
+  },
+  "projects": [
+    {
+      "id": "ringgata-active-demo",
+      "label": "Ringgata access works (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-10",
+      "end_date": "2026-11-22",
+      "section_ids": ["verified-closure"],
+      "reopening_confirmed": false,
+      "source_url": "https://example.invalid/synthetic/ringgata-active-demo",
+      "source_label": "Saved synthetic project record"
+    },
+    {
+      "id": "ringgata-extension-demo",
+      "label": "Ringgata paving extension (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-15",
+      "end_date": "2026-11-17",
+      "section_ids": ["verified-closure"],
+      "reopening_confirmed": false,
+      "source_url": "https://example.invalid/synthetic/ringgata-extension-demo",
+      "source_label": "Saved synthetic project record"
+    },
+    {
+      "id": "ringgata-upcoming-demo",
+      "label": "Ringgata upcoming works (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-25",
+      "end_date": "2026-12-05",
+      "section_ids": ["verified-closure"],
+      "reopening_confirmed": false,
+      "source_url": "https://example.invalid/synthetic/ringgata-upcoming-demo",
+      "source_label": "Saved synthetic project record"
+    },
+    {
+      "id": "ringgata-expired-demo",
+      "label": "Ringgata north diversion (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-01",
+      "end_date": "2026-11-16",
+      "section_ids": ["verified-closure"],
+      "reopening_confirmed": false,
+      "source_url": "https://example.invalid/synthetic/ringgata-expired-demo",
+      "source_label": "Saved synthetic project record"
+    },
+    {
+      "id": "ringgata-reopened-demo",
+      "label": "Ringgata temporary works (synthetic)",
+      "hypothetical": true,
+      "start_date": "2026-11-01",
+      "end_date": "2026-11-17",
+      "section_ids": ["verified-closure"],
+      "reopening_confirmed": true,
+      "reopening_confirmed_at": "2026-11-17T16:30:00+01:00",
+      "source_url": "https://example.invalid/synthetic/ringgata-reopened-demo",
+      "source_label": "Synthetic source explicitly confirming reopening"
+    }
+  ]
+}
