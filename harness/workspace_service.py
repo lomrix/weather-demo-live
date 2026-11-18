@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 try:
+    from .accessibility_evidence import load_evidence, summarize
     from .import_driving_osm import import_roads
     from .import_hamar_osm import import_scenario
     from .ollama_scenario import (
@@ -27,6 +28,7 @@ try:
     from .project_scenario import DATE_RULE, assess_projects, parse_date
     from .scenario_compare import shortest_route
 except ImportError:
+    from accessibility_evidence import load_evidence, summarize
     from import_driving_osm import import_roads
     from import_hamar_osm import import_scenario
     from ollama_scenario import (
@@ -212,6 +214,7 @@ class Workspace:
         self.opener = opener
         self._busy = threading.Lock()
         self.notice = load_notice(self.root)
+        self.koigen_accessibility = load_evidence(self.root)
         manifest = json.loads(
             (self.root / "fixtures" / "maps" / "manifest.json").read_text(encoding="utf-8")
         )
@@ -891,7 +894,7 @@ class Workspace:
                     "longer": "longer", "unchanged": "unchanged",
                 }[custom_row["status"]]
         assessment_fp, _ = self.fingerprints(norm)
-        return {
+        assessment = {
             "fingerprint": assessment_fp,
             "modeled_section_confirmation": norm["modeled_section_confirmation"],
             "assessment_date": info["assessment_date"],
@@ -904,6 +907,22 @@ class Workspace:
             "journeys": rows,
             "custom_journey": custom_view,
         }
+        if case["id"] == "koigen-demo" and rows:
+            journey = case["journeys"][0]
+            modeled_detour = shortest_route(
+                case["scenario"]["network"],
+                journey["origin"]["id"],
+                journey["destination"]["id"],
+                closed=case["section_ids"][case["config"]["closure_section_id"]]["link_ids"],
+            )
+            assessment["accessibility"] = summarize(
+                case, self.koigen_accessibility,
+                {
+                    "baseline_path": rows[0]["baseline_path"],
+                    "path": modeled_detour["path"],
+                },
+            )
+        return assessment
 
     def assess(self, payload):
         return self.assess_normalized(self.normalize(payload))

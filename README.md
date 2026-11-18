@@ -300,6 +300,20 @@ For the Ringgata presentation demo, select **Load Ringgata demo**. This replaces
 
 Select **Load Koigen demo** for the separate Koigen–Tjuvholmen candidate comparison on the existing urban walking map. It shows the 323 m open route and the 593 m result when the modeled OSM way 112510399 section is closed. The selected assessment date and matching one-day project dates only activate the model; the municipality notice does not specify the exact closure extent or dates. The calculated detour is modeled, not a reconstruction of the signed diversion. Slope, surface and steps are unknown.
 
+The Koigen assessment also starts with the accessibility requirement **avoid
+steps** and reports sourced evidence for the shortest and modeled-detour
+routes. The sanitized walking fixture removed accessibility-related OSM tags,
+so the saved review recovers route-way and route-node history versions valid
+at the fixture's retrieval cutoff. It does not treat an absent steps tag as
+step-free evidence or calculate slope from two-dimensional coordinates. For
+the current saved routes, no link has explicit step-free evidence and no route
+can be supported as a step-avoiding alternative: 323 m of baseline links and
+593 m of detour links retain unknown step status. Baseline surface is tagged
+`fine_gravel`; detour surfaces are 125 m `fine_gravel`, 116 m `pebblestone`,
+80 m `unpaved`, and 272 m unknown. Slope remains unknown throughout. Source
+versions, checked time, fixture hash and ODbL attribution are retained in the
+saved evidence file.
+
 The Koigen demo now starts with notice review rather than an automatic assessment. **Draft from notice** reads the saved municipal notice and makes one bounded request to the local `qwen2.5:3b` model. Python verifies sentence numbers against the saved text, separates the focused footpath consequence from the notice's parking dates, and displays a hand-checked correction for human review. The person must explicitly confirm OSM way `112510399`, nodes `302372908`–`1023215093`, as a modeled candidate before **Assess projects** is enabled; Python enforces the same gate. If Ollama is unavailable, the draft action fails clearly and the manual review/confirmation/assessment remains usable without a model. The extraction approach is adapted from Kai's draft PR #20, commit `408db94022cbf0a58d163921618fdddcf51dbc8c`, with attribution retained in the fixture and UI.
 
 For bus-stop access, select **Load synthetic bus scenario**, choose a destination stop, and switch between normal service and the hypothetical skipped usual stop. The map shows the fictional service, direction and stops; the results compare the walk to the usual stop with the shortest walk to a reachable stop still served by the same synthetic trip before the chosen destination. Choosing synthetic stop B as the destination demonstrates the no-alternative outcome. The fixed walking start and all synthetic stop positions are nodes on the wider saved walking network; all synthetic stops are assumed boardable. No walking closures or bus route are modeled; bus delay and boarding accessibility are unknown. This is a fictional example, not a real service, timetable, stop location, closure, delay or passenger observation. Loading it resets the walking workspace; use **Return to walking workspace** and **Load Ringgata demo** to start the walking demo again.
