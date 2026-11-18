@@ -6,6 +6,7 @@ Start with: python hamar_workspace.py
 import argparse
 import json
 import sys
+import urllib.parse
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -111,6 +112,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, self.server.workspace.case_payload(path[len("/api/cases/"):]))
             except LookupError:
                 self._json(404, {"error": "Unknown case"})
+        elif path == "/api/places":
+            query = urllib.parse.parse_qs(self.path.split("?", 1)[1]).get("q", [""])[0] \
+                if "?" in self.path else ""
+            try:
+                self._json(200, self.server.workspace.search_places(query))
+            except ValueError as exc:
+                self._json(400, {"error": str(exc)})
         else:
             self._json(404, {"error": "Not found"})
 

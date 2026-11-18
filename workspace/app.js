@@ -21,11 +21,20 @@ const st = {
   view: null, bounds: null, proj: null, pendingCompare: false,
   custom: { origin: null, destination: null }, customInfo: null, pick: null, customSeq: 0,
   demoBusy: false, bus: null, noticeDraft: null, modeledConfirmed: false,
+  endpointLabels: { origin: null, destination: null },
+  endpointPlaces: { origin: null, destination: null },
+  placeMatches: { origin: [], destination: [] }, placeSeq: { origin: 0, destination: 0 },
+  placeTimer: { origin: null, destination: null }, savedJourneys: [],
+  invalidSavedData: false,
 };
 const CUSTOM = "custom";
+const SAVED_JOURNEYS_KEY = "hamar-access-lab.saved-journeys.v1";
 const isDriving = () => st.data && st.data.mode === "vehicle";
 const isCustom = () => st.journeyId === CUSTOM;
 const allSections = () => st.data.sections.concat(st.customInfo ? st.customInfo.sections : []);
+function endpointLabel(which) {
+  return st.endpointLabels[which] || (which === "origin" ? "Start" : "Destination");
+}
 
 function el(tag, attrs, ...kids) {
   const node = document.createElement(tag);
@@ -447,14 +456,14 @@ function drawMap() {
       const info = st.customInfo && st.customInfo[key];
       const requested = st.proj(raw[0], raw[1]);
       if (info && info.status === "outside_coverage") {
-        addMarker(markers, requested, `${name}: outside loaded map coverage`, "#0b3d75", true);
+        addMarker(markers, requested, `${endpointLabel(key)}: outside loaded map coverage`, "#0b3d75", true);
       } else {
         if (info && info.snapped) {
           const s = st.proj(info.snapped[0], info.snapped[1]);
           markers.append(svg("line", { x1: requested[0], y1: requested[1], x2: s[0], y2: s[1], stroke: fill, "stroke-width": 2, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke" }));
-          addMarker(markers, s, info.snap_metres > 3 ? `${name} (nearest mapped node)` : name, fill, false);
+          addMarker(markers, s, info.snap_metres > 3 ? `${endpointLabel(key)} (nearest mapped node)` : endpointLabel(key), fill, false);
         } else {
-          addMarker(markers, requested, name, fill, false);
+          addMarker(markers, requested, endpointLabel(key), fill, false);
         }
         if (info && info.snapped && info.snap_metres > 3) {
           markers.append(svg("circle", { cx: requested[0], cy: requested[1], r: 4, fill: "#fff", stroke: fill, "stroke-width": 2, "vector-effect": "non-scaling-stroke" }));
@@ -653,7 +662,13 @@ function customCard() {
   return el("article", { class: cls },
     el("div", { class: "card-title" }, el("h3", {}, "Your journey"),
       el("span", {}, $("demo-controls").hidden ? null : pill("Hypothetical demo", "pill-hyp"), " ", pillNode)),
-    el("ul", { class: "endpoint-list" }, endpointLine("Start", info.origin), endpointLine("Destination", info.destination)),
+    el("ul", { class: "endpoint-list" },
+      endpointLine(endpointLabel("origin"), info.origin),
+      endpointLine(endpointLabel("destination"), info.destination)),
+    ...["origin", "destination"].filter((side) => st.endpointPlaces[side]).map((side) => {
+      const selected = st.endpointPlaces[side], source = selected.source || {};
+      return el("p", { class: "hint" }, `${endpointLabel(side)} source: ${source.provider || source.file || "saved Hamar place index"} · ${source.file || selected.source_id || "saved source"}${source.source_url ? ` · ${source.source_url}` : ""}`);
+    }),
     el("p", {}, text),
     st.assessStale && st.assessment ? staleNote() : null,
     row && row.contributing_projects.length ? el("p", { class: "hint" }, `Caused by: ${row.contributing_projects.map((id) => (st.assessment.active_projects.find((p) => p.id === id) || { label: id }).label).join(", ")}.`) : null,
@@ -889,6 +904,8 @@ async function resolveCustom() {
 }
 function setPoint(which, lat, lon) {
   st.custom[which] = [Math.round(lat * 1e6) / 1e6, Math.round(lon * 1e6) / 1e6];
+  st.endpointLabels[which] = which === "origin" ? "Selected start" : "Selected destination";
+  st.endpointPlaces[which] = null;
   selectCustom(); setPick(null); syncCoordInputs();
   st.customInfo = null;
   inputsChanged(); drawMap(); renderResults();
@@ -896,6 +913,13 @@ function setPoint(which, lat, lon) {
 }
 function clearCustom() {
   st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
+  st.endpointLabels = { origin: null, destination: null };
+  st.endpointPlaces = { origin: null, destination: null };
+  for (const side of ["origin", "destination"]) {
+    $(side === "origin" ? "place-from" : "place-to").value = "";
+    $(side === "origin" ? "place-from-results" : "place-to-results").replaceChildren();
+    $(side === "origin" ? "place-from-status" : "place-to-status").textContent = "";
+  }
   setPick(null); syncCoordInputs();
   const valid = new Set(st.data.sections.map((s) => s.id));
   for (const p of st.projects) for (const id of [...p.sections]) if (!valid.has(id)) p.sections.delete(id);
@@ -909,7 +933,255 @@ function applyCoords() {
   const values = ["cj-start-lat", "cj-start-lon", "cj-dest-lat", "cj-dest-lon"].map(num);
   if (values.some((v) => Number.isNaN(v))) { showError("Enter all four coordinates as decimal numbers, for example 60.8044 and 11.0490."); return; }
   st.custom.origin = [values[0], values[1]]; st.custom.destination = [values[2], values[3]];
+  st.endpointLabels = { origin: "Entered start", destination: "Entered destination" };
+  st.endpointPlaces = { origin: null, destination: null };
   setPoint("origin", values[0], values[1]);
+}
+
+function placeResultButton(side, place) {
+  const type = place.kind === "bus_stop"
+    ? `Bus stop${place.services ? ` · ${place.services.join(", ")}` : ""}`
+    : "Named walking place";
+  return el("button", { type: "button", class: "btn btn-small place-result",
+    "data-place-side": side, "data-place-id": place.id },
+  place.name,
+  el("small", {}, `${type} · ${place.source && (place.source.provider || place.source.file)}`));
+}
+
+function showPlaceMatches(side, result) {
+  const host = $(side === "origin" ? "place-from-results" : "place-to-results");
+  const status = $(side === "origin" ? "place-from-status" : "place-to-status");
+  st.placeMatches[side] = result.matches;
+  if (!result.matches.length) {
+    host.replaceChildren();
+    status.textContent = "No match in the saved Hamar index. Try another name or use map/coordinates.";
+    return;
+  }
+  status.textContent = `${result.matches.length}${result.truncated ? "+" : ""} saved match${result.matches.length === 1 ? "" : "es"}.`;
+  host.replaceChildren(...result.matches.map((place) => placeResultButton(side, place)));
+}
+
+async function searchPlaces(side) {
+  const input = $(side === "origin" ? "place-from" : "place-to");
+  const status = $(side === "origin" ? "place-from-status" : "place-to-status");
+  const query = input.value.trim();
+  if (!query) {
+    st.placeMatches[side] = [];
+    $(side === "origin" ? "place-from-results" : "place-to-results").replaceChildren();
+    status.textContent = "";
+    return;
+  }
+  if (query.length > 80) {
+    status.textContent = "Use at most 80 characters.";
+    return;
+  }
+  const seq = ++st.placeSeq[side];
+  status.textContent = "Searching saved local data…";
+  try {
+    const result = await api(`/api/places?q=${encodeURIComponent(query)}`);
+    if (seq !== st.placeSeq[side]) return;
+    showPlaceMatches(side, result);
+  } catch (e) {
+    if (seq === st.placeSeq[side]) status.textContent = e.message;
+  }
+}
+
+async function choosePlace(side, id) {
+  const place = st.placeMatches[side].find((item) => item.id === id);
+  if (!place) {
+    showError("The selected place is no longer in the current search results.");
+    return;
+  }
+  st.custom[side] = [...place.coordinates];
+  st.endpointLabels[side] = place.name;
+  st.endpointPlaces[side] = {
+    id: place.id, source: place.source, source_id: place.source_id,
+    kind: place.kind, services: place.services || [],
+  };
+  $(side === "origin" ? "place-from" : "place-to").value = place.name;
+  selectCustom(); setPick(null); syncCoordInputs();
+  st.customInfo = null;
+  $("demo-controls").hidden = true;
+  inputsChanged(); drawMap(); renderResults();
+  await resolveCustom();
+}
+
+function savedJourneyError(message) {
+  $("saved-journey-message").textContent = message || "";
+}
+
+function validSavedJourney(item) {
+  const point = (value) => Array.isArray(value) && value.length === 2
+    && value.every((number) => typeof number === "number" && Number.isFinite(number));
+  const data = item && item.version === 1 && typeof item.id === "string"
+    && typeof item.name === "string" && item.name.trim() && item.name.length <= 60
+    && typeof item.case_id === "string"
+    && st.index.cases.some((entry) => entry.id === item.case_id && entry.id !== "hamar-driving")
+    && item.origin && typeof item.origin.label === "string" && item.origin.label.length <= 120
+    && item.destination && typeof item.destination.label === "string" && item.destination.label.length <= 120
+    && point(item.origin && item.origin.coordinates)
+    && point(item.destination && item.destination.coordinates);
+  return Boolean(data);
+}
+
+function writeSavedJourneys(items) {
+  try {
+    localStorage.setItem(SAVED_JOURNEYS_KEY, JSON.stringify({ version: 1, journeys: items }));
+    st.savedJourneys = items;
+    return true;
+  } catch (e) {
+    savedJourneyError("This browser could not save journeys. Check local storage permissions.");
+    return false;
+  }
+}
+
+function renderSavedJourneys() {
+  const host = $("saved-journey-list");
+  host.replaceChildren();
+  if (!st.savedJourneys.length) {
+    host.append(el("p", { class: "hint" }, "No valid saved journeys yet."));
+    return;
+  }
+  for (const journey of st.savedJourneys) {
+    const caseLabel = (st.index.cases.find((item) => item.id === journey.case_id) || {}).label || journey.case_id;
+    const item = el("div", { class: "saved-item" },
+      el("div", {},
+        el("p", {}, el("strong", {}, journey.name)),
+        el("p", { class: "hint" }, `${journey.origin.label} → ${journey.destination.label}`),
+        el("p", { class: "hint" }, caseLabel)),
+      el("div", {},
+        el("button", { type: "button", class: "btn btn-small", "data-restore-saved": journey.id }, "Restore"),
+        " ",
+        el("button", { type: "button", class: "btn btn-small", "data-delete-saved": journey.id }, "Delete")));
+    host.append(item);
+  }
+}
+
+function loadSavedJourneys() {
+  let raw;
+  try {
+    raw = localStorage.getItem(SAVED_JOURNEYS_KEY);
+  } catch (e) {
+    savedJourneyError("Local browser storage is unavailable; saved journeys cannot be loaded.");
+    $("discard-saved-data").hidden = true;
+    renderSavedJourneys();
+    return;
+  }
+  if (raw === null) {
+    st.invalidSavedData = false;
+    savedJourneyError("Saved journeys are stored only in this browser.");
+    $("discard-saved-data").hidden = true;
+    renderSavedJourneys();
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (
+      !parsed || parsed.version !== 1 || !Array.isArray(parsed.journeys)
+      || parsed.journeys.length > 20 || !parsed.journeys.every(validSavedJourney)
+    ) {
+      throw new Error("invalid");
+    }
+    st.savedJourneys = parsed.journeys;
+    st.invalidSavedData = false;
+    savedJourneyError(`Loaded ${st.savedJourneys.length} saved journey${st.savedJourneys.length === 1 ? "" : "s"} from this browser.`);
+    $("discard-saved-data").hidden = true;
+  } catch (e) {
+    st.savedJourneys = [];
+    st.invalidSavedData = true;
+    savedJourneyError("Saved journey data is invalid and was not loaded. Discard it or leave it unchanged.");
+    $("discard-saved-data").hidden = false;
+  }
+  renderSavedJourneys();
+}
+
+function saveSelectedJourney() {
+  const name = $("saved-journey-name").value.trim();
+  if (!name || name.length > 60) {
+    savedJourneyError("Enter a journey name of 1 to 60 characters.");
+    $("saved-journey-name").focus();
+    return;
+  }
+  if (st.invalidSavedData) {
+    savedJourneyError("Discard the invalid saved data before saving a new journey.");
+    return;
+  }
+  if (st.caseId === "hamar-driving" || !st.custom.origin || !st.custom.destination) {
+    savedJourneyError("Choose both walking endpoints before saving.");
+    return;
+  }
+  if (!st.customInfo || st.customInfo.status !== "ready") {
+    savedJourneyError("Resolve a connected walking journey before saving. Outside-coverage and unmapped connections cannot be saved.");
+    return;
+  }
+  if (st.savedJourneys.some((item) => item.name.toLocaleLowerCase() === name.toLocaleLowerCase())) {
+    savedJourneyError("Use a different name; saved journey names must be unique.");
+    return;
+  }
+  if (st.savedJourneys.length >= 20) {
+    savedJourneyError("Delete a saved journey before adding another; this browser stores at most 20.");
+    return;
+  }
+  const journey = {
+    version: 1,
+    id: `journey-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+    name, case_id: st.caseId,
+    origin: { coordinates: [...st.custom.origin], label: endpointLabel("origin"), place_id: st.endpointPlaces.origin && st.endpointPlaces.origin.id },
+    destination: { coordinates: [...st.custom.destination], label: endpointLabel("destination"), place_id: st.endpointPlaces.destination && st.endpointPlaces.destination.id },
+    saved_at: new Date().toISOString(),
+  };
+  if (writeSavedJourneys([...st.savedJourneys, journey])) {
+    $("saved-journey-name").value = "";
+    savedJourneyError(`Saved “${name}” in this browser.`);
+    renderSavedJourneys();
+  }
+}
+
+async function restoreSavedJourney(id) {
+  const journey = st.savedJourneys.find((item) => item.id === id);
+  if (!journey) {
+    savedJourneyError("That saved journey is no longer available.");
+    return;
+  }
+  setBusy("Restoring saved walking endpoints…");
+  try {
+    if (!await loadCase(journey.case_id)) return;
+    $("case-select").value = st.caseId;
+    st.custom.origin = [...journey.origin.coordinates];
+    st.custom.destination = [...journey.destination.coordinates];
+    st.endpointLabels = { origin: journey.origin.label, destination: journey.destination.label };
+    st.endpointPlaces = { origin: null, destination: null };
+    $("place-from").value = journey.origin.label;
+    $("place-to").value = journey.destination.label;
+    selectCustom(); syncCoordInputs();
+    await resolveCustom();
+    if (!st.customInfo || st.customInfo.status !== "ready") {
+      savedJourneyError(`Restored “${journey.name}”, but ${st.customInfo ? st.customInfo.message : "the endpoints could not be resolved."}`);
+      return;
+    }
+    await assess();
+    if (st.assessment && !st.assessStale) {
+      savedJourneyError(`Restored “${journey.name}” and calculated a fresh assessment.`);
+    } else {
+      savedJourneyError(`Restored “${journey.name}”, but the fresh assessment failed; review the error above.`);
+    }
+  } catch (e) {
+    savedJourneyError(e.message);
+  } finally {
+    setBusy("");
+  }
+}
+
+function deleteSavedJourney(id) {
+  const deleted = st.savedJourneys.find((item) => item.id === id);
+  if (!deleted) {
+    savedJourneyError("That saved journey is no longer available.");
+    return;
+  }
+  if (writeSavedJourneys(st.savedJourneys.filter((item) => item.id !== id))) {
+    savedJourneyError(`Deleted “${deleted.name}” from this browser.`);
+    renderSavedJourneys();
+  }
 }
 function mapPoint(event) {
   const map = $("map"), pt = map.createSVGPoint();
@@ -1003,8 +1275,14 @@ async function loadCase(id) {
     $("confirm-koigen-model").checked = false;
     syncAssessmentGate();
     st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
+    st.endpointLabels = { origin: null, destination: null };
+    st.endpointPlaces = { origin: null, destination: null };
     setPick(null); syncCoordInputs();
     $("custom-journey").hidden = isDriving();
+    $("place-search-scope").textContent = isDriving()
+      ? ""
+      : `Walking scope: ${st.data.label}. Results come from saved Hamar data; points outside this map or more than 75 m from its walking network cannot be assessed.`;
+    renderSavedJourneys();
     $("walking-ai").hidden = isDriving();
     $("compare-btn").disabled = st.data.candidates.length < 3;
     $("ai-note").textContent = st.data.candidates.length < 3
@@ -1162,6 +1440,44 @@ async function init() {
   $("pick-dest").addEventListener("click", () => { $("demo-controls").hidden = true; selectCustom(); setPick("destination"); drawMap(); renderResults(); });
   $("clear-custom").addEventListener("click", clearCustom);
   $("apply-coords").addEventListener("click", applyCoords);
+  for (const side of ["origin", "destination"]) {
+    const id = side === "origin" ? "place-from" : "place-to";
+    $(id).addEventListener("input", () => {
+      clearTimeout(st.placeTimer[side]);
+      st.placeTimer[side] = setTimeout(() => searchPlaces(side), 180);
+    });
+    $(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        searchPlaces(side);
+      }
+    });
+    $(side === "origin" ? "place-from-results" : "place-to-results")
+      .addEventListener("click", (e) => {
+        const button = e.target.closest && e.target.closest("[data-place-id]");
+        if (button) choosePlace(button.getAttribute("data-place-side"), button.getAttribute("data-place-id"));
+      });
+  }
+  $("save-journey").addEventListener("click", saveSelectedJourney);
+  $("saved-journey-list").addEventListener("click", (e) => {
+    const restore = e.target.closest && e.target.closest("[data-restore-saved]");
+    if (restore) return restoreSavedJourney(restore.getAttribute("data-restore-saved"));
+    const remove = e.target.closest && e.target.closest("[data-delete-saved]");
+    if (remove) deleteSavedJourney(remove.getAttribute("data-delete-saved"));
+  });
+  $("discard-saved-data").addEventListener("click", () => {
+    try {
+      localStorage.removeItem(SAVED_JOURNEYS_KEY);
+      st.savedJourneys = [];
+      st.invalidSavedData = false;
+      $("discard-saved-data").hidden = true;
+      savedJourneyError("Invalid saved data was discarded.");
+      renderSavedJourneys();
+    } catch (e) {
+      savedJourneyError("This browser could not remove the invalid saved data.");
+    }
+  });
+  loadSavedJourneys();
   $("assess-date").addEventListener("input", inputsChanged);
   $("question").addEventListener("input", () => { if (st.compare) { st.compareStale = true; applyStale(); clearTimeout(st.timer); st.timer = setTimeout(checkFingerprint, 150); } });
   $("assess-btn").addEventListener("click", assess);

@@ -47,6 +47,8 @@ MAX_QUESTION = 400
 MAX_NAME = 60
 MAX_SECTIONS = 60
 MAX_SNAP_METRES = 75
+MAX_PLACE_QUERY = 80
+MAX_PLACE_RESULTS = 20
 CUSTOM_ID = "custom"
 REQUEST_KEYS = {
     "case_id", "assessment_date", "projects", "question", "custom_journey",
@@ -209,7 +211,7 @@ def _canonical(value):
 
 
 class Workspace:
-    def __init__(self, root=ROOT, opener=urlopen):
+    def __init__(self, root=ROOT, opener=urlopen, load_places=True):
         self.root = Path(root)
         self.opener = opener
         self._busy = threading.Lock()
@@ -243,6 +245,21 @@ class Workspace:
         }
         self.default_published_bus_id = next(iter(self.published_buses))
         self.published_bus = self.published_buses[self.default_published_bus_id]
+        self.place_index = None
+        self.places = []
+        if load_places:
+            place_path = self.root / "fixtures" / "places" / "hamar-place-index.json"
+            self.place_index = json.loads(place_path.read_text(encoding="utf-8"))
+            self.places = self.place_index["places"]
+            if (
+                self.place_index.get("generated_from_saved_data_only") is not True
+                or not isinstance(self.places, list)
+                or not self.places
+            ):
+                raise ValueError("Invalid saved Hamar place index")
+            place_ids = [place.get("id") for place in self.places]
+            if len(place_ids) != len(set(place_ids)):
+                raise ValueError("Saved place IDs must be unique")
 
     def _load_driving_case(self, manifest):
         filename = "hamar-urban-roads.osm"
@@ -641,6 +658,42 @@ class Workspace:
                  "summary": case["config"]["summary"]}
                 for case in self.cases.values()
             ],
+        }
+
+    def search_places(self, query):
+        text = _clean_text(query, "Place search", MAX_PLACE_QUERY)
+        needle = " ".join(text.casefold().split())
+        matches = []
+        for place in self.places:
+            if needle in " ".join(place["name"].casefold().split()):
+                matches.append({
+                    key: value for key, value in place.items()
+                    if key in (
+                        "id", "name", "kind", "coordinates", "source_id",
+                        "services", "service_date", "case_id",
+                    )
+                })
+                matches[-1]["source"] = {
+                    key: place["source"].get(key)
+                    for key in (
+                        "file", "sha256", "provider", "attribution",
+                        "licence_url", "source_url", "retrieved_at_utc",
+                        "map_file", "map_sha256",
+                    )
+                    if place["source"].get(key) is not None
+                }
+                if len(matches) == MAX_PLACE_RESULTS:
+                    break
+        return {
+            "query": text,
+            "matches": matches,
+            "truncated": len(matches) == MAX_PLACE_RESULTS,
+            "source": {
+                "id": self.place_index["id"],
+                "walking_scope": self.place_index["walking_scope"],
+                "generated_from_saved_data_only": True,
+                "provenance": self.place_index["sources"],
+            },
         }
 
     def case_payload(self, case_id):

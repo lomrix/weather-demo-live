@@ -282,6 +282,30 @@ python hamar_workspace.py
 
 Open `http://127.0.0.1:8765/` (`--port N` changes the port, `--open` launches the browser). Pick one of the mapped Hamar cases, a journey and an assessment date, edit the named hypothetical projects (each closes selected route sections; dates are inclusive), then use **Assess projects**. This is a deterministic Python calculation that works with Ollama stopped. For walking cases, **Compare options with AI** recalculates the assessment, then makes one bounded request to the local `qwen2.5:3b` model; Python alone computes candidate geometry and lengths, and the same active closures apply under every option. The model's prose is shown as unchecked text, and its raw reply is kept in collapsed diagnostics. Changing a date, project, section or the question marks displayed results outdated (the fingerprint is computed in Python) until recalculated.
 
+Walking journeys can use **From** and **To** searches over the saved local
+`hamar-place-index.json`, map picking, or direct coordinates. Search is not a
+live geocoder: it contains deduplicated stops from the saved B21/B23 Entur
+fixtures plus named endpoints from saved Hamar walking scenarios. Results keep
+the source fixture/provider, identifiers, source hashes and service date or map
+provenance. The active case label and walking scope are shown beside search.
+An endpoint outside the selected extract, or without a walking node within
+75 m, is reported as outside coverage; disconnected mapped endpoints report
+no mapped connection. Named places are sparse scenario endpoints, not a
+comprehensive Hamar gazetteer, and stop coordinates represent saved quays rather
+than verified entrances.
+
+After resolving a connected custom walking journey, a person can name and save
+it in browser local storage. Saved records contain only endpoints, labels,
+case ID and timestamp; they are local to the browser and survive refresh.
+Restore clears earlier results and requires a fresh assessment. Delete removes
+the record; malformed or unavailable saved data is shown explicitly instead
+of being silently accepted. Rebuild the place index from the same local
+fixtures with:
+
+```text
+python harness\build_place_index.py
+```
+
 For the first car assessment, choose **Hamar driving: Furubergvegen area to Ringgata**. The fixed illustrative journey runs from OSM node `829426096` to `3223998135`; the selected project closes the 15 m segment `osm-road-27339628-segment-11` in both directions. Set the project dates to include the assessment date and select **Assess projects**: the saved graph gives **2,449 m** without the closure and **2,854 m** with it (+405 m). The closure is hypothetical, not a reported closure. Change the assessment date outside the project dates and reassess to see the baseline; the map draws both routes and the active closed segment. Only this fixed driving journey is offered; custom points and AI mitigation remain walking-only.
 
 The separate car graph uses the same study rectangle described below, saved as `fixtures\maps\hamar-urban-roads.osm` on 2026-11-12. Its manifest records each tile URL, retrieval time and hash, the merged hash and sanitized hash. The snapshot contains 23,409 graph nodes and 24,201 car links. Roads crossing the rectangle can retain nodes beyond it, but alternatives farther outside the extract are missing. Rebuild with another area's west, south, east, north coordinates and a suitable tile grid:
