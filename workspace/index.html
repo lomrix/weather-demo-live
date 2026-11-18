@@ -95,9 +95,16 @@
           </div>
           <div id="koigen-demo-controls" hidden>
             <p class="hint"><strong>Modeled candidate, not a confirmed closure segment.</strong> The notice confirms the waterfront footpath will be closed and a diversion signed, but exact closure extent and dates are unknown. The assessment date and matching project start/end shown below are model inputs only, not reported closure dates.</p>
-            <p class="demo-distance" id="koigen-distance" role="status" aria-live="polite"></p>
+            <button type="button" class="btn btn-secondary" id="draft-koigen-notice">Draft from notice</button>
+            <p class="hint">Uses the saved municipal notice and makes one bounded request to local Ollama. The result remains a draft for human review.</p>
+            <p class="demo-distance" id="koigen-distance" role="status" aria-live="polite">Review the notice, then explicitly confirm the modeled map section before assessing.</p>
             <p class="hint">Slope: unknown · Surface: unknown · Steps: unknown. The calculated detour is modeled, not the signed route.</p>
             <p class="hint" id="koigen-source-link"></p>
+            <label class="check confirm-box" for="confirm-koigen-model">
+              <input type="checkbox" id="confirm-koigen-model">
+              <span>I reviewed the notice and confirm OSM way 112510399, nodes 302372908–1023215093, only as a modeled candidate for this assessment.</span>
+            </label>
+            <p class="hint">Confirmation allows the existing Python map calculation. It does not turn the modeled section into verified notice evidence.</p>
           </div>
         </div>
         <label for="case-select">Mapped Hamar case</label>

@@ -27,3 +27,43 @@ Reported usage was 17,513 input / 54 output tokens for `20261022T143808Z-e3red74
 Recurring permitted acquisition, repeated-day evidence and a completed end-to-end coursework workflow remain pending, along with comparison against existing tools and evidence of actual municipal benefit. Selection usefulness must be compared with a simple deterministic baseline; AI superiority is not established. Invocation/time/size controls are not a proven hard token or monetary budget, which remains open. The offline reports/replay do not complete the agentic coursework assignment.
 
 Earlier funding timeline and source-probe components remain practice exercises; their synthetic tests do not establish live performance or complete a funding workflow.
+
+# Saved journeys and source-backed alerts
+
+Add named saved journeys as a later extension of the existing notice-to-map
+workflow. A saved journey stores the existing case, journey or user-selected
+endpoints, and the mapped mode; it does not store a person's identity, contact
+details or a continuous location. A person can review which saved journeys
+could be affected when a notice is checked.
+
+Start alert delivery in the browser workspace. A source-backed in-app alert may
+cover:
+
+- upcoming works that have a stated future period;
+- a source change affecting a route, closure segment or saved journey;
+- an extended end date or changed works period; and
+- a confirmed reopening of an affected route.
+
+Every alert must show the saved source, the supporting excerpt or extracted
+source fact, and the `last_checked` time. It must link to the saved notice or
+official source and state whether the information is scheduled, announced,
+unchanged, or confirmed. Rechecking may refresh `last_checked` without creating
+a duplicate alert when the source fact is unchanged.
+
+Keep **scheduled completion** separate from **verified reopening**. A planning
+date, stated end date or project timetable is a scheduled completion only. Do
+not label access restored or reopened until the source explicitly confirms the
+reopening or provides separately verified observation evidence. Parking,
+project-milestone and publication dates must not be reused as footpath closure
+or reopening dates.
+
+Email and phone notifications are later delivery extensions. They require an
+explicit separate opt-in, a contact-address design, delivery-failure handling,
+retention/deletion controls and a review of personal-data scope; none are part
+of the initial in-app alert workflow.
+
+Source checks must remain bounded and inspectable. The first implementation
+may use saved notices and explicit user-triggered checks; it must not imply
+continuous monitoring. Alert matching must reuse the checked notice review
+and Python-owned map/routing logic rather than allowing an AI draft to change
+journey geometry or declare reopening.
