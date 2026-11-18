@@ -152,6 +152,9 @@
             <p class="hint" id="saved-journey-message" role="status"></p>
             <div id="saved-journey-list"></div>
             <button type="button" class="btn btn-small" id="discard-saved-data" hidden>Discard invalid saved data</button>
+            <p class="hint">Journey alerts are checked only when the app opens or you request a refresh; this is not continuous monitoring.</p>
+            <button type="button" class="btn btn-small" id="refresh-journey-alerts">Refresh journey alerts</button>
+            <p class="hint" id="journey-alert-status" role="status"></p>
           </div>
         </div>
       </section>
@@ -181,6 +184,7 @@
 
   <section class="results" id="results" aria-labelledby="results-title">
     <h2 id="results-title">Checked results</h2>
+    <section id="journey-alerts" aria-live="polite" hidden></section>
     <div id="result-cards"></div>
     <details class="panel" id="evidence">
       <summary>Evidence and technical IDs</summary>

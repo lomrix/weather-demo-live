@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 try:
+    from .project_alerts import build_alerts, load_snapshot
     from .accessibility_evidence import load_evidence, summarize
     from .import_driving_osm import import_roads
     from .import_hamar_osm import import_scenario
@@ -28,6 +29,7 @@ try:
     from .project_scenario import DATE_RULE, assess_projects, parse_date
     from .scenario_compare import shortest_route
 except ImportError:
+    from project_alerts import build_alerts, load_snapshot
     from accessibility_evidence import load_evidence, summarize
     from import_driving_osm import import_roads
     from import_hamar_osm import import_scenario
@@ -695,6 +697,33 @@ class Workspace:
                 "provenance": self.place_index["sources"],
             },
         }
+
+    def project_records(self, revision="current"):
+        snapshot = load_snapshot(self.root, revision)
+        return {
+            "id": snapshot["id"],
+            "sha256": snapshot["sha256"],
+            "source": snapshot["source"],
+            "projects": snapshot["projects"],
+            "synthetic": snapshot["synthetic"],
+        }
+
+    def journey_alerts(self, payload):
+        if not isinstance(payload, dict) or set(payload) not in (
+            {"saved_journeys", "previous_projects"},
+            {"saved_journeys", "previous_projects", "revision"},
+            {"saved_journeys", "previous_projects", "as_of"},
+            {"saved_journeys", "previous_projects", "revision", "as_of"},
+        ):
+            raise ValueError("Send saved_journeys and the previous project snapshot")
+        return build_alerts(
+            self,
+            self.root,
+            payload["saved_journeys"],
+            payload["previous_projects"],
+            payload.get("revision", "current"),
+            payload.get("as_of"),
+        )
 
     def case_payload(self, case_id):
         case = self.get_case(case_id)

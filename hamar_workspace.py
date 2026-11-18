@@ -27,7 +27,8 @@ STATIC = {
 }
 POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compare": "compare",
          "/api/journey": "resolve_journey", "/api/bus/assess": "assess_bus",
-         "/api/notice/draft": "draft_koigen_notice"}
+         "/api/notice/draft": "draft_koigen_notice",
+         "/api/journey-alerts": "journey_alerts"}
 SECURITY_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
@@ -117,6 +118,13 @@ class Handler(BaseHTTPRequestHandler):
                 if "?" in self.path else ""
             try:
                 self._json(200, self.server.workspace.search_places(query))
+            except ValueError as exc:
+                self._json(400, {"error": str(exc)})
+        elif path == "/api/project-records":
+            query = urllib.parse.parse_qs(self.path.split("?", 1)[1]).get("revision", ["current"])[0] \
+                if "?" in self.path else "current"
+            try:
+                self._json(200, self.server.workspace.project_records(query))
             except ValueError as exc:
                 self._json(400, {"error": str(exc)})
         else:
