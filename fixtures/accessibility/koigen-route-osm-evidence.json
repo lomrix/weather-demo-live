@@ -1,0 +1,123 @@
+{
+  "id": "koigen-route-osm-evidence-2026-11-12",
+  "requirement": "avoid_steps",
+  "snapshot_cutoff": "2026-11-12T16:42:29.998466+00:00",
+  "checked_at": "2026-11-18T14:26:55.0985917+01:00",
+  "fixture": {
+    "file": "fixtures/maps/hamar-urban.osm",
+    "source_manifest": "fixtures/maps/manifest.json",
+    "retrieved_at": "2026-11-12T16:42:29.998466+00:00",
+    "sanitized_fixture_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
+    "attribution": "OpenStreetMap contributors",
+    "license": "ODbL 1.0"
+  },
+  "source_method": "Recovered the latest visible OSM way and route-node element versions at or before the saved map's retrieval cutoff from the official OSM API history endpoints. The sanitizer had retained only highway and foot tags; these historical source versions restore other non-personal tags for evidence review without changing the routing fixture.",
+  "way_elements": {
+    "112510399": {
+      "version": 13,
+      "timestamp": "2024-06-17T08:57:41Z",
+      "source_url": "https://api.openstreetmap.org/api/0.6/way/112510399/history",
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "surface": "fine_gravel"
+      }
+    },
+    "28661660": {
+      "version": 16,
+      "timestamp": "2024-06-17T08:57:41Z",
+      "source_url": "https://api.openstreetmap.org/api/0.6/way/28661660/history",
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway",
+        "ncn_ref": "7",
+        "surface": "pebblestone"
+      }
+    },
+    "38891385": {
+      "version": 15,
+      "timestamp": "2024-06-17T08:57:41Z",
+      "source_url": "https://api.openstreetmap.org/api/0.6/way/38891385/history",
+      "tags": {
+        "bicycle": "designated",
+        "foot": "designated",
+        "highway": "cycleway"
+      }
+    },
+    "821766363": {
+      "version": 1,
+      "timestamp": "2020-07-01T07:50:26Z",
+      "source_url": "https://api.openstreetmap.org/api/0.6/way/821766363/history",
+      "tags": {
+        "highway": "footway"
+      }
+    },
+    "667133355": {
+      "version": 3,
+      "timestamp": "2020-07-01T07:50:26Z",
+      "source_url": "https://api.openstreetmap.org/api/0.6/way/667133355/history",
+      "tags": {
+        "highway": "footway"
+      }
+    },
+    "59405582": {
+      "version": 9,
+      "timestamp": "2026-07-14T17:50:25Z",
+      "source_url": "https://api.openstreetmap.org/api/0.6/way/59405582/history",
+      "tags": {
+        "bicycle": "designated",
+        "check_date:surface": "2026-07-14",
+        "foot": "designated",
+        "highway": "cycleway",
+        "surface": "unpaved"
+      }
+    }
+  },
+  "route_node_elements": {
+    "checked_count": 66,
+    "source_url_template": "https://api.openstreetmap.org/api/0.6/node/{node_id}/history",
+    "node_ids": [
+      "302136563", "302372903", "302372904", "302372907", "302372908",
+      "302372909", "302372910", "302372911", "302372912", "302372913",
+      "302372914", "302372915", "302372916", "302372917", "302372918",
+      "302372919", "302372921", "302372925", "302372926", "302372927",
+      "302372928", "302372929", "302372930", "302372931", "302372932",
+      "461987664", "461987666", "461987669", "736693902", "736694349",
+      "736694356", "736694365", "829425796", "1023215093", "1023215097",
+      "1023215099", "1023215125", "1023215135", "1023215138", "1023215163",
+      "1023215176", "1023215192", "1023215203", "1023215214", "1023215216",
+      "1095154145", "1095154965", "2510094581", "2705301357", "3924531699",
+      "3924531700", "3924531701", "4831621827", "6246444329", "6246446645",
+      "6246446648", "6246446649", "6246446650", "6246446651", "6246446871",
+      "7672972836", "7672972837", "7672972838", "8699412630", "9092642095",
+      "9464458649"
+    ],
+    "reviewed_tag_keys": [
+      "barrier", "highway", "incline", "ramp", "ramp:stroller",
+      "ramp:wheelchair", "smoothness", "step_count", "surface",
+      "tactile_paving", "wheelchair"
+    ],
+    "relevant_findings": []
+  },
+  "route_way_metres": {
+    "baseline": {
+      "112510399": 323
+    },
+    "detour": {
+      "112510399": 125,
+      "28661660": 116,
+      "38891385": 185,
+      "821766363": 7,
+      "667133355": 80,
+      "59405582": 80
+    }
+  },
+  "interpretation_limits": [
+    "An absent steps tag is not proof that a link is step-free.",
+    "Wheelchair suitability, ramp continuity and crossing safety are not established by the reviewed tags.",
+    "No incline or vertical-coordinate evidence was found. Slope is not inferred from two-dimensional coordinates.",
+    "The source evidence is historical OSM tagging, not an on-site accessibility inspection."
+  ]
+}

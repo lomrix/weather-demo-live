@@ -699,6 +699,41 @@ function noticeDraftCard() {
     el("p", { class: "hint" }, d.notice.attribution));
 }
 
+function accessibilityCard() {
+  if (st.caseId !== "koigen-demo") return null;
+  const a = st.assessment && st.assessment.accessibility;
+  if (!a) {
+    return el("article", { class: "card" },
+      el("div", { class: "card-title" }, el("h3", {}, "Accessibility evidence"), pill("Review required", "pill-warn")),
+      el("p", {}, el("strong", {}, "Requirement: avoid steps.")),
+      el("p", { class: "hint" }, "Confirm the modeled section and assess to compare evidence for the calculated baseline and modeled detour."));
+  }
+  const metresBy = (route, key) => route.step_status_metres[key] || 0;
+  const row = (label, route) => el("tr", {},
+    el("td", {}, label), el("td", { class: "num" }, metres(route.metres)),
+    el("td", { class: "num" }, metres(metresBy(route, "known_steps"))),
+    el("td", { class: "num" }, metres(metresBy(route, "supported_step_free"))),
+    el("td", { class: "num" }, metres(metresBy(route, "unknown"))));
+  const evidenceLines = (route) => Object.entries(route.surface_metres)
+    .map(([value, distance]) => `${value}: ${metres(distance)}`).join("; ");
+  return el("article", { class: "card " + (st.assessStale ? "stale" : "clar") },
+    el("div", { class: "card-title" }, el("h3", {}, "Accessibility evidence"), pill("Avoid steps", "pill-warn")),
+    st.assessStale ? staleNote() : null,
+    el("p", { class: "hint" }, "Only explicitly tagged evidence is counted. An absent steps tag is unknown, not step-free."),
+    el("table", {},
+      el("thead", {}, el("tr", {}, ["Route", "Distance", "Known steps", "Supported step-free", "Unknown"].map((h) => el("th", { scope: "col" }, h)))),
+      el("tbody", {}, row("Shortest baseline", a.baseline), row("Modeled detour", a.modeled_detour))),
+    el("p", {}, el("strong", {}, "Alternative: "), a.alternative.reason),
+    el("p", {}, el("strong", {}, "Baseline surfaces: "), evidenceLines(a.baseline), "."),
+    el("p", {}, el("strong", {}, "Detour surfaces: "), evidenceLines(a.modeled_detour), "."),
+    el("p", { class: "unverified" }, `Slope: unknown for ${metres(a.baseline.slope_metres.unknown)} of the baseline and ${metres(a.modeled_detour.slope_metres.unknown)} of the detour. Two-dimensional coordinates were not used to infer slope.`),
+    el("p", { class: "hint" }, `OSM historical route evidence checked ${a.provenance.evidence_checked_at}; ${a.provenance.route_nodes_checked} route nodes checked. Fixture retrieved ${a.provenance.snapshot_retrieved_at}; ${a.provenance.attribution}, ${a.provenance.license}.`),
+    el("details", {},
+      el("summary", {}, "Precise accessibility data gaps"),
+      el("ul", {}, a.gaps.map((gap) => el("li", {}, gap))),
+      el("p", { class: "hint" }, a.provenance.source_method)));
+}
+
 function renderResults() {
   const host = $("result-cards");
   if (st.bus) {
@@ -744,7 +779,7 @@ function renderResults() {
       scenario.synthetic ? el("p", { class: "hint" }, "The fictional trip and stops are not published service facts.") : null));
     return;
   }
-  host.replaceChildren(...[noticeDraftCard(), customCard(), assessmentCard(), isDriving() ? null : aiCard()].filter(Boolean));
+  host.replaceChildren(...[noticeDraftCard(), accessibilityCard(), customCard(), assessmentCard(), isDriving() ? null : aiCard()].filter(Boolean));
 }
 
 function renderEvidence() {

@@ -70,3 +70,22 @@ Incomplete by design:
 - On-site accessibility, slope, surface, steps, legal access and physical
   feasibility are not checked.
 - A successful draft remains a model result requiring human review.
+
+## Accessibility evidence
+
+For the saved 2026-11-12 `hamar-urban.osm` snapshot, the sanitizer retained
+only `highway` and `foot` tags. The review therefore traced the six route ways
+and all 66 baseline/detour nodes through their official OSM history endpoints
+and selected visible element versions at or before the fixture retrieval
+cutoff. The saved evidence records the source URLs, versions, times, fixture
+hash, check time, OpenStreetMap attribution and ODbL licence.
+
+With the requirement **avoid steps**, neither route has evidence of explicit
+steps or explicit step-free access. That does **not** mean either route is
+step-free: all 323 baseline metres and all 593 detour metres have unknown
+step status. No evidence-supported step-avoiding alternative is presented.
+
+The baseline is explicitly tagged `fine_gravel`. The detour has 125 m
+`fine_gravel`, 116 m `pebblestone`, 80 m `unpaved`, and 272 m unknown surface.
+No incline evidence was recovered, so slope is unknown for both routes; the
+two-dimensional map coordinates are not used to calculate it.
