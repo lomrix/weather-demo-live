@@ -23,3 +23,7 @@ These are our proposals, not topics prescribed by the lecturer. Funding has a ti
 - **Source:** [Accessibility statement](https://uustatus.no/nb/erklaringer/publisert/cc891f86-c607-4331-94b0-77f5ccec897a).
 - **Success:** Produce accessible HTML preserving all required source facts and passing the selected automated checks.
 - **Limit:** Comprehension and full accessibility need human review.
+
+
+
+
