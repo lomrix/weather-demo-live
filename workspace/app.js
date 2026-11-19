@@ -1324,33 +1324,68 @@ function alertLabel(kind) {
   }[kind] || kind;
 }
 
-function journeyAlertCard(alert) {
+function readableDate(value, withTime = false) {
+  const date = new Date(withTime ? value : value + "T12:00:00");
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric", month: "short", year: "numeric",
+    ...(withTime ? { hour: "2-digit", minute: "2-digit" } : {}),
+  }).format(date);
+}
+
+function journeyAlertCard(alert, dismissed = false) {
   const source = alert.source;
   const effect = alert.route_effect;
-  const effectLabel = alert.user_confirmed_simulation ? "Modeled" : alert.kind === "active_impact" ? "Current" : "Modeled historical";
-  const routeText = effect ? effect.status === "unreachable"
-    ? `${effectLabel} effect: baseline ${metres(effect.baseline_metres)}; route becomes unreachable.`
-    : `${effectLabel} effect: baseline ${metres(effect.baseline_metres)}; affected route ${metres(effect.metres)} (${signed(effect.change_metres)}).`
+  const simulated = alert.user_confirmed_simulation;
+  let headline = alertLabel(alert.kind);
+  if (effect && alert.kind === "active_impact") {
+    headline = effect.status === "unreachable"
+      ? "No mapped route during works"
+      : effect.change_metres > 0
+        ? `${metres(effect.change_metres)} extra on your walk`
+        : "Your walking route changes";
+  } else if (alert.kind === "dates_changed") {
+    headline = `Works dates updated · ends ${readableDate(alert.end_date)}`;
+  } else if (alert.kind === "approaching_works") {
+    headline = `Works start ${readableDate(alert.start_date)}`;
+  } else if (simulated && alert.kind === "reopening_unconfirmed") {
+    headline = "Simulation period ended";
+  }
+  const phase = alert.kind === "approaching_works" ? "Expected modeled route"
+    : alert.kind === "active_impact" ? "Modeled route" : "Previously modeled route";
+  const routeText = effect
+    ? effect.status === "unreachable"
+      ? `${phase}: ${metres(effect.baseline_metres)} baseline; destination becomes unreachable.`
+      : `${phase}: ${metres(effect.baseline_metres)} → ${metres(effect.metres)}.`
     : "";
+  const realSource = /^https?:\/\//i.test(source.project_source_url)
+    && !new URL(source.project_source_url).hostname.endsWith(".invalid");
+  const sourceLabel = realSource
+    ? el("a", { href: source.project_source_url, target: "_blank", rel: "noopener noreferrer" }, source.project_source_label)
+    : el("span", {}, source.project_source_label);
   return el("article", {
-    class: `card alert-card ${alert.kind === "reopening_confirmed" ? "confirmed" : ""} ${alert.synthetic ? "synthetic" : ""}`,
+    class: `card alert-card compact-alert ${alert.kind === "reopening_confirmed" ? "confirmed" : ""} ${alert.synthetic ? "synthetic" : ""}`,
   },
   el("div", { class: "card-title" },
-    el("h3", {}, `${alert.user_confirmed_simulation && alert.kind === "reopening_unconfirmed" ? "Simulation period ended" : alertLabel(alert.kind)} · ${alert.journey_name}`),
-    el("span", {}, pill(alert.user_confirmed_simulation ? "User-confirmed simulation" : alert.synthetic ? "Synthetic project" : "Saved project", alert.synthetic ? "pill-warn" : "pill-ok"))),
-  el("p", {}, alert.message),
-  routeText ? el("p", { class: "hint" }, routeText) : null,
-  el("p", {}, el("strong", {}, `${alert.project_label}. `),
-    `${alert.user_confirmed_simulation ? "User-selected simulation dates: " : ""}${alert.start_date} to ${alert.end_date}.`),
-  alert.user_confirmed_simulation ? el("p", { class: "hint" }, "Notice footpath dates and exact closure extent are unknown; this is not a verified closure or reopening.") : null,
-  el("p", { class: "alert-meta alert-source" },
-    "Source: ", el("a", { href: source.project_source_url, target: "_blank", rel: "noopener noreferrer" }, source.project_source_label),
-    `. Saved data: ${source.snapshot_file}. Last assessment: ${alert.checked_at}.`),
-  source.excerpt ? el("blockquote", {}, source.excerpt) : null,
-  el("button", {
-    type: "button", class: "btn btn-small",
-    "data-dismiss-alert": alert.id,
-  }, "Dismiss"));
+    el("h3", {}, headline),
+    pill(simulated ? "User-confirmed simulation" : alert.synthetic ? "Synthetic project" : "Saved project",
+      alert.synthetic ? "pill-warn" : "pill-ok")),
+  el("p", { class: "alert-journey" }, alert.journey_name),
+  routeText ? el("p", { class: "alert-route" }, routeText) : null,
+  alert.kind === "reopening_unconfirmed"
+    ? el("p", { class: "hint" }, "Scheduled end passed; reopening unconfirmed.") : null,
+  el("p", { class: "hint" }, alert.project_label),
+  el("details", { class: "alert-details" },
+    el("summary", {}, "Source and assessment details"),
+    el("p", {}, alert.message),
+    el("p", {}, `${simulated ? "User-selected simulation dates" : "Project dates"}: ${readableDate(alert.start_date)} – ${readableDate(alert.end_date)}.`),
+    simulated ? el("p", { class: "hint" }, "The notice leaves the exact footpath dates and closure extent unknown. These dates belong to the simulation.") : null,
+    el("p", { class: "alert-meta" }, "Source: ", sourceLabel),
+    el("p", { class: "alert-meta" }, `Last assessment: ${readableDate(alert.checked_at, true)}. Saved data: ${source.snapshot_file}.`),
+    source.excerpt ? el("blockquote", {}, source.excerpt) : null),
+  el("button", { type: "button", class: "btn btn-small",
+    [dismissed ? "data-restore-alert" : "data-dismiss-alert"]: alert.id },
+    dismissed ? "Restore alert" : "Dismiss"));
 }
 
 function renderJourneyAlerts() {
@@ -1358,7 +1393,10 @@ function renderJourneyAlerts() {
   const visible = st.journeyAlerts.filter(
     (alert) => !st.dismissedJourneyAlerts.includes(alert.id)
   );
-  if (!visible.length) {
+  const dismissed = st.journeyAlerts.filter(
+    (alert) => st.dismissedJourneyAlerts.includes(alert.id)
+  );
+  if (!visible.length && !dismissed.length) {
     host.replaceChildren();
     host.hidden = true;
     return;
@@ -1367,7 +1405,10 @@ function renderJourneyAlerts() {
   host.replaceChildren(
     el("h2", {}, "Saved-journey alerts"),
     el("p", { class: "hint" }, "Checks occur when the app opens or when you refresh; there is no continuous monitoring."),
-    ...visible.map(journeyAlertCard),
+    ...visible.map((alert) => journeyAlertCard(alert)),
+    dismissed.length ? el("details", { class: "dismissed-alerts alert-details" },
+      el("summary", {}, `Show dismissed alerts (${dismissed.length})`),
+      ...dismissed.map((alert) => journeyAlertCard(alert, true))) : null,
   );
 }
 
@@ -1375,6 +1416,7 @@ async function refreshJourneyAlerts() {
   const status = $("journey-alert-status");
   const seq = ++st.alertSeq;
   if (!st.savedJourneys.length) {
+    $("alert-check-details")?.remove();
     st.journeyAlerts = [];
     status.textContent = "No saved walking journeys to check.";
     renderJourneyAlerts();
@@ -1393,13 +1435,26 @@ async function refreshJourneyAlerts() {
     st.alertSnapshot = result.snapshot;
     saveAlertState(result.snapshot);
     const unavailable = result.unavailable || [];
-    status.textContent = unavailable.length
-      ? `${result.alerts.length} alert(s); ${unavailable.length} saved journey or project data item(s) unavailable. ${unavailable.map((item) => item.message).join(" ")}`
-      : `${result.alerts.length} alert(s) checked at ${result.checked_at}.`;
+    $("alert-check-details")?.remove();
+    const visibleCount = result.alerts.filter((alert) => !st.dismissedJourneyAlerts.includes(alert.id)).length;
+    status.textContent = `${visibleCount} visible alert(s). Checked ${readableDate(result.checked_at, true)}.`;
+    if (unavailable.length) {
+      const grouped = new Map();
+      for (const item of unavailable) {
+        const key = `${item.kind}:${item.message}`;
+        if (!grouped.has(key)) grouped.set(key, { message: item.message, journeys: new Set() });
+        grouped.get(key).journeys.add(item.journey_name || item.journey_id || "Saved journey");
+      }
+      status.after(el("details", { id: "alert-check-details", class: "alert-details" },
+        el("summary", {}, `${grouped.size} distinct data issue(s) across ${unavailable.length} checks`),
+        el("ul", {}, ...Array.from(grouped.values(), (item) => el("li", {}, item.message,
+          el("span", { class: "hint" }, ` Affected journeys: ${Array.from(item.journeys).join(", ")}.`))))));
+    }
     renderJourneyAlerts();
   } catch (e) {
     if (seq !== st.alertSeq) return;
     st.journeyAlerts = [];
+    $("alert-check-details")?.remove();
     status.textContent = `Project data unavailable: ${e.message}`;
     renderJourneyAlerts();
   }
@@ -1704,6 +1759,14 @@ async function init() {
   });
   $("refresh-journey-alerts").addEventListener("click", refreshJourneyAlerts);
   $("journey-alerts").addEventListener("click", (e) => {
+    const restore = e.target.closest && e.target.closest("[data-restore-alert]");
+    if (restore) {
+      const id = restore.getAttribute("data-restore-alert");
+      st.dismissedJourneyAlerts = st.dismissedJourneyAlerts.filter((item) => item !== id);
+      saveAlertState();
+      renderJourneyAlerts();
+      return;
+    }
     const button = e.target.closest && e.target.closest("[data-dismiss-alert]");
     if (!button) return;
     const id = button.getAttribute("data-dismiss-alert");
