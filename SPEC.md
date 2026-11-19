@@ -83,3 +83,78 @@ may use saved notices and explicit user-triggered checks; it must not imply
 continuous monitoring. Alert matching must reuse the checked notice review
 and Python-owned map/routing logic rather than allowing an AI draft to change
 journey geometry or declare reopening.
+
+# Citywide notifications and Hamar bus-service coverage
+
+These are explicit product requirements. Existing saved-journey simulations
+and the B21/B23 fixtures are demonstrations, not completion of this scope.
+
+## Notifications people can follow
+
+Provide a visible notification centre, with two independently selectable scopes:
+
+- Hamar-area updates: follow new works and announced restrictions even without
+  saving a journey. Later filters include area, transport mode and bus line.
+- My journeys: identify which saved journeys are affected, showing a calculated
+  consequence only when the relevant geometry and routing mode are supported.
+
+Represent announced/upcoming works, reported work starts, announced/active
+closures, changed or extended dates, and explicitly confirmed reopening.
+Construction starting does not itself prove a road is closed. Completing a
+construction project does not itself prove every access restriction is lifted.
+An elapsed planned end date means reopening is unconfirmed until the source
+confirms access restoration. An unavailable source is not a reopening event.
+
+Each notification retains source URL, supporting evidence, source-check time,
+event status, relevant location/mode, and whether its impact is modeled.
+Users can mark read, dismiss, restore, and manage what they follow. Stable event
+identities and source revisions prevent duplicates and distinguish genuine
+changes from repeated checks. Synthetic examples remain separately labeled.
+
+Delivery while the app is open and push delivery while it is closed are
+different capabilities. Background delivery requires a deployed recurring
+source checker, persisted subscriptions and an opt-in push delivery service;
+browser-local storage and refresh alone do not provide it. Do not claim it
+exists until tested on a subscribed device with the app closed. Obtain browser
+notification consent only after an explicit user action; denied permission
+must preserve the in-app notification centre. Store no personal contact details
+or continuous location in the present prototype.
+
+Verification must cover a new notice, upcoming-to-active update, date extension,
+confirmed reopening, expired but unconfirmed reopening, missing source,
+unchanged refresh, dismissal persistence, and an unrelated saved journey.
+Citywide notices must remain viewable without claiming that all works are known.
+
+## All bus services serving Hamar
+
+Import an official Entur timetable dataset instead of manually adding one
+fixture per line. Discover every bus line serving stops in the declared Hamar
+area; retain stable line, direction, journey-pattern, trip and quay identities.
+Keep the complete relevant stop sequences, including portions outside Hamar.
+Preserve calendars and date exceptions so an unavailable departure is never
+presented as running on the selected day. Distinguish scheduled from real-time
+information and retain the feed version, retrieval time, hashes and attribution.
+
+The intended geographic scope is Hamar, not just the current study rectangle.
+Publish the exact area definition used for discovery and any gaps. Do not label
+an inventory complete until checked against the chosen official source. A route
+catalogue, scheduled journey lookup, pedestrian access assessment, bus-road
+diversion and delay prediction are separate coverage claims. In particular,
+importing a line must not imply that its outside-map stops are walk-assessable,
+or that a pedestrian detour calculates bus driving time or delay.
+
+Acceptance includes a source-backed searchable line catalogue, direction and
+date selection, ordered stops for imported trips, explicit no-service outcomes,
+reproducible imports and gap reporting. B21/B23 remain regression examples for
+the common assessment path rather than special-case code. Reconcile the
+catalogue with its official input before claiming all Hamar services are covered.
+
+Official starting points:
+- https://www.hamar.kommune.no/veger-og-gater/trafikkmeldinger/
+- https://developer.entur.no/open-data/timetable
+- https://developer.entur.no/apis/graphql/journey-planner/query/stopPlacesByBbox
+- https://developer.entur.no/open-data/realtime
+
+The municipal traffic page links to municipal closures, county/national road
+information and Innlandstrafikk bus updates. A single municipal article feed
+does not establish comprehensive coverage of all these authorities.

@@ -226,14 +226,12 @@ def extract_notice(notice, opener=urlopen, model=MODEL):
 
 
 def draft_notice(notice, opener=urlopen):
-    extracted = extract_notice(notice, opener=opener)
-    reviewed = review_draft(extracted["model_draft"], notice)
-    return {
-        **reviewed,
-        "notice": {
-            "id": notice["id"], "title": notice["title"],
-            "source_url": notice["source_url"], "retrieved_at": notice["retrieved_at"],
-            "saved_from": notice["saved_from"], "attribution": notice["attribution"],
-        },
-        "diagnostics": extracted["diagnostics"],
-    }
+    """Workspace path: sentence-bound evidence, without reference replacement.
+
+    The original extract_notice/build_prompt stay frozen for the saved baseline.
+    """
+    try:
+        from .notice_evidence import draft_evidence_notice
+    except ImportError:
+        from notice_evidence import draft_evidence_notice
+    return draft_evidence_notice(notice, opener=opener)

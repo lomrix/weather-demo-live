@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "harness"))
 
 import hamar_workspace
+from check_notice_evidence import koigen_reply
 from workspace_service import Workspace, shortest_route
 
 CASE = "furubergvegen-masabekkvegen"
@@ -586,6 +587,22 @@ class HttpBoundaryTests(unittest.TestCase):
                      "/.env", "/api/cases/..%2f..%2fREADME.md", "/api/cases/a/b", "/api/nothing"):
             self.assertEqual(self.call("GET", path)[0], 404, path)
 
+    def test_geographic_assets_and_network_boundary(self):
+        paths = ("/preferences.js", "/geographic-map.js",
+                 "/vendor/maplibre/maplibre-gl.mjs", "/vendor/maplibre/maplibre-gl-worker.mjs",
+                 "/vendor/maplibre/maplibre-gl-shared.mjs", "/vendor/maplibre/maplibre-gl.css")
+        for path in paths:
+            status, _, headers = self.call("GET", path)
+            self.assertEqual(status, 200, path)
+            policy = headers["Content-Security-Policy"]
+            self.assertIn("script-src 'self'", policy)
+            self.assertIn("worker-src 'self'", policy)
+            self.assertIn("connect-src 'self' https://tiles.openfreemap.org;", policy)
+            self.assertNotIn("unsafe-eval", policy)
+        for path in ("/vendor/maplibre/../../README.md", "/vendor/maplibre/package.json",
+                     "/vendor/maplibre/%2e%2e/%2e%2e/README.md"):
+            self.assertEqual(self.call("GET", path)[0], 404, path)
+
     def test_cases_api(self):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
@@ -652,7 +669,7 @@ class HttpBoundaryTests(unittest.TestCase):
     def test_notice_endpoint_is_bounded_and_requires_saved_notice(self):
         original = self.server.workspace.opener
         notice = self.server.workspace.notice
-        opener = FakeOpener(notice["hand_reference"])
+        opener = FakeOpener(koigen_reply())
         self.server.workspace.opener = opener
         try:
             status, body, _ = self.call(

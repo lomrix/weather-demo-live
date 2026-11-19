@@ -1,0 +1,76 @@
+{
+  "requests": [
+    {
+      "url": "https://api.kartverket.no/kommuneinfo/v1/kommuner/3403/omrade"
+    },
+    {
+      "query": "query HamarStops($south:Float!,$west:Float!,$north:Float!,$east:Float!){\nstopPlacesByBbox(minimumLatitude:$south,minimumLongitude:$west,maximumLatitude:$north,maximumLongitude:$east,filterByInUse:false){\nid name quays{id name latitude longitude lines{id publicCode name transportMode}}}}",
+      "url": "https://api.entur.io/journey-planner/v3/graphql",
+      "variables": {
+        "east": 11.28071179212433,
+        "north": 61.23704469557031,
+        "south": 60.767984105408,
+        "west": 10.97997952938445
+      }
+    },
+    {
+      "query": "query HamarLines($ids:[ID],$date:Date!){lines(ids:$ids){\nid publicCode name transportMode authority{id name} journeyPatterns{\nid name directionType pointsOnLink{points length distance}\nquays{id name latitude longitude}\nserviceJourneysForDate(date:$date){id}}}}",
+      "url": "https://api.entur.io/journey-planner/v3/graphql",
+      "variables": {
+        "date": "2026-11-19",
+        "ids": [
+          "INN:Line:100",
+          "INN:Line:105",
+          "INN:Line:21",
+          "INN:Line:22",
+          "INN:Line:23",
+          "INN:Line:24",
+          "INN:Line:25",
+          "INN:Line:26",
+          "INN:Line:27",
+          "INN:Line:605",
+          "INN:Line:612",
+          "INN:Line:616",
+          "INN:Line:637",
+          "INN:Line:642",
+          "INN:Line:643",
+          "INN:Line:645",
+          "INN:Line:646",
+          "INN:Line:649",
+          "INN:Line:650",
+          "INN:Line:651",
+          "INN:Line:652",
+          "INN:Line:654",
+          "INN:Line:655",
+          "INN:Line:656",
+          "INN:Line:657",
+          "INN:Line:658",
+          "INN:Line:660",
+          "INN:Line:662",
+          "INN:Line:664",
+          "INN:Line:670",
+          "INN:Line:671",
+          "INN:Line:673",
+          "INN:Line:674",
+          "INN:Line:675",
+          "INN:Line:678",
+          "INN:Line:680",
+          "INN:Line:683",
+          "INN:Line:684",
+          "INN:Line:686",
+          "INN:Line:688",
+          "INN:Line:689",
+          "INN:Line:692",
+          "INN:Line:697"
+        ]
+      }
+    }
+  ],
+  "retrieved_at": "2026-11-19T18:12:04.887223+00:00",
+  "service_date": "2026-11-19",
+  "sha256": {
+    "boundary.json": "0fe4a485289bf8ca7497debe1da426133a0e9505df4fde1ef56917b31c058593",
+    "discovery.json": "0bc113690887d069a6228bc98309e51e6883060bede2e27ea6a8edb14aefacf5",
+    "line-details.json": "7831e1f6098188a0f2a27509472e6e838f1c62bde8b2185f520d1473484b3db9"
+  }
+}

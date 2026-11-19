@@ -4,55 +4,81 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hamar Access Lab · Planning workspace</title>
+<link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
 <link rel="stylesheet" href="/app.css">
+<script src="/preferences.js" defer></script>
+<script type="module" src="/geographic-map.js"></script>
 <script src="/app.js" defer></script>
+<script src="/bus-catalogue.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#controls">Skip to controls</a>
 <header class="topbar">
-  <div>
-    <p class="eyebrow">Hamar Access Lab</p>
-    <h1>Access planning workspace</h1>
+  <a class="brand" href="#map-card" aria-label="Hamar Access Lab home">
+    <span class="brand-mark" aria-hidden="true">H<span>↗</span></span>
+    <span><strong>Hamar Access Lab</strong><small>Understand the way ahead</small></span>
+  </a>
+  <nav class="mode-switch" aria-label="Travel mode">
+    <button type="button" data-workspace-mode="walking" aria-pressed="true"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="13" cy="4" r="2"/><path d="m8 21 3-7 3 3 1 4M5 12l4-2 3-4 3 5 4 1M12 7l-1 7"/></svg></span> Walking</button>
+    <button type="button" data-workspace-mode="bus" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="3" width="14" height="17" rx="3"/><path d="M5 11h14M9 3v8M15 3v8M7 20v2M17 20v2M8 16h1M15 16h1"/></svg></span> Bus</button>
+    <button type="button" data-workspace-mode="driving" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m5 9 2-5h10l2 5M4 10h16v8H4zM7 18v3M17 18v3M7 14h2M15 14h2"/></svg></span> Driving</button>
+  </nav>
+  <div class="appearance-controls">
+    <label class="sr-only" for="language-select">Language</label><select id="language-select" aria-label="Language"><option value="en">English</option><option value="nb">Norsk</option></select>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">☾</button>
   </div>
-  <ul class="badges" aria-label="Workspace status">
-    <li class="badge">Offline · saved OpenStreetMap fixtures</li>
-    <li class="badge badge-mode" id="mode-badge">Walking and driving supported</li>
-  </ul>
+  <div class="workspace-status"><span class="status-dot" aria-hidden="true"></span> Saved local data <span id="mode-badge" class="sr-only">Walking and driving supported</span></div>
 </header>
+<div class="workspace-intro">
+  <div><p class="eyebrow">Hamar, Norway · Access planning</p><h1>A clearer way through the city.</h1><p>Explore how street changes affect the journeys that matter.</p></div>
+  <span class="prototype-label">Planning prototype <span>Hypothetical changes</span></span>
+</div>
 
 <main class="layout">
   <section class="map-card" id="map-card" aria-labelledby="map-title">
     <div class="map-head">
       <div>
-        <h2 id="map-title">Route map</h2>
-        <p class="hint" id="map-caption">Loading saved map…</p>
+        <p class="eyebrow">Explore the impact</p>
+        <h2 id="map-title">Your journey, on the map</h2>
       </div>
       <p class="chip chip-idle" id="map-freshness" role="status">No results yet</p>
     </div>
+    <div id="journey-overview" class="journey-overview" aria-live="polite"></div>
     <div class="map-tools" role="toolbar" aria-label="Map view">
+      <label class="sr-only" for="map-style">Map style</label><select id="map-style" aria-label="Map style"><option value="street">Street map</option><option value="3d">3D buildings</option><option value="offline">Saved map (offline)</option></select>
       <button type="button" class="btn btn-small" id="zoom-in">Zoom in</button>
       <button type="button" class="btn btn-small" id="zoom-out">Zoom out</button>
       <button type="button" class="btn btn-small" id="fit-route">Fit journey</button>
       <button type="button" class="btn btn-small" id="fit-all">Whole area</button>
+      <button type="button" class="btn btn-small details-button" id="details-button">Details</button>
     </div>
     <div class="map-frame" id="map-frame" tabindex="0" role="group"
          aria-label="Route map" aria-describedby="map-help">
+      <div id="geographic-map" aria-label="Geographic map with streets and buildings"></div>
+      <span class="map-north" aria-hidden="true">↑<small>N</small></span>
+      <span class="map-area-label">HAMAR <small>Saved network · schematic view</small></span>
       <svg id="map" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
       <p class="stale-banner" id="map-stale" hidden>Outdated: inputs changed. Recalculate to refresh the map.</p>
     </div>
+    <div class="map-key" aria-label="Route colours"><span><i class="key-base"></i>Normal route</span><span><i class="key-route"></i>With changes</span><span><i class="key-closure"></i>Closed section</span></div>
+    <details class="map-options"><summary>Map layers, coverage &amp; help</summary>
+    <p class="hint" id="map-caption">Loading saved map…</p>
     <p class="hint" id="map-help">Drag to pan. With the map focused: arrow keys pan, + and − zoom, 0 fits the journey. Ctrl + wheel zooms. To set a start or destination, press its button, then click the map.</p>
     <p class="hint" id="coverage-note"></p>
     <fieldset class="layers">
       <legend>Map layers</legend>
       <div id="layer-list" class="layer-list"></div>
     </fieldset>
-    <p class="attribution">Map data © OpenStreetMap contributors (ODbL 1.0). Saved, sanitized extract; no live map tiles.</p>
+    </details>
+    <div class="map-status-line"><span id="geographic-status" role="status">Loading geographic map…</span><span>Basemap is geographic context. Routing uses saved data; 3D heights may be approximate.</span></div>
+    <p class="attribution">Routing © OpenStreetMap contributors (ODbL 1.0). Online basemap © OpenMapTiles / OpenStreetMap via OpenFreeMap.</p>
   </section>
 
   <aside class="controls" id="controls" aria-label="Planning controls" tabindex="-1">
+    <div class="controls-heading"><p class="eyebrow">Make it your journey</p><h2 id="planner-title">Plan a walk</h2><p id="mode-scope" class="hint">Choose an example or search saved places.</p></div>
     <form id="plan-form" novalidate>
       <fieldset id="plan-fields" class="plan-fields" disabled>
-      <section class="group" aria-labelledby="g-bus">
+      <section class="group" id="bus-section" aria-labelledby="g-bus" hidden>
         <h2 id="g-bus">Bus stop access</h2>
         <button type="button" class="btn btn-small" id="load-bus">Load synthetic bus scenario</button>
         <div id="published-bus-picker">
@@ -78,7 +104,7 @@
       </section>
       <p class="alert" id="form-error" role="alert" hidden></p>
       <section class="group" id="walking-case" aria-labelledby="g-case">
-        <h2 id="g-case"><span class="step" aria-hidden="true">1</span> Case and journey</h2>
+        <h2 id="g-case" class="sr-only">Case and journey</h2>
         <button type="button" class="btn btn-small" id="load-demo">Load Ringgata demo</button>
         <button type="button" class="btn btn-small" id="load-koigen-demo">Load Koigen demo</button>
         <div id="demo-controls" hidden>
@@ -115,14 +141,14 @@
         <select id="journey-select"></select>
         <div class="custom-journey" id="custom-journey">
           <div class="place-search">
-            <h3>Search walking endpoints</h3>
+            <h3 class="sr-only">Search walking endpoints</h3>
             <p class="hint" id="place-search-scope"></p>
             <label for="place-from">From</label>
-            <input type="search" id="place-from" maxlength="80" autocomplete="off" placeholder="Bus stop or named place">
+            <input type="search" id="place-from" maxlength="80" autocomplete="off" placeholder="Search a saved place or bus stop">
             <p class="search-status hint" id="place-from-status" role="status"></p>
             <div class="place-results" id="place-from-results"></div>
             <label for="place-to">To</label>
-            <input type="search" id="place-to" maxlength="80" autocomplete="off" placeholder="Bus stop or named place">
+            <input type="search" id="place-to" maxlength="80" autocomplete="off" placeholder="Search a saved place or bus stop">
             <p class="search-status hint" id="place-to-status" role="status"></p>
             <div class="place-results" id="place-to-results"></div>
           </div>
@@ -160,7 +186,7 @@
       </section>
 
       <section class="group" id="walking-projects" aria-labelledby="g-projects">
-        <h2 id="g-projects"><span class="step" aria-hidden="true">2</span> Date and projects</h2>
+        <h2 id="g-projects">Date &amp; changes</h2>
         <label for="assess-date">Assessment date</label>
         <input type="date" id="assess-date" required>
         <p class="hint" id="date-rule"></p>
@@ -187,13 +213,14 @@
       </section>
       </fieldset>
     </form>
+    <div class="planner-actions" id="planner-actions"></div>
     <p class="busy" id="busy" role="status" aria-live="polite" hidden></p>
   </aside>
 
   <section class="results" id="results" aria-labelledby="results-title">
-    <h2 id="results-title">Checked results</h2>
-    <section id="journey-alerts" aria-live="polite" hidden></section>
-    <div id="result-cards"></div>
+    <h2 id="results-title" class="sr-only">Checked results</h2>
+    <details class="result-disclosure" id="alerts-panel"><summary>Saved-journey alerts <span id="alert-count"></span></summary><section id="journey-alerts" aria-live="polite" hidden></section></details>
+    <details class="result-disclosure" id="assessment-panel"><summary>Full assessment &amp; accessibility evidence</summary><div id="result-cards"></div></details>
     <details class="panel" id="evidence">
       <summary>Evidence and technical IDs</summary>
       <div id="evidence-body"></div>
