@@ -1,0 +1,55 @@
+{
+  "checked_at": "2026-11-19T16:00:14.3299053+00:00",
+  "endpoint": "http://127.0.0.1:11434/api/tags",
+  "note": "Installed model metadata collected after the comparison; no model download or update was performed.",
+  "models": [
+    {
+      "name": "qwen2.5:3b",
+      "model": "qwen2.5:3b",
+      "modified_at": "2026-09-29T15:31:45.7597143+02:00",
+      "size": 1929912432,
+      "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "3.1B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 32768,
+        "embedding_length": 2048,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "llama3.2:3b",
+      "model": "llama3.2:3b",
+      "modified_at": "2026-09-23T22:47:27.3737407+02:00",
+      "size": 2019393189,
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "3.2B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 131072,
+        "embedding_length": 3072,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    }
+  ]
+}

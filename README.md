@@ -80,6 +80,25 @@ snapshot and saved run used by the replay. The evidence is minimal and
 attributed to Hamar municipality, but no general reuse licence has been
 verified; redistribution permission remains pending confirmation from Kai.
 
+## Evaluate raw notice extraction
+
+The notice evaluator compares raw local-model answers with a fixed non-AI
+keyword baseline, before the Koigen UI applies reference-based corrections.
+It reports the one known municipal notice separately from three synthetic
+stress cases. See [the evaluation guide](docs/notice-ai-evaluation.md) for
+metrics, bounded opt-in model runs, provenance and independent-review limits.
+
+```text
+python -B -m unittest check_notice_evaluation check_koigen_notice -v
+python -B -m harness.notice_evaluation --mode baseline --output out/notice-baseline
+```
+
+The default evaluation is offline. Model comparison requires explicit live
+mode; a successful test suite is not evidence of model accuracy.
+The [19 November comparison](docs/notice-evaluation-2026-11-19.md) records
+eight actual local-model requests, consequential errors and the limits of
+exact-match scores. Raw answers and installed model digests are saved with it.
+
 ## Ringgata offline integration
 
 Run the checked Ringgata replay from the repository root:

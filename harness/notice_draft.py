@@ -3,6 +3,7 @@
 import json
 import re
 from pathlib import Path
+from time import perf_counter
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
@@ -70,7 +71,7 @@ def load_notice(root):
     return notice
 
 
-def _prompt(notice):
+def build_prompt(notice):
     numbered = "\n".join(
         f"{index}. {sentence}" for index, sentence in enumerate(notice["sentences"], 1)
     )
@@ -88,10 +89,10 @@ Numbered notice:
 {numbered}"""
 
 
-def _request(notice, opener):
+def _request(notice, opener, model=MODEL):
     body = json.dumps({
-        "model": MODEL,
-        "prompt": _prompt(notice),
+        "model": model,
+        "prompt": build_prompt(notice),
         "stream": False,
         "format": RESPONSE_SCHEMA,
         "options": {"temperature": 0, "num_predict": 400},
@@ -205,9 +206,28 @@ def review_draft(result, notice):
     }
 
 
+def extract_notice(notice, opener=urlopen, model=MODEL):
+    """Return the raw answer and measurements, without reference-based correction."""
+    started = perf_counter()
+    result, envelope, raw = _request(notice, opener, model=model)
+    return {
+        "model_draft": result,
+        "diagnostics": {
+            "model": model, "endpoint": OLLAMA_URL,
+            "timeout_seconds": TIMEOUT_SECONDS, "requests_made": 1,
+            "raw_model_reply": envelope.get("response"), "raw_bytes": len(raw),
+            "elapsed_seconds": round(perf_counter() - started, 3),
+            **{key: envelope[key] for key in (
+                "prompt_eval_count", "eval_count", "total_duration", "load_duration",
+                "prompt_eval_duration", "eval_duration", "done_reason",
+            ) if key in envelope},
+        },
+    }
+
+
 def draft_notice(notice, opener=urlopen):
-    result, envelope, raw = _request(notice, opener)
-    reviewed = review_draft(result, notice)
+    extracted = extract_notice(notice, opener=opener)
+    reviewed = review_draft(extracted["model_draft"], notice)
     return {
         **reviewed,
         "notice": {
@@ -215,10 +235,5 @@ def draft_notice(notice, opener=urlopen):
             "source_url": notice["source_url"], "retrieved_at": notice["retrieved_at"],
             "saved_from": notice["saved_from"], "attribution": notice["attribution"],
         },
-        "diagnostics": {
-            "model": MODEL, "endpoint": OLLAMA_URL,
-            "timeout_seconds": TIMEOUT_SECONDS, "requests_made": 1,
-            "raw_model_reply": envelope.get("response"),
-            "raw_bytes": len(raw),
-        },
+        "diagnostics": extracted["diagnostics"],
     }
