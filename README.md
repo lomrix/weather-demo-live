@@ -31,7 +31,7 @@ it closed (+270 m). The candidate section and route are modeled, not a confirmed
 closure boundary or the signed diversion. Slope, surface and steps remain
 unknown in the saved map data.
 
-The repository uses Python's standard library only. Use Python 3.12 or newer,
+The backend uses Python's standard library only. Use Python 3.12 or newer,
 with no package installation required for the offline workflow. The saved OSM
 fixtures preserve OpenStreetMap attribution and ODbL provenance while removing
 contributor account metadata and personal contact tags. Their reproducible
@@ -79,6 +79,60 @@ upstream integration at commit `b97988e`, specifically the checker, input
 snapshot and saved run used by the replay. The evidence is minimal and
 attributed to Hamar municipality, but no general reuse licence has been
 verified; redistribution permission remains pending confirmation from Kai.
+
+## Search bus services across Hamar municipality
+
+Open the workspace, select **Bus**, then search a line or destination under
+**Explore Hamar bus lines**. Choose a direction/variant and **Show bus route**
+to display official route geometry and ordered stops. Norwegian controls are
+available through the existing language selector.
+
+The saved 19 November acquisition includes **43 lines, 173 variants and 383
+quays within Hamar's official municipal polygon**, including B22/B24–B27 and
+regional services beyond B21/B23. Outside-municipality stops are retained.
+This is an imported network and scheduled-journey snapshot, not live bus
+departures, general bus-closure assessment or proof of operator-level complete
+coverage. The B21/B23 walking-access comparisons remain available separately.
+Source records, reproduction and gaps are in
+[fixtures/transit/hamar/README.md](fixtures/transit/hamar/README.md).
+
+## Browser appearance and geographic context
+
+Start the interactive workspace from the repository root:
+
+```text
+python hamar_workspace.py --open
+```
+
+After updating the server code, stop the old process with Ctrl+C and run the
+command again. The header contains English/Norsk and a light/dark toggle;
+both choices persist in this browser. Main interface controls and summaries
+are translated. Original source quotations, proper place names, raw model
+responses and technical evidence retain their source wording.
+
+The map selector offers a geographic street map, a tilted 3D-building view,
+and the saved schematic map. Street names, places and building footprints
+come from [OpenFreeMap](https://openfreemap.org/quick_start/) and require
+internet access and WebGL. No API key or paid account is required. Building
+heights may be estimated or missing; these are map extrusions, not satellite
+photography, surveyed elevations or accessibility evidence. MapLibre GL JS
+6.19.0 is bundled locally with its BSD licence and checksum manifest under
+`workspace/vendor/maplibre/`. The browser network policy permits geographic
+assets only from `tiles.openfreemap.org`; application scripts and workers
+are served locally.
+
+The geographic basemap is visual context: route calculations still use the
+saved, bounded OSM graphs and retain their original coverage and limitations.
+A more extensive basemap does not extend routing coverage. If the online
+map cannot load, the saved map and local assessments remain available.
+No automatic GPS location is collected. A and B mark the selected journey.
+Exact origins/destinations and the visible map area are sent to the basemap
+provider indirectly through requested geographic tiles; source and journey
+records otherwise remain in the existing local application.
+
+Technical evidence and alerts are available through **Details** rather than
+occupying the main map screen. The modal keeps source provenance and unknowns
+available for review; the overview retains the hypothetical/model status.
 
 ## Evaluate raw notice extraction
 
@@ -378,7 +432,7 @@ can be supported as a step-avoiding alternative: 323 m of baseline links and
 versions, checked time, fixture hash and ODbL attribution are retained in the
 saved evidence file.
 
-The Koigen demo now starts with notice review rather than an automatic assessment. **Draft from notice** reads the saved municipal notice and makes one bounded request to the local `qwen2.5:3b` model. Python verifies sentence numbers against the saved text, separates the focused footpath consequence from the notice's parking dates, and displays a hand-checked correction for human review. The person must explicitly confirm OSM way `112510399`, nodes `302372908`–`1023215093`, as a modeled candidate before **Assess projects** is enabled; Python enforces the same gate. If Ollama is unavailable, the draft action fails clearly and the manual review/confirmation/assessment remains usable without a model. The extraction approach is adapted from Kai's draft PR #20, commit `408db94022cbf0a58d163921618fdddcf51dbc8c`, with attribution retained in the fixture and UI.
+The Koigen demo now starts with notice review rather than an automatic assessment. **Draft from notice** reads the saved municipal notice and makes one bounded request to the local `qwen2.5:3b` model. Python retrieves source sentences for the requested transport subject, constrains the model to one consequence, and checks each field against that sentence. Prepared reference answers are not inserted into the draft; unsupported fields stay unknown. Source-word mode rules are labelled separately from model quotations. See [evidence-linked notice review and measured limits](docs/evidence-linked-notice-review.md). The person must explicitly confirm OSM way `112510399`, nodes `302372908`–`1023215093`, as a modeled candidate before **Assess projects** is enabled; Python enforces the same gate. If Ollama is unavailable, the draft action fails clearly and the manual review/confirmation/assessment remains usable without a model. The extraction approach is adapted from Kai's draft PR #20, commit `408db94022cbf0a58d163921618fdddcf51dbc8c`, with attribution retained in the fixture and UI.
 
 To monitor that modeled scenario locally, load the Koigen demo, review the
 linked notice or the draft, and confirm the candidate section. Choose the

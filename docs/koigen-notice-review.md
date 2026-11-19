@@ -17,7 +17,15 @@ The extraction and sentence-ID approach is adapted, with attribution, from
 Kai's draft PR #20 at commit
 `408db94022cbf0a58d163921618fdddcf51dbc8c`.
 
-## Actual local Ollama comparison
+## Current review flow (19 November)
+
+The current workspace uses [evidence-linked review](evidence-linked-notice-review.md):
+source-subject retrieval, one consequence per request, per-field quote checks,
+explicit source-rule mode labels and unknowns. It does not populate the draft
+from the prepared reference. The historical comparison below describes the
+earlier implementation, whose saved reference was used to correct Koigen fields.
+
+## Historical local Ollama comparison (18 November)
 
 One browser action was run on 2026-11-18 with the installed local
 `qwen2.5:3b` model. It made one request to `127.0.0.1:11434/api/generate`, with
@@ -46,8 +54,8 @@ Hand-checked comparison:
   and signed-diversion clause, describe the location with the sentence's
   pumping-station-to-Mjøsa wording, and leave exact footpath dates unknown.
 
-Python verifies that displayed sentence IDs exist in the saved notice and
-applies the focused-scope correction. The notice still does not establish the
+That earlier implementation verified displayed sentence IDs and applied the
+prepared-reference correction. The notice still does not establish the
 exact closure endpoints or dates. The OSM section used for the route comparison
 remains a modeled candidate, not a verified closure boundary.
 

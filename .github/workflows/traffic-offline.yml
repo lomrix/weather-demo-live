@@ -44,4 +44,6 @@ jobs:
       - name: Run workspace request-boundary and stale-result checks
         run: python -m unittest check_workspace.py
       - name: Check raw notice evaluation offline (no model calls)
-        run: python -B -m unittest check_notice_evaluation.py check_koigen_notice.py
+        run: python -B -m unittest check_notice_evaluation.py check_koigen_notice.py check_notice_evidence.py
+      - name: Check imported Hamar bus inventory offline
+        run: python -B -m unittest check_bus_catalogue.py

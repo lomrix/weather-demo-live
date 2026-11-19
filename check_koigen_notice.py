@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "harness"))
 
 from notice_draft import load_notice, review_draft
 from workspace_service import Workspace
+from check_notice_evidence import koigen_reply
 
 
 class FakeResponse:
@@ -115,7 +116,7 @@ class KoigenNoticeTests(unittest.TestCase):
         self.assertTrue(result["modeled_section_confirmation"])
 
     def test_saved_notice_uses_one_bounded_model_request(self):
-        opener = FakeOpener({**self.reference})
+        opener = FakeOpener(koigen_reply())
         result = Workspace(ROOT, opener).draft_koigen_notice({"notice_id": "hamar-koigen-footpath"})
         self.assertEqual(result["state"], "success")
         self.assertEqual(opener.calls, 1)

@@ -20,7 +20,7 @@ const st = {
   layers: Object.fromEntries(LAYERS.map((l) => [l.key, true])),
   view: null, bounds: null, proj: null, pendingCompare: false,
   custom: { origin: null, destination: null }, customInfo: null, pick: null, customSeq: 0,
-  demoBusy: false, bus: null, noticeDraft: null, modeledConfirmed: false,
+  catalogue: null, catalogueBox: null, demoBusy: false, bus: null, noticeDraft: null, modeledConfirmed: false,
   endpointLabels: { origin: null, destination: null },
   endpointPlaces: { origin: null, destination: null },
   placeMatches: { origin: [], destination: [] }, placeSeq: { origin: 0, destination: 0 },
@@ -73,6 +73,209 @@ async function api(path, body) {
   return data;
 }
 
+function showDetails(panelId) {
+  const dialog = $("details-dialog");
+  if (!dialog.open) dialog.showModal();
+  if (panelId) { $(panelId).open = true; $(panelId).scrollIntoView({block:"nearest"}); }
+}
+
+function drawCatalogue() {
+  const {line,pattern,service_date}=st.catalogue;
+  const coordinates=pattern.geometry?.length>1?pattern.geometry:pattern.stops.map(stop=>[stop.longitude,stop.latitude]);
+  const features=[{type:'Feature',properties:{kind:'opt2'},geometry:{type:'LineString',coordinates}},
+    ...pattern.stops.map((stop,index)=>({type:'Feature',properties:{kind:'marker',colour:stop.in_hamar?'#735deb':'#7890aa',label:index===0||index===pattern.stops.length-1?stop.name:''},geometry:{type:'Point',coordinates:[stop.longitude,stop.latitude]}}))];
+  const xs=coordinates.map(p=>p[0]),ys=coordinates.map(p=>p[1]);
+  const bounds=[[Math.min(...xs),Math.min(...ys)],[Math.max(...xs),Math.max(...ys)]];
+  window.__hamarMapPayload={caseId:pattern.id,data:{type:'FeatureCollection',features},bounds};
+  window.hamarGeo?.sync(window.__hamarMapPayload);
+  const points=coordinates.map(p=>st.proj(p[1],p[0]));
+  const map=$('map');map.replaceChildren(polyline(points,{stroke:'#735deb',width:4}));
+  const px=points.map(p=>p[0]),py=points.map(p=>p[1]);
+  const x=Math.min(...px),y=Math.min(...py),w=Math.max(...px)-x,h=Math.max(...py)-y;
+  st.catalogueBox={x,y,w,h};
+  $('map-freshness').textContent='Saved timetable snapshot';$('map-freshness').className='chip chip-idle';
+  $('map-caption').textContent=pattern.geometry?'Imported Entur route geometry; not a closure assessment.':'Stop-to-stop schematic: route geometry unavailable.';
+  $('journey-overview').replaceChildren(
+    el('div',{class:'overview-heading'},el('h3',{},`${line.code} · ${line.name}`),el('span',{class:'scenario-badge'},'Published bus route')),
+    el('div',{class:'overview-stats'},stat('Ordered stops',String(pattern.stops.length)),stat('Stops in Hamar',String(pattern.stops.filter(s=>s.in_hamar).length)),stat('Scheduled journeys',String(pattern.scheduled_journey_count))),
+    el('p',{class:'overview-note'},`${service_date} · ${pattern.stops[0].name} → ${pattern.stops.at(-1).name}. ${pattern.scheduled_journey_count===0?'No scheduled journeys for this variant on the snapshot date.':'Scheduled snapshot; not live departures.'} Bus delay and closure effects are not assessed.`));
+}
+
+function syncGeographicMap() {
+  if (!st.data) return;
+  const features = [];
+  const coordinate = (id) => {const point=st.data.nodes[id];return point?[point[1],point[0]]:null;};
+  const line = (kind,path) => {
+    if (!st.layers[kind]) return;
+    const coordinates=path.map(coordinate).filter(Boolean);
+    if(coordinates.length>1)features.push({type:"Feature",properties:{kind},geometry:{type:"LineString",coordinates}});
+  };
+  const marker=(point,label,colour)=>{if(point&&st.layers.markers)features.push({type:"Feature",properties:{kind:"marker",label,colour},geometry:{type:"Point",coordinates:[point[1],point[0]]}});};
+  const section=(kind,ids)=>{for(const id of ids){const link=st.linkIndex[id];if(link)line(kind,[link[1],link[2]]);}};
+  if(st.bus){
+    const result=st.bus.result,scenario=st.bus.scenario;
+    if(result){line("baseline",result.normal.path);line("route",result[st.bus.mode].path);}
+    marker(scenario.origin.coordinates || st.data.nodes[scenario.origin.node_id],"A · Start","#127a66");
+    const usual=busStop(scenario.usual_stop_id);marker(usual.coordinates,usual.name,st.bus.mode==="skipped"?"#e34c57":"#498dff");
+    if(result?.skipped.stop_id){const stop=busStop(result.skipped.stop_id);marker(stop.coordinates,stop.name,"#ce7a20");}
+    const stop=busStop($("bus-destination").value);if(stop)marker(stop.coordinates,stop.name,"#18374d");
+  }else{
+    const row=selectedRow();
+    if(row&&!st.assessStale){line("baseline",row.baseline_path);line("route",row.path);}
+    if(st.assessment&&!st.assessStale)section("closure",st.assessment.closed_link_ids);
+    else for(const project of st.projects)for(const id of project.sections){const part=allSections().find(s=>s.id===id);if(part)section("inactive",part.link_ids);}
+    if(!st.compareStale)selectedOptions().forEach(({row},i)=>{if(row)line(i?"opt2":"opt1",row.path);});
+    if(isCustom()){
+      marker(st.custom.origin,"A · Start","#127a66");marker(st.custom.destination,"B · Destination","#18374d");
+    }else{
+      const journey=st.data.journeys.find(item=>item.id===st.journeyId);
+      if(journey){marker(journey.origin.coordinates || st.data.nodes[journey.origin.id],"A · Start","#127a66");marker(journey.destination.coordinates || st.data.nodes[journey.destination.id],"B · Destination","#18374d");}
+    }
+  }
+  const c=st.data.coverage;
+  if(st.layers.coverage)features.push({type:"Feature",properties:{kind:"coverage"},geometry:{type:"LineString",coordinates:[[c.minlon,c.minlat],[c.maxlon,c.minlat],[c.maxlon,c.maxlat],[c.minlon,c.maxlat],[c.minlon,c.minlat]]}});
+  const box=journeyBox();
+  const southwest=st.unproj(box.x,box.y+box.h),northeast=st.unproj(box.x+box.w,box.y);
+  const payload={caseId:st.caseId,data:{type:"FeatureCollection",features},bounds:[[southwest[1],southwest[0]],[northeast[1],northeast[0]]]};
+  window.__hamarMapPayload=payload;
+  if(window.hamarGeo)window.hamarGeo.sync(payload);
+}
+
+/* ---------- workspace presentation ---------- */
+function wrapDisclosure(id, label, nodes) {
+  const first = nodes[0];
+  if (!first) return null;
+  const details = el("details", { id, class: "control-disclosure" }, el("summary", {}, label));
+  first.before(details);
+  nodes.forEach((node) => { if (node) details.append(node); });
+  return details;
+}
+
+function prepareWorkspace() {
+  window.addEventListener("hamar-bus-catalogue",event=>{st.catalogue=event.detail;$("bus-controls").hidden=true;drawCatalogue();syncWorkspace();fitBox(journeyBox(),.2);});
+  const results=$("results");
+  const dialog=el("dialog", {id:"details-dialog",class:"details-modal","aria-labelledby":"details-heading"});
+  const close=el("button",{type:"button",class:"btn btn-small","aria-label":"Close details"},"×");
+  close.addEventListener("click",()=>dialog.close());
+  dialog.append(el("div",{class:"details-header"},el("h2",{id:"details-heading"},"Source and technical details"),close));
+  results.before(dialog);dialog.append(results);
+  $("details-button").addEventListener("click",()=>showDetails());
+  window.addEventListener("hamar-map-pick",(event)=>{if(st.pick){const [lat,lon]=event.detail;setPoint(st.pick,lat,lon);}});
+  wrapDisclosure("demo-settings", "Example closure settings", [$("demo-controls")]);
+  wrapDisclosure("case-options", "Map area & example journeys", [
+    document.querySelector('label[for="case-select"]'), $("case-select"), $("case-summary"),
+    document.querySelector('label[for="journey-select"]'), $("journey-select"),
+  ]);
+  wrapDisclosure("search-coverage", "Search coverage & limits", [$("place-search-scope")]);
+  wrapDisclosure("saved-options", "Saved journeys & alerts", [$("custom-journey").querySelector(".saved-journeys")]);
+  wrapDisclosure("project-options", "Review closures & project dates", [$("date-rule"), $("projects"), $("add-project")]);
+  wrapDisclosure("monitor-options", "Save a scenario for alerts", [$("walking-projects").querySelector(".saved-journeys")]);
+  wrapDisclosure("ai-tools", "Compare mitigation options with AI", [$("walking-ai")]);
+  wrapDisclosure("bus-example-options", "Synthetic test example", [$("load-bus")]);
+  wrapDisclosure("bus-source-details", "Trip details & coverage limits", [$("bus-service"), $("bus-disclaimer"), $("bus-sequence"), $("bus-limits")]);
+  wrapDisclosure("pick-options", "Choose points on the map instead", [$("pick-hint"), $("custom-journey").querySelector(".pick-row")]);
+  const koigen = $("koigen-demo-controls");
+  wrapDisclosure("koigen-scope-details", "What the source confirms & what is unknown", [koigen.querySelector("p"), koigen.querySelectorAll("p")[1]]);
+  const action = $("assess-btn");
+  const note = action.nextElementSibling;
+  $("planner-actions").append(action, note);
+  document.querySelectorAll("[data-workspace-mode]").forEach((button) => {
+    button.addEventListener("click", () => switchWorkspaceMode(button.dataset.workspaceMode));
+  });
+}
+
+function syncWorkspace() {
+  if (!st.data) return;
+  const mode = (st.bus || st.catalogue) ? "bus" : isDriving() ? "driving" : "walking";
+  document.body.dataset.mode = mode;
+  document.querySelectorAll("[data-workspace-mode]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.workspaceMode === mode));
+    button.disabled = st.busy || st.demoBusy;
+  });
+  $("bus-section").hidden = mode !== "bus";
+  $("planner-actions").hidden = mode === "bus";
+  $("alerts-panel").hidden = mode !== "walking";
+  $("assessment-panel").hidden = Boolean(st.catalogue);
+  $("evidence").hidden = Boolean(st.catalogue);
+  $("diagnostics").hidden = Boolean(st.catalogue) || mode === "bus";
+  $("details-button").hidden = Boolean(st.catalogue);
+  document.querySelector(".map-key").hidden = Boolean(st.catalogue);
+  $("walking-case").hidden = mode === "bus";
+  $("walking-projects").hidden = mode === "bus";
+  $("ai-tools").hidden = mode !== "walking" || st.data.candidates.length < 3;
+  $("planner-title").textContent = {walking: "Plan a walk", bus: "Explore Hamar buses", driving: "Explore a driving change"}[mode];
+  $("mode-scope").textContent = {
+    walking: "Search saved places, pick map points, or try an example. Coverage depends on the selected map area.",
+    bus: "Search imported bus lines and route variants, or compare walking access in the saved closure examples.",
+    driving: "One supported driving example. The road closure is hypothetical; custom driving journeys are not available yet.",
+  }[mode];
+  for (const option of $("case-select").options) option.hidden = (option.value === "hamar-driving") !== (mode === "driving");
+  $("demo-settings").hidden = mode !== "walking" || $("demo-controls").hidden;
+  $("load-demo").hidden = mode !== "walking";
+  $("load-koigen-demo").hidden = mode !== "walking";
+  $("alert-count").textContent = st.journeyAlerts.filter((a) => !st.dismissedJourneyAlerts.includes(a.id)).length || "";
+  renderOverview();
+}
+
+async function switchWorkspaceMode(mode) {
+  if (st.busy || st.demoBusy || !st.index || document.body.dataset.mode === mode) return;
+  if (mode === "bus") { if (!st.bus) await loadBus(true); return; }
+  st.catalogue = null;
+  st.bus = null;
+  setBusView(false);
+  $("assess-date").value = st.index.today;
+  if (mode === "driving") { if (await loadCase("hamar-driving")) await assess(); }
+  else await loadCase("hamar-urban");
+  syncWorkspace();
+}
+
+function renderOverview() {
+  const host = $("journey-overview");
+  if (!host || !st.data) return;
+  if (st.catalogue) { drawCatalogue(); return; }
+  let normal = null, affected = null, title = "Choose your journey", status = "Ready to explore";
+  let note = "Choose two saved places or use an example, then assess the configured changes.";
+  if (st.bus) {
+    title = `${st.bus.scenario.service} · Walking access to the bus`;
+    status = st.bus.scenario.synthetic ? "Synthetic example" : "Dated trip · hypothetical stop skip";
+    if (st.bus.result) { normal = st.bus.result.normal.metres; affected = st.bus.result.skipped.metres; }
+    note = "Distances are walks to mapped stop connections. Bus travel time and delay are unknown.";
+  } else {
+    const row = selectedRow();
+    const stale = st.assessStale;
+    title = isDriving() ? "Driving route comparison" : "Walking route comparison";
+    status = stale ? "Inputs changed · recalculate" : row ? "Hypothetical scenario" : "Choose a journey";
+    if (row && !stale) { normal = row.baseline_metres; affected = row.metres; }
+    if (st.caseId === "koigen-demo") note = "Modeled candidate section. Exact closure extent and dates are unknown; accessibility requires review.";
+    else if (isDriving()) note = "Fixed driving example. Turn restrictions, conditional rules and live conditions are not modeled.";
+    else if (row && !stale) note = `Walking assessment for ${st.assessment.assessment_date}. Saved map; hypothetical closures.`;
+    else if (isCustom() && st.customInfo && st.customInfo.status !== "ready") note = st.customInfo.message;
+  }
+  const hasResult = normal !== null;
+  const display = (value) => value === null ? hasResult ? "No route" : "—" : value >= 1000 ? `${(value / 1000).toFixed(2)} km` : `${value} m`;
+  const change = normal !== null && affected !== null ? affected - normal : null;
+  const busLimited = st.bus && st.bus.result && st.bus.result.skipped.status === "coverage_limited";
+  if (busLimited) note += " Some eligible stops are outside coverage; an alternative cannot be ruled out.";
+  host.replaceChildren(
+    el("div", {class: "overview-heading"}, el("h3", {}, title), el("span", {class: "scenario-badge"}, status)),
+    el("div", {class: "overview-stats"}, stat(st.bus ? "To usual stop" : "Normal route", display(normal)),
+      stat(st.bus ? "After stop skip" : "With changes", busLimited ? "Unassessed" : display(affected)),
+      stat("Extra distance", change === null ? busLimited ? "Unknown" : hasResult ? "No route" : "—" : change === 0 ? "Unchanged" : signed(change))),
+    el("p", {class: "overview-note"}, note));
+}
+
+function resizeMapMarkers() {
+  if (!st.view) return;
+  const frame = $("map-frame").getBoundingClientRect();
+  const unit = Math.max(st.view.w / Math.max(frame.width, 1), st.view.h / Math.max(frame.height, 1));
+  $("map").querySelectorAll("[data-map-marker]").forEach((node) => node.setAttribute("r", 6 * unit));
+  $("map").querySelectorAll("[data-map-label]").forEach((node) => {
+    node.style.fontSize = `${11 * unit}px`;
+    node.style.strokeWidth = `${3.5 * unit}px`;
+    node.setAttribute("dy", -12 * unit);
+  });
+}
+
 /* ---------- payload and form ---------- */
 function payload(withQuestion) {
   const body = {
@@ -103,10 +306,11 @@ function setBusy(message) {
   busy.textContent = message || "";
   $("plan-fields").disabled = st.busy || st.demoBusy;
   syncAssessmentGate();
+  syncWorkspace();
 }
 
 function syncAssessmentGate() {
-  $("assess-btn").disabled = st.busy || (st.caseId === "koigen-demo" && !st.modeledConfirmed);
+  $("assess-btn").disabled = st.busy || st.demoBusy || (st.caseId === "koigen-demo" && !st.modeledConfirmed);
 }
 
 function defaultProjects() {
@@ -244,6 +448,7 @@ async function draftFromNotice() {
   } finally {
     setBusy("");
     renderResults();
+    showDetails("assessment-panel");
   }
 }
 async function compareWithAi() {
@@ -265,6 +470,7 @@ async function compareWithAi() {
     st.pendingCompare = false;
     setBusy("");
     applyStale(); drawMap(); renderEvidence(); renderDiagnostics();
+    showDetails("assessment-panel");
   }
 }
 
@@ -296,8 +502,13 @@ function fitBox(box, pad) {
   if (w / h < aspect) { const nw = h * aspect; st.view.x -= (nw - w) / 2; st.view.w = nw; }
   else { const nh = w / aspect; st.view.y -= (nh - h) / 2; st.view.h = nh; }
   applyView();
+  if(window.hamarGeo?.active){
+    const sw=st.unproj(box.x,box.y+box.h),ne=st.unproj(box.x+box.w,box.y);
+    window.hamarGeo.fit([[sw[1],sw[0]],[ne[1],ne[0]]]);
+  }
 }
 function journeyBox() {
+  if(st.catalogue)return st.catalogueBox || st.bounds;
   if (st.bus) {
     const scenario = st.bus.scenario, result = st.bus.result;
     const ids = new Set([scenario.origin.node_id, busStop(scenario.usual_stop_id).node_id,
@@ -338,13 +549,15 @@ function journeyBox() {
 function applyView() {
   const v = st.view;
   $("map").setAttribute("viewBox", `${v.x} ${v.y} ${v.w} ${v.h}`);
+  resizeMapMarkers();
 }
 function zoom(factor) {
+  if(window.hamarGeo?.active){window.hamarGeo.zoomBy(factor);return;}
   const v = st.view, cx = v.x + v.w / 2, cy = v.y + v.h / 2;
   v.w /= factor; v.h /= factor; v.x = cx - v.w / 2; v.y = cy - v.h / 2;
   applyView();
 }
-function pan(dx, dy) { st.view.x += dx * st.view.w; st.view.y += dy * st.view.h; applyView(); }
+function pan(dx, dy) { if(window.hamarGeo?.active){window.hamarGeo.pan(dx,dy);return;} st.view.x += dx * st.view.w; st.view.y += dy * st.view.h; applyView(); }
 
 function polyline(points, layer, extra) {
   const node = svg("polyline", {
@@ -362,12 +575,14 @@ function pathPoints(ids) { return ids.map((n) => st.xy[n]).filter(Boolean); }
 function linkSegments(linkIds) {
   return linkIds.map((id) => st.linkIndex[id]).filter(Boolean).map((l) => [st.xy[l[1]], st.xy[l[2]]]);
 }
-function addMarker(markers, p, text, fill, ring, side) {
-  markers.append(svg("circle", { cx: p[0], cy: p[1], r: 7, fill: ring ? "#fff" : fill, stroke: ring ? fill : "#fff", "stroke-width": ring ? 3 : 2, "vector-effect": "non-scaling-stroke" }));
+function addMarker(markers, p, text, fill, ring, side, shortLabel) {
+  markers.append(svg("circle", { "data-map-marker": true, cx: p[0], cy: p[1], r: 7, fill: ring ? "#fff" : fill, stroke: ring ? fill : "#fff", "stroke-width": ring ? 3 : 2, "vector-effect": "non-scaling-stroke" }));
   const t = svg("text", { x: p[0] + (side === "left" ? -9 : side === "right" ? 9 : 0),
     y: p[1] - (side ? 2 : 12), class: side ? "bus-map-label" : "map-label", fill,
     "text-anchor": side === "left" ? "end" : side === "right" ? "start" : "middle" });
-  t.textContent = text;
+  t.setAttribute("data-map-label", "true");
+  t.textContent = shortLabel || (side ? text : text.startsWith("Start") ? "A · Start" : text.startsWith("Destination") ? "B · Destination" : text.replace(/Candidate endpoint node \d+/g, "Candidate endpoint"));
+  const title = svg("title", {}); title.textContent = text; t.append(title);
   markers.append(t);
 }
 function busStop(id) { return st.bus.scenario.stops.find((stop) => stop.id === id); }
@@ -387,10 +602,11 @@ function drawBusMap(group) {
     "Alternative: " + busStop(result.skipped.stop_id).name, "#8a4b00", false, "left");
   const destination = $("bus-destination").value;
   marker(destination, "Destination: " + busStop(destination).name, "#1c2530", true, "right");
-  renderLegend();
+  renderLegend(); resizeMapMarkers();
   const description = st.bus.mode === "normal" ? "normal service" : "hypothetical skipped stop";
   $("map-caption").textContent = `${scenario.service} · ${scenario.direction} · ${description}. ${scenario.synthetic ? "Synthetic trip" : "Published dated trip; hypothetical change"}; walking distance only.`;
   $("map").setAttribute("aria-label", `${scenario.synthetic ? "Synthetic" : "Published"} bus access map: ${scenario.service}, ${scenario.direction}`);
+  syncWorkspace();
 }
 function selectedRow() {
   if (!st.assessment) return null;
@@ -403,6 +619,7 @@ function selectedOptions() {
 }
 
 function drawMap() {
+  if(st.catalogue){drawCatalogue();return;}
   const map = $("map");
   map.replaceChildren();
   if (!st.data) return;
@@ -412,13 +629,18 @@ function drawMap() {
   const cov = st.data.coverage, covA = st.proj(cov.maxlat, cov.minlon), covB = st.proj(cov.minlat, cov.maxlon);
   group("coverage").append(svg("rect", {
     x: covA[0], y: covA[1], width: covB[0] - covA[0], height: covB[1] - covA[1], fill: "none",
-    stroke: L("coverage").stroke, "stroke-width": L("coverage").width, "stroke-dasharray": L("coverage").dash,
+    class: "coverage-outline", stroke: L("coverage").stroke, "stroke-width": L("coverage").width, "stroke-dasharray": L("coverage").dash,
     "vector-effect": "non-scaling-stroke",
   }));
 
   const ctx = group("context");
-  for (const l of st.data.links) { const a = st.xy[l[1]], b = st.xy[l[2]]; if (a && b) ctx.append(polyline([a, b], L("context"))); }
-  if (st.bus) { drawBusMap(group); return; }
+  const network = st.data.links.map((l) => {
+    const a = st.xy[l[1]], b = st.xy[l[2]];
+    return a && b ? `M${a[0].toFixed(1)},${a[1].toFixed(1)}L${b[0].toFixed(1)},${b[1].toFixed(1)}` : "";
+  }).join(" ");
+  ctx.append(svg("path", {d: network, class: "network-casing", fill: "none", stroke: "#ffffff", "stroke-width": 5, "vector-effect": "non-scaling-stroke"}));
+  ctx.append(svg("path", {d: network, class: "network-line", fill: "none", stroke: "#b8c9c0", "stroke-width": 1.6, "vector-effect": "non-scaling-stroke"}));
+  if (st.bus) { drawBusMap(group); syncGeographicMap(); return; }
 
   const inactive = group("inactive");
   const activeNames = new Set(st.assessment ? st.assessment.active_projects.map((p) => p.label) : []);
@@ -456,18 +678,19 @@ function drawMap() {
   if (isCustom()) {
     for (const [key, name, fill] of [["origin", "Start", "#14633a"], ["destination", "Destination", "#1c2530"]]) {
       const raw = st.custom[key];
+      const shortLabel = name === "Start" ? "A · Start" : "B · Destination";
       if (!raw) continue;
       const info = st.customInfo && st.customInfo[key];
       const requested = st.proj(raw[0], raw[1]);
       if (info && info.status === "outside_coverage") {
-        addMarker(markers, requested, `${endpointLabel(key)}: outside loaded map coverage`, "#0b3d75", true);
+        addMarker(markers, requested, `${endpointLabel(key)}: outside loaded map coverage`, "#0b3d75", true, undefined, shortLabel);
       } else {
         if (info && info.snapped) {
           const s = st.proj(info.snapped[0], info.snapped[1]);
           markers.append(svg("line", { x1: requested[0], y1: requested[1], x2: s[0], y2: s[1], stroke: fill, "stroke-width": 2, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke" }));
-          addMarker(markers, s, info.snap_metres > 3 ? `${endpointLabel(key)} (nearest mapped node)` : endpointLabel(key), fill, false);
+          addMarker(markers, s, info.snap_metres > 3 ? `${endpointLabel(key)} (nearest mapped node)` : endpointLabel(key), fill, false, undefined, shortLabel);
         } else {
-          addMarker(markers, requested, endpointLabel(key), fill, false);
+          addMarker(markers, requested, endpointLabel(key), fill, false, undefined, shortLabel);
         }
         if (info && info.snapped && info.snap_metres > 3) {
           markers.append(svg("circle", { cx: requested[0], cy: requested[1], r: 4, fill: "#fff", stroke: fill, "stroke-width": 2, "vector-effect": "non-scaling-stroke" }));
@@ -480,12 +703,14 @@ function drawMap() {
       addMarker(markers, st.xy[pt.id] || st.proj(pt.coordinates[0], pt.coordinates[1]), text, fill, false);
     }
   }
-  renderLegend();
+  renderLegend(); resizeMapMarkers();
   const sizeNote = st.assessment ? ` · assessed for ${st.assessment.assessment_date}` : " · not assessed yet";
   const demo = $("demo-controls").hidden ? "" : "Hypothetical demo · ";
   const demoDistance = demo && row ? ` · ${metres(row.metres)}` : "";
   $("map-caption").textContent = `${demo}${journeyLabel(st.journeyId)}${demoDistance}${sizeNote}. ${isDriving() ? "Car road network; closure hypothetical." : "Walking network only."}`;
   $("map").setAttribute("aria-label", `Map of ${journeyLabel(st.journeyId)}`);
+  syncWorkspace();
+  syncGeographicMap();
 }
 
 function renderLegend() {
@@ -696,6 +921,7 @@ function noticeDraftCard() {
   const f = d.fields, checks = d.evidence_checks;
   const modes = f.travel_modes.length ? f.travel_modes.join(", ") : "unknown";
   const review = [
+    ["Access status", d.access_status || "unknown"],
     ["Affected location", f.location || "unknown"],
     ["Travel modes", modes],
     ["Restriction", f.restriction || "unknown"],
@@ -703,14 +929,18 @@ function noticeDraftCard() {
   ];
   return el("article", { class: "card clar" },
     el("div", { class: "card-title" }, el("h3", {}, "Saved-notice draft"), pill("Needs human review", "pill-hyp")),
-    el("p", { class: "hint" }, "Python verified that the displayed supporting sentence exists in the saved notice. This is not map evidence for the selected OSM section."),
+    el("p", { class: "hint" }, "Each consequence is kept separate. Python checks literal quotes within its source sentence; uncertain fields stay unknown. These checks do not verify meaning, closure geometry or physical access."),
     el("dl", { class: "kv" }, review.flatMap(([k, v]) => [el("dt", {}, k), el("dd", {}, v)])),
     el("h4", {}, "Supporting sentence"),
     ...d.supporting_sentences.map((s) => el("blockquote", {}, `${s.sentence_id}. ${s.text}`)),
-    el("p", { class: "hint" }, `${checks.correct_fields.length} hand-checked field(s) matched; ${checks.omissions.length} omission(s); ${checks.unsupported_claims.length} unsupported claim(s).`),
-    checks.omissions.length ? el("p", {}, el("strong", {}, "Omissions: "), checks.omissions.join(" ")) : null,
-    checks.unsupported_claims.length ? el("p", {}, el("strong", {}, "Unsupported or out of scope: "), checks.unsupported_claims.join(" ")) : null,
-    checks.corrections.length ? el("p", {}, el("strong", {}, "Corrections: "), checks.corrections.join(" ")) : null,
+    el("p", { class: "hint" }, `${checks.verified_quotes || 0} source quote checks passed; ${checks.omissions.length + checks.unsupported_claims.length} review issue(s). Unresolved fields need source review.`),
+    el("details", {},
+      el("summary", {}, "Field evidence and review notes"),
+      ...(d.field_evidence || []).map((item) => el("p", {},
+        el("strong", {}, `${item.field} · sentence ${item.sentence_id} · ${{quote_found: "Quote found", source_rule: "Source rule — review", not_stated: "Not stated", withheld: "Withheld"}[item.check] || item.check}: `),
+        item.source_quote || item.quote || "not stated")),
+      checks.omissions.length ? el("p", {}, el("strong", {}, "Missing: "), checks.omissions.join(" ")) : null,
+      checks.unsupported_claims.length ? el("p", {}, el("strong", {}, "Withheld or unresolved: "), checks.unsupported_claims.join(" ")) : null),
     el("details", {},
       el("summary", {}, "Local model draft and diagnostics"),
       el("p", { class: "hint" }, `${d.diagnostics.model}; ${d.diagnostics.requests_made} request; ${d.diagnostics.timeout_seconds} s limit; endpoint ${d.diagnostics.endpoint}.`),
@@ -754,6 +984,7 @@ function accessibilityCard() {
 }
 
 function renderResults() {
+  if(st.catalogue){syncWorkspace();return;}
   const host = $("result-cards");
   if (st.bus) {
     const scenario = st.bus.scenario, result = st.bus.result;
@@ -1396,6 +1627,7 @@ function renderJourneyAlerts() {
   const dismissed = st.journeyAlerts.filter(
     (alert) => st.dismissedJourneyAlerts.includes(alert.id)
   );
+  if ($("alert-count")) $("alert-count").textContent = visible.length || "";
   if (!visible.length && !dismissed.length) {
     host.replaceChildren();
     host.hidden = true;
@@ -1406,10 +1638,11 @@ function renderJourneyAlerts() {
     el("h2", {}, "Saved-journey alerts"),
     el("p", { class: "hint" }, "Checks occur when the app opens or when you refresh; there is no continuous monitoring."),
     ...visible.map((alert) => journeyAlertCard(alert)),
-    dismissed.length ? el("details", { class: "dismissed-alerts alert-details" },
+    ...(dismissed.length ? [el("details", { class: "dismissed-alerts alert-details" },
       el("summary", {}, `Show dismissed alerts (${dismissed.length})`),
-      ...dismissed.map((alert) => journeyAlertCard(alert, true))) : null,
+      ...dismissed.map((alert) => journeyAlertCard(alert, true)))] : []),
   );
+  if ($("alert-count")) $("alert-count").textContent = visible.length || "";
 }
 
 async function refreshJourneyAlerts() {
@@ -1471,8 +1704,8 @@ function mapPoint(event) {
 function setBusView(active) {
   for (const id of ["walking-case", "walking-projects", "walking-ai"]) $(id).hidden = active;
   if (!active && isDriving()) $("walking-ai").hidden = true;
-  $("load-bus").hidden = active;
-  $("published-bus-picker").hidden = active;
+  $("load-bus").hidden = false;
+  $("published-bus-picker").hidden = false;
   $("bus-controls").hidden = !active;
   $("diagnostics").hidden = active;
   $("map-help").textContent = active
@@ -1535,18 +1768,22 @@ async function loadBus(published = false) {
 }
 
 function closeBus() {
+  st.catalogue = null;
   st.bus = null;
   setBusView(false); showError("");
   applyStale(); drawMap(); renderEvidence(); renderDiagnostics();
   fitBox(journeyBox(), 0.25);
+  syncWorkspace();
 }
 
 async function loadCase(id) {
+  st.catalogue = null;
   clearTimeout(st.timer); st.seq++;
   setBusy("Loading saved map…");
   try {
     st.data = await api(`/api/cases/${encodeURIComponent(id)}`);
     st.caseId = id;
+    $("case-select").value = id;
     st.assessment = null; st.compare = null; st.assessStale = false; st.compareStale = false;
     st.noticeDraft = null; st.modeledConfirmed = false;
     $("confirm-koigen-model").checked = false;
@@ -1554,6 +1791,12 @@ async function loadCase(id) {
     st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
     st.endpointLabels = { origin: null, destination: null };
     st.endpointPlaces = { origin: null, destination: null };
+    for (const side of ["origin", "destination"]) {
+      clearTimeout(st.placeTimer[side]); st.placeSeq[side]++;
+      st.placeMatches[side] = [];
+      const field = side === "origin" ? "place-from" : "place-to";
+      $(field).value = ""; $(`${field}-results`).replaceChildren(); $(`${field}-status`).textContent = "";
+    }
     setPick(null); syncCoordInputs();
     $("custom-journey").hidden = isDriving();
     $("place-search-scope").textContent = isDriving()
@@ -1628,13 +1871,15 @@ async function loadDemo() {
     await resolveCustom();
     if (!st.customInfo) return;
     if (st.customInfo.status !== "ready") throw new Error(`Demo journey cannot be assessed: ${st.customInfo.message}`);
+    st.endpointLabels = {origin: start.origin.label, destination: end.destination.label};
+    $("place-from").value = start.origin.label; $("place-to").value = end.destination.label;
     $("demo-closures").value = "none";
-    $("demo-controls").hidden = false;
+    $("demo-controls").hidden = false; $("demo-settings").open = true;
     await updateDemo();
   } catch (e) {
     showError(e.message);
   } finally {
-    st.demoBusy = false; $("plan-fields").disabled = st.busy;
+    st.demoBusy = false; $("plan-fields").disabled = st.busy; syncAssessmentGate(); syncWorkspace();
   }
 }
 
@@ -1668,18 +1913,19 @@ async function loadKoigenDemo() {
     renderProjects();
     $("ringgata-demo-controls").hidden = true;
     $("koigen-demo-controls").hidden = false;
-    $("demo-controls").hidden = false;
+    $("demo-controls").hidden = false; $("demo-settings").open = true;
     syncAssessmentGate();
     renderResults();
     fitBox(journeyBox(), 0.25);
   } catch (e) {
     showError(e.message);
   } finally {
-    st.demoBusy = false; $("plan-fields").disabled = st.busy;
+    st.demoBusy = false; $("plan-fields").disabled = st.busy; syncAssessmentGate(); syncWorkspace();
   }
 }
 
 async function init() {
+  prepareWorkspace();
   try {
     st.index = await api("/api/cases");
   } catch (e) { $("map-caption").textContent = e.message; return; }
@@ -1813,23 +2059,26 @@ async function init() {
     if (actions[e.key]) { e.preventDefault(); actions[e.key](); }
   });
   let drag = null;
-  frame.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false }; frame.setPointerCapture(e.pointerId); });
+  frame.addEventListener("pointerdown", (e) => { if (window.hamarGeo?.active || e.target.closest("button")) return; drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false }; frame.setPointerCapture(e.pointerId); });
   frame.addEventListener("pointermove", (e) => {
-    if (!drag) return;
+    if (window.hamarGeo?.active || !drag) return;
     if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 4) drag.moved = true;
     if (st.pick && !drag.moved) return;
     const rect = frame.getBoundingClientRect(), s = Math.max(st.view.w / rect.width, st.view.h / rect.height);
     st.view.x -= (e.clientX - drag.x) * s; st.view.y -= (e.clientY - drag.y) * s; drag = { ...drag, x: e.clientX, y: e.clientY }; applyView();
   });
   frame.addEventListener("pointerup", (e) => {
+    if(window.hamarGeo?.active)return;
     const finished = drag;
     drag = null;
     if (finished && !finished.moved && st.pick) { const [lat, lon] = mapPoint(e); setPoint(st.pick, lat, lon); }
   });
-  frame.addEventListener("wheel", (e) => { if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 0.87); } }, { passive: false });
+  frame.addEventListener("wheel", (e) => { if(window.hamarGeo?.active)return; if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 0.87); } }, { passive: false });
   window.addEventListener("resize", () => { if (st.data) fitBox(journeyBox(), 0.25); });
-  await loadCase(st.index.cases[0].id);
+  await loadDemo();
+  $("demo-settings").open = false;
   await refreshJourneyAlerts();
+  syncWorkspace();
 }
 init();
 })();

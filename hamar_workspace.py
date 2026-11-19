@@ -24,6 +24,13 @@ STATIC = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/bus-catalogue.js": ("bus-catalogue.js", "text/javascript; charset=utf-8"),
+    "/preferences.js": ("preferences.js", "text/javascript; charset=utf-8"),
+    "/geographic-map.js": ("geographic-map.js", "text/javascript; charset=utf-8"),
+    "/vendor/maplibre/maplibre-gl.mjs": ("vendor/maplibre/maplibre-gl.mjs", "text/javascript; charset=utf-8"),
+    "/vendor/maplibre/maplibre-gl-worker.mjs": ("vendor/maplibre/maplibre-gl-worker.mjs", "text/javascript; charset=utf-8"),
+    "/vendor/maplibre/maplibre-gl-shared.mjs": ("vendor/maplibre/maplibre-gl-shared.mjs", "text/javascript; charset=utf-8"),
+    "/vendor/maplibre/maplibre-gl.css": ("vendor/maplibre/maplibre-gl.css", "text/css; charset=utf-8"),
 }
 POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compare": "compare",
          "/api/journey": "resolve_journey", "/api/bus/assess": "assess_bus",
@@ -32,8 +39,10 @@ POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compa
          "/api/journey-alerts": "journey_alerts"}
 SECURITY_HEADERS = {
     "Content-Security-Policy": (
-        "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
-        "connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+        "default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; "
+        "img-src 'self' data: blob: https://tiles.openfreemap.org; "
+        "connect-src 'self' https://tiles.openfreemap.org; "
+        "base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
     ),
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -100,6 +109,18 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, body, content_type)
         elif path == "/api/cases":
             self._json(200, self.server.workspace.index())
+        elif path == "/api/bus/catalogue" or path.startswith("/api/bus/catalogue/"):
+            try:
+                from harness.bus_catalogue import query
+                tail = path[len("/api/bus/catalogue/"):] if path.startswith("/api/bus/catalogue/") else None
+                if tail is not None and (not tail or "/" in urllib.parse.unquote(tail)):
+                    raise LookupError("Unknown imported bus line")
+                args = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+                self._json(200, query(self.server.root, urllib.parse.unquote(tail) if tail else None, args.get("pattern", [None])[0]))
+            except LookupError as exc:
+                self._json(404, {"error": str(exc)})
+            except (OSError, ValueError, KeyError) as exc:
+                self._json(503, {"error": "Imported bus data unavailable; use the saved comparison examples."})
         elif path == "/api/bus":
             self._json(200, self.server.workspace.bus_scenario())
         elif path == "/api/bus/published":
