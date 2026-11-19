@@ -361,6 +361,32 @@ saved evidence file.
 
 The Koigen demo now starts with notice review rather than an automatic assessment. **Draft from notice** reads the saved municipal notice and makes one bounded request to the local `qwen2.5:3b` model. Python verifies sentence numbers against the saved text, separates the focused footpath consequence from the notice's parking dates, and displays a hand-checked correction for human review. The person must explicitly confirm OSM way `112510399`, nodes `302372908`–`1023215093`, as a modeled candidate before **Assess projects** is enabled; Python enforces the same gate. If Ollama is unavailable, the draft action fails clearly and the manual review/confirmation/assessment remains usable without a model. The extraction approach is adapted from Kai's draft PR #20, commit `408db94022cbf0a58d163921618fdddcf51dbc8c`, with attribution retained in the fixture and UI.
 
+To monitor that modeled scenario locally, load the Koigen demo, review the
+linked notice or the draft, and confirm the candidate section. Choose the
+assessment date and the project's inclusive start and end dates; these are
+simulation inputs, **not** known footpath dates. Save the selected Koigen
+preset journey (or a resolved custom walking journey) with a name, then use
+**Save confirmed scenario for alerts**. Only one Koigen candidate project
+and section can be saved as the monitoring scenario. Saving another replaces
+it. The notice reference and excerpt, modeled section, selected dates and
+dated confirmation are stored in browser-local storage; no identity or
+contact information is collected. Delete the scenario or journeys in the UI.
+
+On opening the app or selecting **Refresh journey alerts**, the existing
+Python routing and alert engine reassesses saved walking journeys against the
+saved model. Alerts identify a user-confirmed simulation, show the official
+source, excerpt and last assessment time, and appear only for journeys whose
+modeled route changes. The Koigen preset gives 323 m to 593 m (+270 m) when
+active. Dismissals persist, and unchanged checks do not create duplicate
+alerts. After the selected end date the modeled historical impact can still
+appear with reopening unconfirmed; neither the chosen dates nor the passing
+of time establishes an actual closure or reopening. **Restore saved
+scenario** restores its confirmation and inputs for a fresh assessment;
+restoring a Koigen saved journey also restores its saved scenario. Checks use
+saved data, not live notice polling or continuous monitoring. Saved
+synthetic project records are checked separately and may report unavailable
+sections for a different map.
+
 For bus-stop access, select **Load synthetic bus scenario**, choose a destination stop, and switch between normal service and the hypothetical skipped usual stop. The map shows the fictional service, direction and stops; the results compare the walk to the usual stop with the shortest walk to a reachable stop still served by the same synthetic trip before the chosen destination. Choosing synthetic stop B as the destination demonstrates the no-alternative outcome. The fixed walking start and all synthetic stop positions are nodes on the wider saved walking network; all synthetic stops are assumed boardable. No walking closures or bus route are modeled; bus delay and boarding accessibility are unknown. This is a fictional example, not a real service, timetable, stop location, closure, delay or passenger observation. Loading it resets the walking workspace; use **Return to walking workspace** and **Load Ringgata demo** to start the walking demo again.
 
 For a published timetable example, choose a trip under **Published dated bus trip** and select **Load published bus scenario**. B21 uses inbound `INN:ServiceJourney:53561`, Hedmarktoppen to Sanderud sykehus; B23 uses outbound `INN:ServiceJourney:81731`, Stange skole to Fossumfeltet snuplass. Both are for **2026-11-12**. Their fixtures `fixtures\scenarios\hamar-b21-2026-11-12.json` and `fixtures\scenarios\hamar-b23-2026-11-12.json` record respectively 36 and 52 scheduled calls in order, quay coordinates, boarding/alighting and timing-point rules. Entur's [journey planner API](https://developer.entur.no/apis/graphql/journey-planner/query/serviceJourneys) confirmed the trips were active on that date and supplied scheduled passing times; all quay names and coordinates were cross-checked against the [national stop registry GTFS dump](https://developer.entur.no/open-data/stops). Each fixture records its exact query, URLs, retrieval time and source-response SHA-256 hashes. These are historical snapshot facts, not a live timetable or evidence of an actual closure. Entur attribution: Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.

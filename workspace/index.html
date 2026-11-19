@@ -168,6 +168,14 @@
         <button type="button" class="btn btn-small" id="add-project">Add hypothetical project</button>
         <button type="button" class="btn btn-primary" id="assess-btn">Assess projects</button>
         <p class="hint">Local calculation. Works without Ollama.</p>
+        <div class="saved-journeys">
+          <h3>Local scenario monitoring</h3>
+          <p class="hint">Save one confirmed Koigen candidate simulation in this browser. Project dates are your model inputs, not dates reported for the footpath.</p>
+          <button type="button" class="btn btn-small" id="save-monitor-scenario">Save confirmed scenario for alerts</button>
+          <button type="button" class="btn btn-small" id="restore-monitor-scenario" hidden>Restore saved scenario</button>
+          <button type="button" class="btn btn-small" id="delete-monitor-scenario" hidden>Delete saved scenario</button>
+          <p class="hint" id="monitor-scenario-status" role="status"></p>
+        </div>
       </section>
 
       <section class="group" id="walking-ai" aria-labelledby="g-ai">

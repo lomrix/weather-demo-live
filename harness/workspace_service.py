@@ -11,7 +11,7 @@ import json
 import math
 import re
 import threading
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -709,13 +709,19 @@ class Workspace:
         }
 
     def journey_alerts(self, payload):
-        if not isinstance(payload, dict) or set(payload) not in (
-            {"saved_journeys", "previous_projects"},
-            {"saved_journeys", "previous_projects", "revision"},
-            {"saved_journeys", "previous_projects", "as_of"},
-            {"saved_journeys", "previous_projects", "revision", "as_of"},
-        ):
+        if (not isinstance(payload, dict)
+                or not {"saved_journeys", "previous_projects"} <= set(payload)
+                or set(payload) - {"saved_journeys", "previous_projects", "revision", "as_of", "monitor_scenario"}):
             raise ValueError("Send saved_journeys and the previous project snapshot")
+        monitored = payload.get("monitor_scenario")
+        if monitored is not None:
+            if not isinstance(monitored, dict) or set(monitored) != {
+                "id", "request", "source", "modeled", "confirmation"
+            }:
+                raise ValueError("Saved monitoring scenario is invalid")
+            expected = self._monitor_scenario(monitored["request"], monitored["confirmation"])
+            if monitored != expected:
+                raise ValueError("Saved monitoring scenario does not match the confirmed Koigen notice")
         return build_alerts(
             self,
             self.root,
@@ -723,7 +729,46 @@ class Workspace:
             payload["previous_projects"],
             payload.get("revision", "current"),
             payload.get("as_of"),
+            monitored,
         )
+
+    def _monitor_scenario(self, request, confirmation):
+        norm = self.normalize(request)
+        if (norm["case"]["id"] != "koigen-demo" or norm["custom"] is not None
+                or len(norm["projects"]) != 1
+                or norm["projects"][0]["section_ids"] != ["koigen-candidate-closure"]):
+            raise ValueError("Monitoring requires the confirmed Koigen candidate section as the only project")
+        if (not isinstance(confirmation, dict) or set(confirmation) != {"confirmed", "confirmed_at"}
+                or confirmation["confirmed"] is not True
+                or not isinstance(confirmation["confirmed_at"], str)):
+            raise ValueError("A dated modeled-section confirmation is required")
+        try:
+            confirmed_at = datetime.fromisoformat(confirmation["confirmed_at"].replace("Z", "+00:00"))
+            if confirmed_at.tzinfo is None:
+                raise ValueError("timezone required")
+        except ValueError as exc:
+            raise ValueError("Confirmation timestamp must include a timezone") from exc
+        notice = load_notice(self.root)
+        source = {
+            "notice_id": notice["id"], "label": notice["title"],
+            "url": notice["source_url"], "file": "fixtures/notices/hamar-koigen-footpath.json",
+            "excerpt": notice["focus_quote"], "footpath_dates": None,
+        }
+        project = norm["projects"][0]
+        canonical_request = {
+            "case_id": "koigen-demo", "assessment_date": norm["date"],
+            "modeled_section_confirmation": True,
+            "projects": [{"name": project["label"], "start_date": project["start_date"],
+                          "end_date": project["end_date"], "sections": project["section_ids"],
+                          "hypothetical": True}],
+        }
+        identity = hashlib.sha256(_canonical(canonical_request).encode()).hexdigest()[:20]
+        return {"id": f"koigen-{identity}", "request": canonical_request,
+                "source": source, "modeled": True, "confirmation": confirmation}
+
+    def monitor_scenario(self, payload):
+        confirmation = {"confirmed": True, "confirmed_at": datetime.now(timezone.utc).isoformat()}
+        return self._monitor_scenario(payload, confirmation)
 
     def case_payload(self, case_id):
         case = self.get_case(case_id)
