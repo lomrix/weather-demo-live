@@ -28,6 +28,7 @@ STATIC = {
 POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compare": "compare",
          "/api/journey": "resolve_journey", "/api/bus/assess": "assess_bus",
          "/api/notice/draft": "draft_koigen_notice",
+         "/api/monitor-scenario": "monitor_scenario",
          "/api/journey-alerts": "journey_alerts"}
 SECURITY_HEADERS = {
     "Content-Security-Policy": (

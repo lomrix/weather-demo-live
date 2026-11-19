@@ -113,7 +113,8 @@ def _source(snapshot, project):
     }
 
 
-def build_alerts(workspace, root, saved_journeys, previous_projects, revision="current", as_of=None):
+def build_alerts(workspace, root, saved_journeys, previous_projects, revision="current", as_of=None,
+                 monitor_scenario=None):
     if not isinstance(saved_journeys, list) or len(saved_journeys) > MAX_SAVED_JOURNEYS:
         raise ValueError(f"Send up to {MAX_SAVED_JOURNEYS} saved journeys")
     if not all(_valid_journey(journey) for journey in saved_journeys):
@@ -131,6 +132,16 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
     previous = {item["id"]: item for item in previous_projects}
     alerts = []
     unresolved = []
+    projects = [(project, False) for project in snapshot["projects"]]
+    if monitor_scenario is not None:
+        request = monitor_scenario["request"]
+        saved = request["projects"][0]
+        projects.append(({
+            "id": monitor_scenario["id"], "label": saved["name"],
+            "start_date": saved["start_date"], "end_date": saved["end_date"],
+            "section_ids": saved["sections"], "hypothetical": True,
+            "reopening_confirmed": False,
+        }, True))
     for journey in saved_journeys:
         try:
             case = workspace.get_case(journey["case_id"])
@@ -156,8 +167,22 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                 "message": str(exc),
             })
             continue
-        section_ids = case["section_ids"]
-        for project in snapshot["projects"]:
+        original_case, original_resolved = case, resolved
+        for project, simulation in projects:
+            case, resolved = original_case, original_resolved
+            if simulation:
+                case = workspace.get_case("koigen-demo")
+                resolved = workspace.resolve_custom(case, {
+                    "origin": tuple(journey["origin"]["coordinates"]),
+                    "destination": tuple(journey["destination"]["coordinates"]),
+                })
+                if resolved["status"] != "ready":
+                    unresolved.append({
+                        "journey_id": journey["id"], "journey_name": journey["name"],
+                        "kind": "journey_unavailable", "message": resolved["message"],
+                    })
+                    continue
+            section_ids = case["section_ids"]
             if any(section not in section_ids for section in project["section_ids"]):
                 unresolved.append({
                     "journey_id": journey["id"],
@@ -168,41 +193,7 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                 continue
             start = date.fromisoformat(project["start_date"])
             end = date.fromisoformat(project["end_date"])
-            relevant = False
-            result = None
-            if start <= when <= end:
-                scenario = {
-                    "metadata": {"id": snapshot["id"], "synthetic": snapshot["synthetic"]},
-                    "network": case["scenario"]["network"],
-                    "routing_mode": "walking",
-                    "journeys": [{
-                        "id": "saved",
-                        "origin": resolved["origin"]["node_id"],
-                        "destination": resolved["destination"]["node_id"],
-                    }],
-                    "projects": [{
-                        "id": project["id"],
-                        "label": project["label"],
-                        "hypothetical": bool(project["hypothetical"]),
-                        "start_date": project["start_date"],
-                        "end_date": project["end_date"],
-                        "restrictions": [{
-                            "type": "close_links",
-                            "mode": "walking",
-                            "link_ids": [
-                                link_id
-                                for section in project["section_ids"]
-                                for link_id in section_ids[section]["link_ids"]
-                            ],
-                        }],
-                    }],
-                }
-                result = assess_projects(scenario, when.isoformat())[
-                    "comparison"
-                ]["alternatives"][0]["journeys"][0]
-                relevant = result["status"] != "unchanged"
-            elif start > when:
-                preview = {
+            preview = {
                     "metadata": {"id": snapshot["id"]},
                     "network": case["scenario"]["network"],
                     "routing_mode": "walking",
@@ -227,42 +218,12 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                             ],
                         }],
                     }],
-                }
-                result = assess_projects(preview, start.isoformat())[
-                    "comparison"
-                ]["alternatives"][0]["journeys"][0]
-                relevant = result["status"] != "unchanged"
-            else:
-                preview = {
-                    "metadata": {"id": snapshot["id"]},
-                    "network": case["scenario"]["network"],
-                    "routing_mode": "walking",
-                    "journeys": [{
-                        "id": "saved",
-                        "origin": resolved["origin"]["node_id"],
-                        "destination": resolved["destination"]["node_id"],
-                    }],
-                    "projects": [{
-                        "id": project["id"],
-                        "label": project["label"],
-                        "hypothetical": bool(project["hypothetical"]),
-                        "start_date": project["start_date"],
-                        "end_date": project["end_date"],
-                        "restrictions": [{
-                            "type": "close_links",
-                            "mode": "walking",
-                            "link_ids": [
-                                link_id
-                                for section in project["section_ids"]
-                                for link_id in section_ids[section]["link_ids"]
-                            ],
-                        }],
-                    }],
-                }
-                result = assess_projects(preview, start.isoformat())[
-                    "comparison"
-                ]["alternatives"][0]["journeys"][0]
-                relevant = result["status"] != "unchanged"
+            }
+            assessment_day = when if start <= when <= end else start
+            result = assess_projects(preview, assessment_day.isoformat())[
+                "comparison"
+            ]["alternatives"][0]["journeys"][0]
+            relevant = result["status"] != "unchanged"
 
             def add(kind, suffix, message):
                 stable = f"{journey['id']}:{project['id']}:{kind}:{suffix}"
@@ -278,7 +239,13 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                     "start_date": project["start_date"],
                     "end_date": project["end_date"],
                     "checked_at": checked_at,
-                    "source": _source(snapshot, project),
+                    "source": ({
+                        "project_source_label": monitor_scenario["source"]["label"],
+                        "project_source_url": monitor_scenario["source"]["url"],
+                        "snapshot_file": monitor_scenario["source"]["file"],
+                        "excerpt": monitor_scenario["source"]["excerpt"],
+                    } if simulation else _source(snapshot, project)),
+                    "user_confirmed_simulation": simulation,
                 }
                 if result is not None:
                     alert["route_effect"] = {
@@ -289,11 +256,13 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                     }
                 alerts.append(alert)
 
-            if relevant and 0 <= (start - when).days <= APPROACHING_DAYS:
+            if (relevant and 0 <= (start - when).days <= APPROACHING_DAYS
+                    and (not simulation or start > when)):
                 add(
                     "approaching_works",
                     project["start_date"],
-                    f"Works start on {project['start_date']} and affect this saved journey.",
+                    (f"Simulation begins on {project['start_date']} and affects this saved journey."
+                     if simulation else f"Works start on {project['start_date']} and affect this saved journey."),
                 )
             if relevant and start <= when <= end:
                 effect = "make the route unreachable" if result["status"] == "unreachable" else (
@@ -303,10 +272,10 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                 add(
                     "active_impact",
                     f"{project['start_date']}:{project['end_date']}:{result['status']}",
-                    f"Active works {effect}.",
+                    f"User-confirmed simulation would {effect}." if simulation else f"Active works {effect}.",
                 )
             old = previous.get(project["id"])
-            if relevant and old and (
+            if relevant and not simulation and old and (
                 old.get("start_date"), old.get("end_date")
             ) != (project["start_date"], project["end_date"]):
                 add(
@@ -327,7 +296,8 @@ def build_alerts(workspace, root, saved_journeys, previous_projects, revision="c
                 add(
                     "reopening_unconfirmed",
                     project["end_date"],
-                    "Scheduled end passed; reopening unconfirmed.",
+                    ("Simulation period ended; reopening unconfirmed." if simulation
+                     else "Scheduled end passed; reopening unconfirmed."),
                 )
     unique = {alert["id"]: alert for alert in alerts}
     return {

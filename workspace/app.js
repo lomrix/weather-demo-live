@@ -27,10 +27,12 @@ const st = {
   placeTimer: { origin: null, destination: null }, savedJourneys: [],
   invalidSavedData: false,
   journeyAlerts: [], dismissedJourneyAlerts: [], alertSnapshot: null,
+  monitorScenario: null, invalidMonitorScenario: false, alertSeq: 0,
 };
 const CUSTOM = "custom";
 const SAVED_JOURNEYS_KEY = "hamar-access-lab.saved-journeys.v1";
 const JOURNEY_ALERT_STATE_KEY = "hamar-access-lab.journey-alert-state.v1";
+const MONITOR_SCENARIO_KEY = "hamar-access-lab.monitor-scenario.v1";
 const isDriving = () => st.data && st.data.mode === "vehicle";
 const isCustom = () => st.journeyId === CUSTOM;
 const allSections = () => st.data.sections.concat(st.customInfo ? st.customInfo.sections : []);
@@ -1108,11 +1110,14 @@ function saveSelectedJourney() {
     savedJourneyError("Discard the invalid saved data before saving a new journey.");
     return;
   }
-  if (st.caseId === "hamar-driving" || !st.custom.origin || !st.custom.destination) {
+  const preset = !isCustom() && st.data.journeys.find((item) => item.id === st.journeyId);
+  const origin = preset ? preset.origin.coordinates : st.custom.origin;
+  const destination = preset ? preset.destination.coordinates : st.custom.destination;
+  if (st.caseId === "hamar-driving" || !origin || !destination) {
     savedJourneyError("Choose both walking endpoints before saving.");
     return;
   }
-  if (!st.customInfo || st.customInfo.status !== "ready") {
+  if (!preset && (!st.customInfo || st.customInfo.status !== "ready")) {
     savedJourneyError("Resolve a connected walking journey before saving. Outside-coverage and unmapped connections cannot be saved.");
     return;
   }
@@ -1128,8 +1133,8 @@ function saveSelectedJourney() {
     version: 1,
     id: `journey-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
     name, case_id: st.caseId,
-    origin: { coordinates: [...st.custom.origin], label: endpointLabel("origin"), place_id: st.endpointPlaces.origin && st.endpointPlaces.origin.id },
-    destination: { coordinates: [...st.custom.destination], label: endpointLabel("destination"), place_id: st.endpointPlaces.destination && st.endpointPlaces.destination.id },
+    origin: { coordinates: [...origin], label: preset ? preset.origin.label : endpointLabel("origin"), place_id: preset ? null : st.endpointPlaces.origin && st.endpointPlaces.origin.id },
+    destination: { coordinates: [...destination], label: preset ? preset.destination.label : endpointLabel("destination"), place_id: preset ? null : st.endpointPlaces.destination && st.endpointPlaces.destination.id },
     saved_at: new Date().toISOString(),
   };
   if (writeSavedJourneys([...st.savedJourneys, journey])) {
@@ -1137,6 +1142,84 @@ function saveSelectedJourney() {
     savedJourneyError(`Saved “${name}” in this browser.`);
     renderSavedJourneys();
     refreshJourneyAlerts();
+  }
+}
+
+function renderMonitorScenario(message) {
+  const scenario = st.monitorScenario;
+  $("restore-monitor-scenario").hidden = !scenario;
+  $("delete-monitor-scenario").hidden = !scenario && !st.invalidMonitorScenario;
+  $("monitor-scenario-status").textContent = message || (scenario
+    ? `Saved user-confirmed simulation: ${scenario.request.projects[0].start_date} to ${scenario.request.projects[0].end_date}. Source footpath dates are unknown.`
+    : "No scenario saved in this browser.");
+}
+
+function loadMonitorScenario() {
+  try {
+    const raw = localStorage.getItem(MONITOR_SCENARIO_KEY);
+    if (!raw) return renderMonitorScenario();
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.version !== 1 || !parsed.scenario
+        || !parsed.scenario.request || !Array.isArray(parsed.scenario.request.projects)
+        || !parsed.scenario.request.projects[0]) throw new Error("invalid");
+    st.monitorScenario = parsed.scenario;
+    renderMonitorScenario();
+  } catch (e) {
+    st.invalidMonitorScenario = true;
+    renderMonitorScenario("Saved scenario could not be loaded. Delete invalid data before saving another.");
+  }
+}
+
+async function saveMonitorScenario() {
+  if (st.invalidMonitorScenario) {
+    renderMonitorScenario("Delete invalid saved scenario data before saving another.");
+    return;
+  }
+  try {
+    const request = payload(false);
+    delete request.custom_journey;
+    const scenario = await api("/api/monitor-scenario", request);
+    localStorage.setItem(MONITOR_SCENARIO_KEY, JSON.stringify({ version: 1, scenario }));
+    st.monitorScenario = scenario;
+    renderMonitorScenario("Confirmed simulation saved in this browser. Notice footpath dates remain unknown.");
+    await refreshJourneyAlerts();
+  } catch (e) {
+    renderMonitorScenario(`Scenario not saved: ${e.message}`);
+  }
+}
+
+async function restoreMonitorScenario() {
+  const scenario = st.monitorScenario;
+  if (!scenario) return false;
+  try {
+    // Validate the persisted record before restoring its confirmation.
+    await api("/api/journey-alerts", { saved_journeys: [], previous_projects: [], monitor_scenario: scenario });
+    await loadKoigenDemo();
+    if (st.caseId !== "koigen-demo") throw new Error("Koigen case could not be loaded.");
+    const request = scenario.request, project = request.projects[0];
+    $("assess-date").value = request.assessment_date;
+    st.projects = [{ uid: st.nextProject++, name: project.name, start: project.start_date,
+      end: project.end_date, sections: new Set(project.sections) }];
+    st.modeledConfirmed = true;
+    $("confirm-koigen-model").checked = true;
+    renderProjects(); syncAssessmentGate();
+    renderMonitorScenario("Saved confirmation restored. Select Assess projects for a fresh calculation.");
+    return true;
+  } catch (e) {
+    renderMonitorScenario(`Scenario could not be restored: ${e.message}`);
+    return false;
+  }
+}
+
+function deleteMonitorScenario() {
+  try {
+    localStorage.removeItem(MONITOR_SCENARIO_KEY);
+    st.monitorScenario = null;
+    st.invalidMonitorScenario = false;
+    renderMonitorScenario("Saved scenario removed from this browser.");
+    refreshJourneyAlerts();
+  } catch (e) {
+    renderMonitorScenario("This browser could not remove the saved scenario.");
   }
 }
 
@@ -1148,7 +1231,12 @@ async function restoreSavedJourney(id) {
   }
   setBusy("Restoring saved walking endpoints…");
   try {
-    if (!await loadCase(journey.case_id)) return;
+    if (journey.case_id === "koigen-demo" && st.monitorScenario) {
+      if (!await restoreMonitorScenario()) {
+        savedJourneyError("The saved Koigen scenario could not be restored; review its error.");
+        return;
+      }
+    } else if (!await loadCase(journey.case_id)) return;
     $("case-select").value = st.caseId;
     st.custom.origin = [...journey.origin.coordinates];
     st.custom.destination = [...journey.destination.coordinates];
@@ -1239,23 +1327,26 @@ function alertLabel(kind) {
 function journeyAlertCard(alert) {
   const source = alert.source;
   const effect = alert.route_effect;
+  const effectLabel = alert.user_confirmed_simulation ? "Modeled" : alert.kind === "active_impact" ? "Current" : "Modeled historical";
   const routeText = effect ? effect.status === "unreachable"
-    ? `${alert.kind === "active_impact" ? "Current" : "Modeled historical"} effect: baseline ${metres(effect.baseline_metres)}; route becomes unreachable.`
-    : `${alert.kind === "active_impact" ? "Current" : "Modeled historical"} effect: baseline ${metres(effect.baseline_metres)}; affected route ${metres(effect.metres)} (${signed(effect.change_metres)}).`
+    ? `${effectLabel} effect: baseline ${metres(effect.baseline_metres)}; route becomes unreachable.`
+    : `${effectLabel} effect: baseline ${metres(effect.baseline_metres)}; affected route ${metres(effect.metres)} (${signed(effect.change_metres)}).`
     : "";
   return el("article", {
     class: `card alert-card ${alert.kind === "reopening_confirmed" ? "confirmed" : ""} ${alert.synthetic ? "synthetic" : ""}`,
   },
   el("div", { class: "card-title" },
-    el("h3", {}, `${alertLabel(alert.kind)} · ${alert.journey_name}`),
-    el("span", {}, pill(alert.synthetic ? "Synthetic project" : "Saved project", alert.synthetic ? "pill-warn" : "pill-ok"))),
+    el("h3", {}, `${alert.user_confirmed_simulation && alert.kind === "reopening_unconfirmed" ? "Simulation period ended" : alertLabel(alert.kind)} · ${alert.journey_name}`),
+    el("span", {}, pill(alert.user_confirmed_simulation ? "User-confirmed simulation" : alert.synthetic ? "Synthetic project" : "Saved project", alert.synthetic ? "pill-warn" : "pill-ok"))),
   el("p", {}, alert.message),
   routeText ? el("p", { class: "hint" }, routeText) : null,
   el("p", {}, el("strong", {}, `${alert.project_label}. `),
-    `${alert.start_date} to ${alert.end_date}.`),
+    `${alert.user_confirmed_simulation ? "User-selected simulation dates: " : ""}${alert.start_date} to ${alert.end_date}.`),
+  alert.user_confirmed_simulation ? el("p", { class: "hint" }, "Notice footpath dates and exact closure extent are unknown; this is not a verified closure or reopening.") : null,
   el("p", { class: "alert-meta alert-source" },
-    `Source: ${source.project_source_label}. ${source.project_source_url}. `,
-    `Saved data: ${source.snapshot_file}. Last checked: ${alert.checked_at}.`),
+    "Source: ", el("a", { href: source.project_source_url, target: "_blank", rel: "noopener noreferrer" }, source.project_source_label),
+    `. Saved data: ${source.snapshot_file}. Last assessment: ${alert.checked_at}.`),
+  source.excerpt ? el("blockquote", {}, source.excerpt) : null,
   el("button", {
     type: "button", class: "btn btn-small",
     "data-dismiss-alert": alert.id,
@@ -1282,6 +1373,7 @@ function renderJourneyAlerts() {
 
 async function refreshJourneyAlerts() {
   const status = $("journey-alert-status");
+  const seq = ++st.alertSeq;
   if (!st.savedJourneys.length) {
     st.journeyAlerts = [];
     status.textContent = "No saved walking journeys to check.";
@@ -1294,7 +1386,9 @@ async function refreshJourneyAlerts() {
       saved_journeys: st.savedJourneys,
       previous_projects: st.alertSnapshot && st.alertSnapshot.projects
         ? st.alertSnapshot.projects : [],
+      monitor_scenario: st.monitorScenario,
     });
+    if (seq !== st.alertSeq) return;
     st.journeyAlerts = result.alerts;
     st.alertSnapshot = result.snapshot;
     saveAlertState(result.snapshot);
@@ -1304,6 +1398,7 @@ async function refreshJourneyAlerts() {
       : `${result.alerts.length} alert(s) checked at ${result.checked_at}.`;
     renderJourneyAlerts();
   } catch (e) {
+    if (seq !== st.alertSeq) return;
     st.journeyAlerts = [];
     status.textContent = `Project data unavailable: ${e.message}`;
     renderJourneyAlerts();
@@ -1586,6 +1681,9 @@ async function init() {
       });
   }
   $("save-journey").addEventListener("click", saveSelectedJourney);
+  $("save-monitor-scenario").addEventListener("click", saveMonitorScenario);
+  $("restore-monitor-scenario").addEventListener("click", restoreMonitorScenario);
+  $("delete-monitor-scenario").addEventListener("click", deleteMonitorScenario);
   $("saved-journey-list").addEventListener("click", (e) => {
     const restore = e.target.closest && e.target.closest("[data-restore-saved]");
     if (restore) return restoreSavedJourney(restore.getAttribute("data-restore-saved"));
@@ -1617,6 +1715,7 @@ async function init() {
   });
   loadAlertState();
   loadSavedJourneys();
+  loadMonitorScenario();
   $("assess-date").addEventListener("input", inputsChanged);
   $("question").addEventListener("input", () => { if (st.compare) { st.compareStale = true; applyStale(); clearTimeout(st.timer); st.timer = setTimeout(checkFingerprint, 150); } });
   $("assess-btn").addEventListener("click", assess);

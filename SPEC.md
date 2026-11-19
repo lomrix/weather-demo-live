@@ -8,6 +8,22 @@ Collect a bounded permitted public-data sample, validate provenance and complete
 
 Every reported value must trace to saved source rows and public identifiers. Preserve journey, direction, stop and call-order identities. Reject duplicates and malformed supplied timestamps. Actual comparisons require actual and aimed departure times; predictions remain separate, missing comparisons remain unknown, and cancelled calls are excluded. Independent source-row checks and synthetic failure cases must support conclusions. Do not infer congestion, legal service breach or municipal benefit from the samples.
 
+# Exam priorities and future vision
+
+The exam delivery prioritizes a connected, demonstrable workflow from source
+review and explicit confirmation through route assessment and saved-journey
+alerts; demonstrated walking, driving and bus-access modes; and a usable UI.
+Measure the AI contribution against a non-AI baseline, with request counts,
+usage and limitations rather than an unsupported superiority claim. Provide
+accessibility evidence with unknowns made explicit, and reproducible failure
+experiments that distinguish synthetic checks from live results. These are
+priorities, not claims that all evidence has been completed.
+
+The wider vision of recurring public-data acquisition, broader geographic and
+transport coverage, continuous monitoring and additional notification
+channels remains future work, subject to provenance, privacy and operational
+checks.
+
 # As built versus pending
 
 Task 002 generates offline HTML/JSON for three road counters on 20 October 2026, validating 24 contiguous local hours and reporting separate totals, peaks and coverage. Vehicle passages do not measure unique travellers, congestion or bus delay.

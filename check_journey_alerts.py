@@ -51,6 +51,21 @@ def unrelated_saved_journey(workspace):
     }
 
 
+def koigen_monitor_request():
+    return {
+        "case_id": "koigen-demo",
+        "assessment_date": "2026-11-18",
+        "modeled_section_confirmation": True,
+        "projects": [{
+            "name": "Koigen candidate",
+            "start_date": "2026-11-18",
+            "end_date": "2026-11-18",
+            "sections": ["koigen-candidate-closure"],
+            "hypothetical": True,
+        }],
+    }
+
+
 class JourneyAlertTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -226,6 +241,58 @@ class JourneyAlertTests(unittest.TestCase):
         self.assertIn("Checks occur when the app opens or when you refresh", script)
         self.assertIn("Scheduled end passed; reopening unconfirmed", engine)
         self.assertIn("Reopening confirmed", script)
+
+    def test_confirmed_koigen_simulation_matches_only_affected_journey(self):
+        preset = self.workspace.case_payload("koigen-demo")["journeys"][0]
+        affected = {
+            "id": "koigen-walk", "name": "Koigen walk", "case_id": "koigen-demo",
+            "origin": preset["origin"], "destination": preset["destination"],
+        }
+        unrelated = unrelated_saved_journey(self.workspace)
+        scenario = self.workspace.monitor_scenario(koigen_monitor_request())
+        self.assertEqual(scenario["id"], self.workspace.monitor_scenario(koigen_monitor_request())["id"])
+        payload = {"saved_journeys": [affected, unrelated], "previous_projects": [],
+                   "monitor_scenario": json.loads(json.dumps(scenario)), "as_of": "2026-11-18"}
+        first = self.workspace.journey_alerts(payload)
+        second = self.workspace.journey_alerts(payload)
+        simulated = [a for a in first["alerts"] if a["user_confirmed_simulation"]]
+        self.assertEqual(len(simulated), 1)
+        alert = simulated[0]
+        self.assertEqual(alert["journey_id"], affected["id"])
+        self.assertEqual((alert["route_effect"]["baseline_metres"], alert["route_effect"]["metres"]),
+                         (323, 593))
+        self.assertEqual(alert["id"], next(
+            a["id"] for a in second["alerts"] if a["user_confirmed_simulation"]
+        ))
+        self.assertTrue(alert["checked_at"])
+        self.assertEqual(alert["source"]["project_source_url"], scenario["source"]["url"])
+        self.assertIsNone(scenario["source"]["footpath_dates"])
+        self.assertTrue(scenario["confirmation"]["confirmed"])
+
+        payload["as_of"] = "2026-11-19"
+        expired = [a for a in self.workspace.journey_alerts(payload)["alerts"]
+                   if a["user_confirmed_simulation"]]
+        self.assertEqual([a["kind"] for a in expired], ["reopening_unconfirmed"])
+        self.assertEqual(expired[0]["message"], "Simulation period ended; reopening unconfirmed.")
+
+    def test_monitor_scenario_rejects_unconfirmed_or_tampered_records(self):
+        request = koigen_monitor_request()
+        request["modeled_section_confirmation"] = False
+        with self.assertRaisesRegex(ValueError, "explicitly confirm"):
+            self.workspace.monitor_scenario(request)
+        request = koigen_monitor_request()
+        request["projects"][0]["sections"] = ["missing"]
+        with self.assertRaises(ValueError):
+            self.workspace.monitor_scenario(request)
+        request = koigen_monitor_request()
+        request["projects"][0]["end_date"] = "2026-11-17"
+        with self.assertRaisesRegex(ValueError, "before start"):
+            self.workspace.monitor_scenario(request)
+        scenario = self.workspace.monitor_scenario(koigen_monitor_request())
+        scenario["source"]["footpath_dates"] = "2026-11-18"
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            self.workspace.journey_alerts({"saved_journeys": [], "previous_projects": [],
+                                           "monitor_scenario": scenario})
 
 
 class JourneyAlertHttpTests(unittest.TestCase):
