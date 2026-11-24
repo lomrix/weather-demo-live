@@ -26,7 +26,7 @@ const st = {
   placeMatches: { origin: [], destination: [] }, placeSeq: { origin: 0, destination: 0 },
   placeTimer: { origin: null, destination: null }, savedJourneys: [],
   invalidSavedData: false,
-  journeyAlerts: [], dismissedJourneyAlerts: [], alertSnapshot: null,
+  journeyAlerts: [], dismissedJourneyAlerts: [], readJourneyAlerts: [], alertSnapshot: null,
   monitorScenario: null, invalidMonitorScenario: false, alertSeq: 0,
 };
 const CUSTOM = "custom";
@@ -194,7 +194,6 @@ function syncWorkspace() {
   });
   $("bus-section").hidden = mode !== "bus";
   $("planner-actions").hidden = mode === "bus";
-  $("alerts-panel").hidden = mode !== "walking";
   $("assessment-panel").hidden = Boolean(st.catalogue);
   $("evidence").hidden = Boolean(st.catalogue);
   $("diagnostics").hidden = Boolean(st.catalogue) || mode === "bus";
@@ -213,7 +212,6 @@ function syncWorkspace() {
   $("demo-settings").hidden = mode !== "walking" || $("demo-controls").hidden;
   $("load-demo").hidden = mode !== "walking";
   $("load-koigen-demo").hidden = mode !== "walking";
-  $("alert-count").textContent = st.journeyAlerts.filter((a) => !st.dismissedJourneyAlerts.includes(a.id)).length || "";
   renderOverview();
 }
 
@@ -1520,6 +1518,8 @@ function loadAlertState() {
       throw new Error("invalid");
     }
     st.dismissedJourneyAlerts = parsed.dismissed_alerts;
+    st.readJourneyAlerts = Array.isArray(parsed.read_alerts)
+      ? parsed.read_alerts.filter((id) => typeof id === "string") : [];
     st.alertSnapshot = parsed.snapshot || null;
   } catch (e) {
     $("journey-alert-status").textContent =
@@ -1535,6 +1535,7 @@ function saveAlertState(snapshot) {
     localStorage.setItem(JOURNEY_ALERT_STATE_KEY, JSON.stringify({
       version: 1,
       dismissed_alerts: st.dismissedJourneyAlerts,
+      read_alerts: st.readJourneyAlerts,
       snapshot: st.alertSnapshot,
     }));
     return true;
@@ -1600,7 +1601,8 @@ function journeyAlertCard(alert, dismissed = false) {
   el("div", { class: "card-title" },
     el("h3", {}, headline),
     pill(simulated ? "User-confirmed simulation" : alert.synthetic ? "Synthetic project" : "Saved project",
-      alert.synthetic ? "pill-warn" : "pill-ok")),
+      alert.synthetic ? "pill-warn" : "pill-ok"),
+    pill(st.readJourneyAlerts.includes(alert.id) ? "Read" : "Unread")),
   el("p", { class: "alert-journey" }, alert.journey_name),
   routeText ? el("p", { class: "alert-route" }, routeText) : null,
   alert.kind === "reopening_unconfirmed"
@@ -1614,9 +1616,12 @@ function journeyAlertCard(alert, dismissed = false) {
     el("p", { class: "alert-meta" }, "Source: ", sourceLabel),
     el("p", { class: "alert-meta" }, `Last assessment: ${readableDate(alert.checked_at, true)}. Saved data: ${source.snapshot_file}.`),
     source.excerpt ? el("blockquote", {}, source.excerpt) : null),
-  el("button", { type: "button", class: "btn btn-small",
-    [dismissed ? "data-restore-alert" : "data-dismiss-alert"]: alert.id },
-    dismissed ? "Restore alert" : "Dismiss"));
+  el("div", { class: "notification-actions" },
+    !dismissed && !st.readJourneyAlerts.includes(alert.id)
+      ? el("button", { type: "button", class: "btn btn-small", "data-read-alert": alert.id }, "Mark as read") : null,
+    el("button", { type: "button", class: "btn btn-small",
+      [dismissed ? "data-restore-alert" : "data-dismiss-alert"]: alert.id },
+      dismissed ? "Restore alert" : "Dismiss")));
 }
 
 function renderJourneyAlerts() {
@@ -1627,7 +1632,6 @@ function renderJourneyAlerts() {
   const dismissed = st.journeyAlerts.filter(
     (alert) => st.dismissedJourneyAlerts.includes(alert.id)
   );
-  if ($("alert-count")) $("alert-count").textContent = visible.length || "";
   if (!visible.length && !dismissed.length) {
     host.replaceChildren();
     host.hidden = true;
@@ -1635,14 +1639,12 @@ function renderJourneyAlerts() {
   }
   host.hidden = false;
   host.replaceChildren(
-    el("h2", {}, "Saved-journey alerts"),
     el("p", { class: "hint" }, "Checks occur when the app opens or when you refresh; there is no continuous monitoring."),
     ...visible.map((alert) => journeyAlertCard(alert)),
     ...(dismissed.length ? [el("details", { class: "dismissed-alerts alert-details" },
       el("summary", {}, `Show dismissed alerts (${dismissed.length})`),
       ...dismissed.map((alert) => journeyAlertCard(alert, true)))] : []),
   );
-  if ($("alert-count")) $("alert-count").textContent = visible.length || "";
 }
 
 async function refreshJourneyAlerts() {
@@ -2005,6 +2007,13 @@ async function init() {
   });
   $("refresh-journey-alerts").addEventListener("click", refreshJourneyAlerts);
   $("journey-alerts").addEventListener("click", (e) => {
+    const read = e.target.closest("[data-read-alert]");
+    if (read) {
+      st.readJourneyAlerts.push(read.dataset.readAlert);
+      saveAlertState();
+      renderJourneyAlerts();
+      return;
+    }
     const restore = e.target.closest && e.target.closest("[data-restore-alert]");
     if (restore) {
       const id = restore.getAttribute("data-restore-alert");
@@ -2080,5 +2089,6 @@ async function init() {
   await refreshJourneyAlerts();
   syncWorkspace();
 }
+window.hamarNotificationSupport = { $, el, pill, api, refreshJourneyAlerts };
 init();
 })();

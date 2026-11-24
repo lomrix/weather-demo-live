@@ -130,9 +130,38 @@ Exact origins/destinations and the visible map area are sent to the basemap
 provider indirectly through requested geographic tiles; source and journey
 records otherwise remain in the existing local application.
 
-Technical evidence and alerts are available through **Details** rather than
-occupying the main map screen. The modal keeps source provenance and unknowns
-available for review; the overview retains the hypothetical/model status.
+Technical assessment evidence is available through **Details**. The overview
+retains the hypothetical/model status.
+
+## Hamar notification centre
+
+Open **Notifications** in the workspace header in any travel mode. **Hamar-area
+updates** is available without saving a journey. **My journeys** shows alerts
+matched by the existing walking assessment. Follow either or both scopes, mark
+updates read, or dismiss and restore them. These choices are saved in the
+browser. The header count is for unread municipal updates.
+
+The Hamar feed is a manually reviewed, partial set of saved municipal notices
+for Koigen, Gåsbuvegen and Skappelsgate. Cards retain the source link,
+supporting excerpt or extracted fact and last source-check date. Source
+quotations, summaries and notes are labeled separately; summaries are not
+rendered as quotations. Original evidence text retains its source language. The Gåsbuvegen
+record illustrates an elapsed closure schedule with reopening still unconfirmed
+in the saved evidence. **Simulation examples** contains invented upcoming
+works, a date extension and an explicitly confirmed reopening in the demo data.
+City cards do not calculate route effects.
+
+Refresh reloads the saved records and reruns the enabled journey check.
+It does not fetch municipal sites or provide background or push delivery.
+To add a reviewed source change, append a revision to its record in
+`fixtures/notices/hamar-area.json` with the corresponding evidence and check
+time. Each card shows the latest revision, plus the prior period and evidence
+when dates changed. Refreshing an unchanged revision leaves its read and
+dismissal state intact. A source outage never confirms reopening.
+
+```text
+python -B -m unittest check_city_notices.py check_journey_alerts.py -v
+```
 
 ## Evaluate raw notice extraction
 

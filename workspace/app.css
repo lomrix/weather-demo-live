@@ -366,7 +366,15 @@ input::placeholder { color:#8798ad; }
 .details-header { position:sticky; top:0; background:var(--card); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:17px 22px; z-index:2; }
 .details-header h2 { margin:0; font-size:18px; }
 .details-header button { font-size:22px; padding:0 10px; }
+#close-notifications { font-size: .875rem; padding: .4rem .65rem; }
 .details-modal .results { display:block; box-shadow:none; border:0; border-radius:0; padding:10px 22px 22px; background:var(--card); }
+.notification-body { padding: 0 22px 22px; overflow-wrap: anywhere; }
+.notification-scopes { display: flex; flex-wrap: wrap; gap: .5rem 1rem; border: 1px solid var(--line); border-radius: 8px; margin: 0 0 .75rem; }
+.notification-body section { margin-top: 1rem; }
+.notification-body .card { margin-block: .6rem; }
+.notification-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.notification-body summary { cursor: pointer; padding-block: .4rem; }
+#notifications-button { white-space: nowrap; }
 .layout { grid-template-areas:"controls map"; }
 .card,.project,.panel { background:var(--card); color:var(--ink); border-color:var(--line); }
 th,td { border-color:var(--line); }
