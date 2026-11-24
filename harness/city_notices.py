@@ -4,11 +4,12 @@ import hashlib
 import json
 from datetime import date, datetime
 from urllib.parse import urlsplit
+from .official_notices import article_url, state_at
 
 
 STATUSES = {
     "works_scheduled", "works_upcoming", "works_started",
-    "closure_announced", "closure_active", "reopened",
+    "closure_announced", "closure_active", "reopened", "notice_reviewed",
 }
 
 
@@ -21,6 +22,21 @@ def notice_feed(root, today=None):
     records = json.loads(
         (root / "fixtures/notices/hamar-area.json").read_text(encoding="utf-8")
     )
+    accepted = state_at(root)["accepted"]
+    records = [record for record in records
+               if record["synthetic"] or article_url(record["source_url"]) not in accepted]
+    for url, review in accepted.items():
+        snapshot = review["snapshot"]
+        records.append({
+            "id": "official-" + hashlib.sha256(url.encode()).hexdigest(),
+            "title": snapshot["title"],
+            "location": None, "modes": [], "source_url": url, "synthetic": False,
+            "revisions": [{
+                "status": "notice_reviewed", "evidence": review["quote"],
+                "evidence_kind": "quote", "summary": review["summary"],
+                "last_checked": snapshot["retrieved_at"],
+            }],
+        })
     notices = []
     for record in records:
         revisions = record["revisions"]

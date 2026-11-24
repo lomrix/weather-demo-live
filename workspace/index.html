@@ -44,6 +44,18 @@
       <label><input id="follow-journeys" type="checkbox" checked> My journeys</label>
     </fieldset>
     <button type="button" class="btn btn-small" id="refresh-notifications">Refresh saved updates</button>
+    <section aria-labelledby="official-notices-heading">
+      <h3 id="official-notices-heading">Official sources</h3>
+      <button type="button" class="btn btn-small" id="check-official-notices">Check official sources</button>
+      <p class="hint" id="official-notice-status" role="status" tabindex="-1"></p>
+      <details id="official-check-details" hidden>
+        <summary>Last official source check</summary>
+        <div id="official-check-results"></div>
+      </details>
+      <h4>Pending human review</h4>
+      <p class="hint">Reviewed notices stay in place until a change is accepted.</p>
+      <div id="official-notice-queue"></div>
+    </section>
     <section id="city-notifications" aria-labelledby="city-notifications-heading">
       <h3 id="city-notifications-heading">Hamar-area updates</h3>
       <p class="hint" id="city-notice-status" role="status"></p>
