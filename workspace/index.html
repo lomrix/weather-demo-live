@@ -9,6 +9,7 @@
 <script src="/preferences.js" defer></script>
 <script type="module" src="/geographic-map.js"></script>
 <script src="/app.js" defer></script>
+<script src="/notifications.js" defer></script>
 <script src="/bus-catalogue.js" defer></script>
 </head>
 <body>
@@ -24,11 +25,47 @@
     <button type="button" data-workspace-mode="driving" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m5 9 2-5h10l2 5M4 10h16v8H4zM7 18v3M17 18v3M7 14h2M15 14h2"/></svg></span> Driving</button>
   </nav>
   <div class="appearance-controls">
+    <button type="button" class="btn btn-small" id="notifications-button" aria-haspopup="dialog">Notifications <span id="notifications-count"></span></button>
     <label class="sr-only" for="language-select">Language</label><select id="language-select" aria-label="Language"><option value="en">English</option><option value="nb">Norsk</option></select>
     <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">☾</button>
   </div>
   <div class="workspace-status"><span class="status-dot" aria-hidden="true"></span> Saved local data <span id="mode-badge" class="sr-only">Walking and driving supported</span></div>
 </header>
+<dialog class="details-modal" id="notifications-dialog" aria-labelledby="notifications-heading">
+  <div class="details-header">
+    <h2 id="notifications-heading">Notification centre</h2>
+    <button type="button" class="btn btn-small" id="close-notifications" autofocus>Close notifications</button>
+  </div>
+  <div class="notification-body">
+    <p class="hint">Selected saved notices for Hamar. Coverage is partial. Updates are available inside this app.</p>
+    <fieldset class="notification-scopes">
+      <legend>Follow updates in this browser</legend>
+      <label><input id="follow-hamar" type="checkbox" checked> Hamar-area updates</label>
+      <label><input id="follow-journeys" type="checkbox" checked> My journeys</label>
+    </fieldset>
+    <button type="button" class="btn btn-small" id="refresh-notifications">Refresh saved updates</button>
+    <section id="city-notifications" aria-labelledby="city-notifications-heading">
+      <h3 id="city-notifications-heading">Hamar-area updates</h3>
+      <p class="hint" id="city-notice-status" role="status"></p>
+      <div id="city-notice-list"></div>
+      <details id="dismissed-city-notices" hidden>
+        <summary>Dismissed updates</summary>
+        <div id="dismissed-city-list"></div>
+      </details>
+      <details id="simulation-notices">
+        <summary>Simulation examples</summary>
+        <div id="simulation-notice-list"></div>
+      </details>
+    </section>
+    <section id="journey-notifications" aria-labelledby="journey-notifications-heading">
+      <h3 id="journey-notifications-heading">My journeys</h3>
+      <p class="hint">Route effects are calculated for supported saved walking journeys.</p>
+      <p class="hint" id="journey-alert-status" role="status"></p>
+      <div id="journey-alerts" hidden></div>
+    </section>
+    <p class="hint" id="notification-storage-status" role="status"></p>
+  </div>
+</dialog>
 <div class="workspace-intro">
   <div><p class="eyebrow">Hamar, Norway · Access planning</p><h1>A clearer way through the city.</h1><p>Explore how street changes affect the journeys that matter.</p></div>
   <span class="prototype-label">Planning prototype <span>Hypothetical changes</span></span>
@@ -180,7 +217,6 @@
             <button type="button" class="btn btn-small" id="discard-saved-data" hidden>Discard invalid saved data</button>
             <p class="hint">Journey alerts are checked only when the app opens or you request a refresh; this is not continuous monitoring.</p>
             <button type="button" class="btn btn-small" id="refresh-journey-alerts">Refresh journey alerts</button>
-            <p class="hint" id="journey-alert-status" role="status"></p>
           </div>
         </div>
       </section>
@@ -219,7 +255,6 @@
 
   <section class="results" id="results" aria-labelledby="results-title">
     <h2 id="results-title" class="sr-only">Checked results</h2>
-    <details class="result-disclosure" id="alerts-panel"><summary>Saved-journey alerts <span id="alert-count"></span></summary><section id="journey-alerts" aria-live="polite" hidden></section></details>
     <details class="result-disclosure" id="assessment-panel"><summary>Full assessment &amp; accessibility evidence</summary><div id="result-cards"></div></details>
     <details class="panel" id="evidence">
       <summary>Evidence and technical IDs</summary>

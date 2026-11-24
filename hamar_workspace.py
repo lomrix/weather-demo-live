@@ -16,6 +16,7 @@ HERE = Path(__file__).resolve().parent
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(HERE / "harness"))
 from workspace_service import BusyError, Workspace
+from harness.city_notices import notice_feed
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -24,6 +25,7 @@ STATIC = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/notifications.js": ("notifications.js", "text/javascript; charset=utf-8"),
     "/bus-catalogue.js": ("bus-catalogue.js", "text/javascript; charset=utf-8"),
     "/preferences.js": ("preferences.js", "text/javascript; charset=utf-8"),
     "/geographic-map.js": ("geographic-map.js", "text/javascript; charset=utf-8"),
@@ -109,6 +111,13 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, body, content_type)
         elif path == "/api/cases":
             self._json(200, self.server.workspace.index())
+        elif path == "/api/notifications":
+            try:
+                notices = notice_feed(self.server.root)
+            except (OSError, ValueError, KeyError, TypeError, IndexError):
+                self._json(503, {"error": "Saved Hamar notices are unavailable."})
+            else:
+                self._json(200, {"notices": notices})
         elif path == "/api/bus/catalogue" or path.startswith("/api/bus/catalogue/"):
             try:
                 from harness.bus_catalogue import query

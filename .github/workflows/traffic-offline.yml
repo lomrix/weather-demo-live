@@ -47,3 +47,5 @@ jobs:
         run: python -B -m unittest check_notice_evaluation.py check_koigen_notice.py check_notice_evidence.py
       - name: Check imported Hamar bus inventory offline
         run: python -B -m unittest check_bus_catalogue.py
+      - name: Check Hamar notification feeds offline
+        run: python -B -m unittest check_city_notices.py check_journey_alerts.py

@@ -1,0 +1,151 @@
+[
+  {
+    "id": "koigen-footpath",
+    "title": "Koigen–Tjuvholmen",
+    "location": "Gangstien langs Mjøsa ved Koigen pumpestasjon",
+    "modes": [
+      "walking"
+    ],
+    "source_url": "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen",
+    "synthetic": false,
+    "revisions": [
+      {
+        "status": "closure_announced",
+        "evidence": "vil gangstien langs Mjøsa bli stengt, og omlegging av gangstien skal være skiltet.",
+        "last_checked": "2026-11-18",
+        "evidence_kind": "quote"
+      }
+    ]
+  },
+  {
+    "id": "koigen-works",
+    "title": "Koigen–Tjuvholmen",
+    "location": "Koigen–Tjuvholmen",
+    "modes": [],
+    "source_url": "https://www.hamar.kommune.no/nyhetsarkiv/sjoledning-skal-pa-plass-mellom-koigen-og-tjuvholmen",
+    "synthetic": false,
+    "revisions": [
+      {
+        "status": "works_started",
+        "evidence": "Arbeidet er godt i gang",
+        "last_checked": "2026-11-18",
+        "evidence_kind": "quote"
+      }
+    ]
+  },
+  {
+    "id": "gasbuvegen-through-traffic",
+    "title": "Gåsbuvegen",
+    "location": "Ingeberg–Korslund (Fartvegen)",
+    "modes": [
+      "driving"
+    ],
+    "source_url": "https://www.hamar.kommune.no/veger-og-gater/trafikkmeldinger/gasbuvegen-stengt-for-gjennomkjoring",
+    "synthetic": false,
+    "revisions": [
+      {
+        "status": "closure_announced",
+        "start_date": "2026-09-01",
+        "end_date": "2026-09-13",
+        "hours": "07:00–19:00",
+        "evidence": "Gjennomkjøring stengt 1.–13. september kl. 07–19, med omkjøring via Narmovegen. Busser, utrykningskjøretøy og lokal adkomst håndteres av trafikkvakter.",
+        "last_checked": "2026-11-24",
+        "evidence_kind": "summary"
+      }
+    ]
+  },
+  {
+    "id": "skappelsgate-waterworks",
+    "title": "Skappelsgate",
+    "location": "Skappelsgate",
+    "modes": [
+      "driving",
+      "walking"
+    ],
+    "source_url": "https://www.hamar.kommune.no/utviklingsomrader/skappelsgate-nye-vann-og-avlopsledninger",
+    "synthetic": false,
+    "revisions": [
+      {
+        "status": "works_scheduled",
+        "period": "Oktober 2026 – oktober 2027",
+        "evidence": "Planlagt utskifting av vann- og avløpsnett. Begrenset fremkommelighet og redusert gateparkering. Kommunen vil forsøke å opprettholde gangforbindelsen.",
+        "last_checked": "2026-11-24",
+        "evidence_kind": "summary"
+      }
+    ]
+  },
+  {
+    "id": "demo-upcoming",
+    "title": "Ringgata",
+    "location": "Ringgata",
+    "modes": [
+      "walking"
+    ],
+    "source_url": null,
+    "synthetic": true,
+    "revisions": [
+      {
+        "status": "works_upcoming",
+        "start_date": "2026-12-01",
+        "end_date": "2026-12-05",
+        "evidence": "Demo record: footpath maintenance is scheduled for 1–5 December.",
+        "last_checked": "2026-11-24T12:00:00+01:00",
+        "evidence_kind": "note"
+      }
+    ]
+  },
+  {
+    "id": "demo-extension",
+    "title": "Ringgata",
+    "location": "Ringgata",
+    "modes": [
+      "walking"
+    ],
+    "source_url": null,
+    "synthetic": true,
+    "revisions": [
+      {
+        "status": "closure_announced",
+        "start_date": "2026-11-22",
+        "end_date": "2026-11-25",
+        "evidence": "Demo record: footpath closure scheduled for 22–25 November.",
+        "last_checked": "2026-11-20T12:00:00+01:00",
+        "evidence_kind": "note"
+      },
+      {
+        "status": "closure_active",
+        "start_date": "2026-11-22",
+        "end_date": "2026-11-29",
+        "evidence": "Demo update: the footpath is closed and the planned end has moved to 29 November.",
+        "last_checked": "2026-11-24T12:00:00+01:00",
+        "evidence_kind": "note"
+      }
+    ]
+  },
+  {
+    "id": "demo-reopened",
+    "title": "Ringgata",
+    "location": "Ringgata",
+    "modes": [
+      "walking"
+    ],
+    "source_url": null,
+    "synthetic": true,
+    "revisions": [
+      {
+        "status": "closure_active",
+        "start_date": "2026-11-17",
+        "end_date": "2026-11-20",
+        "evidence": "Demo record: the footpath is closed this week.",
+        "last_checked": "2026-11-17T12:00:00+01:00",
+        "evidence_kind": "note"
+      },
+      {
+        "status": "reopened",
+        "evidence": "Demo update: the footpath reopened to pedestrians on 20 November.",
+        "last_checked": "2026-11-20T16:00:00+01:00",
+        "evidence_kind": "note"
+      }
+    ]
+  }
+]
