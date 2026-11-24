@@ -17,6 +17,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(HERE / "harness"))
 from workspace_service import BusyError, Workspace
 from harness.city_notices import notice_feed
+from harness.official_notices import OfficialNotices
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -39,6 +40,7 @@ POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compa
          "/api/notice/draft": "draft_koigen_notice",
          "/api/monitor-scenario": "monitor_scenario",
          "/api/journey-alerts": "journey_alerts"}
+OFFICIAL_POSTS = {"/api/official-notices/check": "check", "/api/official-notices/accept": "accept"}
 SECURITY_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; "
@@ -59,6 +61,7 @@ class WorkspaceServer(ThreadingHTTPServer):
     def __init__(self, port=DEFAULT_PORT, opener=urlopen, root=HERE):
         self.workspace = Workspace(root, opener)
         self.root = Path(root)
+        self.official_notices = OfficialNotices(self.root)
         super().__init__((HOST, port), Handler)
 
     @property
@@ -118,6 +121,11 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(503, {"error": "Saved Hamar notices are unavailable."})
             else:
                 self._json(200, {"notices": notices})
+        elif path == "/api/official-notices":
+            try:
+                self._json(200, self.server.official_notices.review_queue())
+            except (OSError, ValueError):
+                self._json(503, {"error": "Saved source reviews are unavailable."})
         elif path == "/api/bus/catalogue" or path.startswith("/api/bus/catalogue/"):
             try:
                 from harness.bus_catalogue import query
@@ -167,7 +175,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._local_request(True):
             return
         path = self.path.split("?", 1)[0]
-        method = POSTS.get(path)
+        official_method = OFFICIAL_POSTS.get(path)
+        method = official_method or POSTS.get(path)
         if method is None:
             self._json(404, {"error": "Not found"})
             return
@@ -188,8 +197,9 @@ class Handler(BaseHTTPRequestHandler):
             self._json(400, {"error": "Request body is not valid JSON"})
             return
         try:
-            self._json(200, getattr(self.server.workspace, method)(payload))
-        except BusyError as exc:
+            service = self.server.official_notices if official_method else self.server.workspace
+            self._json(200, getattr(service, method)(payload))
+        except (BusyError, BlockingIOError) as exc:
             self._json(409, {"error": str(exc)})
         except LookupError as exc:
             self._json(404, {"error": str(exc)})
@@ -211,7 +221,7 @@ def main():
         parser.exit(1, f"Workspace could not start: {exc}\n")
     url = f"http://{HOST}:{server.server_address[1]}/"
     print(f"Hamar Access Lab workspace: {url}")
-    print("Offline except explicit local Ollama requests. Press Ctrl+C to stop.")
+    print("Official notice checks and Ollama requests are initiated from the workspace. Press Ctrl+C to stop.")
     if args.open:
         webbrowser.open(url)
     try:

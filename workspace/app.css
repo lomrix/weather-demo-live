@@ -375,6 +375,10 @@ input::placeholder { color:#8798ad; }
 .notification-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
 .notification-body summary { cursor: pointer; padding-block: .4rem; }
 #notifications-button { white-space: nowrap; }
+.official-source-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 14rem; overflow: auto; }
+.official-review-form { display: grid; gap: .45rem; margin-top: .75rem; }
+.official-review-form textarea { width: 100%; }
+.official-review-form button { justify-self: start; }
 .layout { grid-template-areas:"controls map"; }
 .card,.project,.panel { background:var(--card); color:var(--ink); border-color:var(--line); }
 th,td { border-color:var(--line); }

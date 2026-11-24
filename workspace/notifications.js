@@ -8,6 +8,7 @@
   const followJourneys = $("follow-journeys");
   const preferences = { hamar: true, journeys: true, read: [], dismissed: [] };
   let notices = [];
+  let cityRequest;
   let loading = false;
   let unavailable = false;
   let ready = false;
@@ -18,6 +19,7 @@
     closure_announced: "Announced closure",
     closure_active: "Reported active closure",
     reopened: "Reopening confirmed",
+    notice_reviewed: "Reviewed official notice",
     walking: "Walking",
     driving: "Driving",
   };
@@ -77,7 +79,9 @@
       notice.reopening_unconfirmed
         ? el("p", { class: "hint" }, "Scheduled end passed; reopening unconfirmed.") : null,
       notice.previous_period ? el("p", { class: "alert-route" }, "Dates changed") : null,
-      el("p", {}, notice.location),
+      notice.location ? el("p", {}, notice.location) : null,
+      notice.summary ? el("p", {}, el("strong", {}, "Reviewer summary"), " ", el("span", { "data-source-text": "" }, notice.summary)) : null,
+      notice.status === "notice_reviewed" ? el("p", { class: "hint" }, "Closure dates and current access are unverified.") : null,
       el("p", { class: "hint" }, notice.modes.length
         ? notice.modes.map((mode) => el("span", {}, labels[mode] || mode, " "))
         : "Travel modes unspecified"),
@@ -118,32 +122,151 @@
   }
 
   async function refreshCity() {
-    if (!preferences.hamar || loading) return;
+    if (!preferences.hamar) return;
+    if (loading) return cityRequest;
     loading = true;
     render();
-    try {
-      const result = await api("/api/notifications");
-      notices = result.notices;
-      ready = true;
-      unavailable = false;
-    } catch {
-      unavailable = true;
-    } finally {
-      loading = false;
-      render();
-    }
+    cityRequest = api("/api/notifications")
+      .then((result) => {
+        notices = result.notices;
+        ready = true;
+        unavailable = false;
+      })
+      .catch(() => { unavailable = true; })
+      .finally(() => {
+        loading = false;
+        render();
+      });
+    return cityRequest;
   }
 
   function openCentre() {
     dialog.showModal();
     if (!ready) refreshCity();
+    loadReviewQueue();
   }
+
+  const checkButton = $("check-official-notices");
+  const checkStatus = $("official-notice-status");
+  const resultLabels = {
+    new: "New notice", baseline: "First saved snapshot", changed: "Source text changed",
+    unchanged: "Unchanged", unavailable: "Source unavailable",
+    checked: "Index checked", no_links: "No approved notice links found",
+    unlisted: "Previously known source absent from index",
+  };
+  let reviewBusy = false;
+
+  function snapshotBlock(label, snapshot) {
+    return el("details", { open: label === "Retrieved source text" },
+      el("summary", {}, label),
+      el("p", {}, el("time", { datetime: snapshot.retrieved_at }, snapshot.retrieved_at)),
+      el("p", { class: "hint" }, "SHA-256 ", el("code", {}, snapshot.text_sha256)),
+      el("pre", { class: "official-source-text", tabindex: "0" }, snapshot.text));
+  }
+
+  function reviewCard(item) {
+    const source = item.snapshot;
+    const quote = el("textarea", { required: true, minlength: "12", maxlength: "500", rows: "2" });
+    const summary = el("textarea", { maxlength: "400", rows: "2" });
+    const accept = el("button", { type: "submit", class: "btn btn-small" }, "Accept reviewed evidence");
+    const form = el("form", { class: "official-review-form" },
+      el("label", {}, "Exact quotation from the retrieved text", quote),
+      el("label", {}, "Reviewer summary (optional)", summary),
+      el("p", { class: "hint" }, "Acceptance replaces cards for this source. Closure dates and current access stay unverified."),
+      accept);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const exact = quote.value.trim();
+      if (exact.length < 12 || !source.text.includes(exact)) {
+        checkStatus.textContent = "Enter an exact quotation of at least 12 characters.";
+        quote.focus();
+        return;
+      }
+      accept.disabled = true;
+      await runReviewAction("/api/official-notices/accept", {
+        url: source.url, text_sha256: source.text_sha256, quote: exact, summary: summary.value,
+      }, "Reviewed evidence accepted.");
+      accept.disabled = false;
+    });
+    return el("article", { class: "card", "data-review-url": source.url },
+      el("h4", { "data-source-text": "" }, source.title),
+      el("p", {}, resultLabels[item.status]),
+      el("a", { href: source.url, target: "_blank", rel: "noopener noreferrer" }, "Open official notice"),
+      snapshotBlock("Retrieved source text", source),
+      item.previous ? snapshotBlock("Previous source text", item.previous) : null,
+      form);
+  }
+
+  function renderReviewQueue(data) {
+    const queue = $("official-notice-queue");
+    const existing = new Map(Array.from(queue.children, (card) => [card.dataset.reviewUrl, card]));
+    const cards = data.pending.map((item) => {
+      const prior = existing.get(item.snapshot.url);
+      if (prior && prior.dataset.revision === item.snapshot.text_sha256) return prior;
+      const card = reviewCard(item);
+      card.dataset.revision = item.snapshot.text_sha256;
+      return card;
+    });
+    queue.replaceChildren(...(cards.length ? cards : [el("p", { class: "hint" }, "No changes pending review.")]));
+    const check = data.last_check;
+    $("official-check-details").hidden = !check;
+    if (check) {
+      $("official-check-results").replaceChildren(el("div", {},
+        el("p", {}, el("time", { datetime: check.checked_at }, check.checked_at)),
+        check.limited ? el("p", { class: "hint" }, "The article limit was reached.") : null,
+        el("ul", {}, check.results.map((result) => el("li", {},
+          el("a", { href: result.url, target: "_blank", rel: "noopener noreferrer" }, result.url),
+          " · ", el("span", {}, resultLabels[result.status]))))));
+    }
+  }
+
+  async function loadReviewQueue() {
+    if (reviewBusy) return;
+    reviewBusy = true;
+    checkButton.disabled = true;
+    try {
+      renderReviewQueue(await api("/api/official-notices"));
+    } catch {
+      checkStatus.textContent = "Saved source reviews are unavailable.";
+    } finally {
+      reviewBusy = false;
+      checkButton.disabled = false;
+    }
+  }
+
+  async function runReviewAction(path, payload, message) {
+    if (reviewBusy) return;
+    reviewBusy = true;
+    checkButton.disabled = true;
+    checkStatus.textContent = payload.url ? "Saving review…" : "Checking official sources…";
+    try {
+      const data = await api(path, payload);
+      renderReviewQueue(data);
+      if (payload.url) {
+        if (loading) await cityRequest;
+        await refreshCity();
+        checkStatus.focus();
+      }
+      checkStatus.textContent = !payload.url && data.last_check.results.some((item) => item.status === "unavailable")
+        ? "Some official sources were unavailable. Reviewed notices were kept." : message;
+    } catch {
+      checkStatus.textContent = "The source action could not be completed. Reload the review queue and try again.";
+    } finally {
+      reviewBusy = false;
+      checkButton.disabled = false;
+    }
+  }
+
+  checkButton.addEventListener("click", () => {
+    runReviewAction("/api/official-notices/check", {}, "Official source check finished.");
+  });
 
   button.addEventListener("click", openCentre);
   $("refresh-journey-alerts").addEventListener("click", openCentre);
   $("close-notifications").addEventListener("click", () => dialog.close());
   $("refresh-notifications").addEventListener("click", () => {
     refreshCity();
+    loadReviewQueue();
     if (preferences.journeys) refreshJourneyAlerts();
   });
   dialog.addEventListener("change", (event) => {

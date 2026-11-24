@@ -151,17 +151,54 @@ in the saved evidence. **Simulation examples** contains invented upcoming
 works, a date extension and an explicitly confirmed reopening in the demo data.
 City cards do not calculate route effects.
 
-Refresh reloads the saved records and reruns the enabled journey check.
-It does not fetch municipal sites or provide background or push delivery.
-To add a reviewed source change, append a revision to its record in
+**Refresh saved updates** reloads local records and reruns the enabled journey
+check. **Check official sources** explicitly checks the [Hamar traffic notice
+index](https://www.hamar.kommune.no/veger-og-gater/trafikkmeldinger/) and
+discovers linked municipal notices in its main content.
+
+Each check makes at most six sequential HTTPS requests: the index and the
+first five distinct approved article links in page order. The allowlist is
+`www.hamar.kommune.no` and single article slugs under
+`/veger-og-gater/trafikkmeldinger/`, `/nyhetsarkiv/` and `/utviklingsomrader/`.
+Links on other hosts, arbitrary paths and redirects are excluded. There are
+no retries. Requests use a four-second socket timeout, an elapsed deadline
+checked between body reads, and a one MiB response cap. DNS and an in-progress
+socket operation can exceed the elapsed read target.
+
+Successful pulls archive extracted main-content text, the source URL and
+the URL actually fetched, UTC
+retrieval time and SHA-256 of both the response body and saved text. The
+extractor normalizes whitespace and omits page chrome and contact details.
+An approved HTML canonical link identifies the source. Links to the same
+canonical article share one review entry, while each fetch has its own snapshot.
+Changes are compared against the previous saved text. The first retrieval
+for a seeded notice is labeled as a baseline. Formatting-only
+changes or a recheck of identical text leave reviewed cards and their
+read/dismiss state intact. Sources missing from the index or unavailable at
+retrieval are reported separately. They do not replace reviewed evidence.
+
+In **Pending human review**, compare the retrieved text with the previous
+snapshot when one exists. Select a verbatim excerpt from the displayed text
+and add an optional, separately labeled reviewer summary. Acceptance
+replaces the existing cards for that URL with a reviewed evidence card.
+Closure dates, modes and current access stay unverified on those cards.
+Neither project schedules nor an expired or missing notice confirm reopening.
+Checks and review decisions are stored locally under ignored
+`out/official-notices/`. This workflow has no recurring retrieval or push
+delivery and does not cover every road or transit authority.
+
+To update the checked-in seed data, append a revision to its record in
 `fixtures/notices/hamar-area.json` with the corresponding evidence and check
 time. Each card shows the latest revision, plus the prior period and evidence
 when dates changed. Refreshing an unchanged revision leaves its read and
 dismissal state intact. A source outage never confirms reopening.
 
 ```text
-python -B -m unittest check_city_notices.py check_journey_alerts.py -v
+python -B -m unittest check_official_notices.py check_city_notices.py check_journey_alerts.py -v
 ```
+
+These checks use synthetic HTML and injected failures. They do not contact
+the municipality.
 
 ## Evaluate raw notice extraction
 
