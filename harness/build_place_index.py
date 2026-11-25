@@ -19,7 +19,9 @@ BUS_FIXTURES = (
 
 
 def _sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # Git may check text fixtures out with LF or CRLF. Hash their canonical
+    # LF representation, consistently with the existing map loader.
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def _source(path, **extra):
@@ -94,6 +96,7 @@ def build(root=ROOT):
     return {
         "id": "hamar-local-place-index-v1",
         "generated_from_saved_data_only": True,
+        "source_hash_format": "SHA-256 of saved text bytes with CRLF normalized to LF",
         "search_normalization": "Unicode casefold, whitespace and Norwegian diacritics preserved; substring match",
         "walking_scope": (
             "Search results cover the saved Hamar fixtures, not a live geocoder. "

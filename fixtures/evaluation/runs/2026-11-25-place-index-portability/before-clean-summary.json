@@ -1,0 +1,94 @@
+{
+  "checked_at": "2026-11-25T13:12:28.341705+00:00",
+  "mode": "offline; no live-model experiment",
+  "passed": false,
+  "checks": [
+    {
+      "name": "regression",
+      "status": "failed",
+      "exit_code": 1,
+      "seconds": 288.069,
+      "command": [
+        "C:\\Users\\moham\\anaconda3\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "check_address_search",
+        "check_bus_catalogue",
+        "check_city_notices",
+        "check_comparison_renderer",
+        "check_driving",
+        "check_hamar_real_case",
+        "check_journey_alerts",
+        "check_koigen_accessibility",
+        "check_koigen_notice",
+        "check_municipal_walk",
+        "check_notice_evaluation",
+        "check_notice_evidence",
+        "check_official_notices",
+        "check_ollama_scenario",
+        "check_place_search",
+        "check_prepare_walking_map",
+        "check_project_scenarios",
+        "check_readiness",
+        "check_ringgata_demo",
+        "check_scenario_compare",
+        "check_workspace",
+        "-v"
+      ]
+    },
+    {
+      "name": "traffic",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 3.354,
+      "command": [
+        "C:\\Users\\moham\\anaconda3\\python.exe",
+        "-B",
+        "scripts/verify_traffic.py"
+      ]
+    },
+    {
+      "name": "coverage",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 6.189,
+      "command": [
+        "C:\\Users\\moham\\anaconda3\\python.exe",
+        "-B",
+        "scripts/verify_route_coverage.py"
+      ]
+    },
+    {
+      "name": "bus-collection",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 1.86,
+      "command": [
+        "C:\\Users\\moham\\anaconda3\\python.exe",
+        "-B",
+        "scripts/verify_bus_collection.py"
+      ]
+    },
+    {
+      "name": "journeys",
+      "status": "passed",
+      "summary": {
+        "passed": 14,
+        "total": 14,
+        "ready_routes": 11,
+        "median_seconds": 0.725,
+        "maximum_seconds": 1.0589
+      }
+    }
+  ],
+  "suite_sha256": "b2490a80c57ce9f78dc9cdbe9ff33db8d129febcb7152260ae2fc484843259f5",
+  "case_sha256": "de9aa5de858e23e40103930ab924f1de8c94fb4ff37202359bb32fd31c34a19c",
+  "source_sha256": "92f9a05b0d5afff3145344718fa0841d18c9568caff022df162cbfb9f18f4687",
+  "pending_human_evidence": [
+    "Independent usability observation",
+    "Teammate unpublished experiment files/logs",
+    "Professor guidance on meeting reports"
+  ],
+  "interpretation": "Passing software checks does not verify real-world accessibility, user benefit, every physical address entrance, or the pending human evidence."
+}

@@ -113,3 +113,20 @@ the record blank until someone actually performs it. A developer's automated
 browser test is not a user study. Then align the paper's numerical claims with
 the preserved evidence, review the required appendices, rehearse from a clean
 checkout and create the final immutable submission tag only when authorised.
+
+## Follow-up: clean-checkout portability failure
+
+The first clean-checkout rehearsal of commit `2bea913` failed one of 229
+regression tests: the regenerated saved-place index disagreed with its stored
+map hashes. The original development working tree passed because its legacy
+map files mixed LF and CRLF line endings. Fresh checkouts changed those bytes;
+the place-index builder hashed raw text while the map loader normalized it.
+
+The builder now hashes saved text with CRLF normalized to LF, documents that
+convention in the generated index, and regenerates the index without changing
+place names or coordinates. A regression checks that line-ending changes retain
+the hash while a meaningful source edit changes it. All eight focused place
+checks passed after repair. Original clean-checkout failure and focused logs
+are preserved under `fixtures/evaluation/runs/2026-11-25-place-index-portability/`.
+The corrected PR's CI and repeated clean-start results must be checked before
+merging; earlier development passes do not replace those checks.

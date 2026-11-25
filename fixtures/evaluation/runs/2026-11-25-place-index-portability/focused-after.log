@@ -1,0 +1,17 @@
+test_search_http_contract (check_place_search.PlaceHttpTests.test_search_http_contract) ... GET /api/places
+GET /api/places/nope
+GET /api/places
+GET /api/places
+ok
+test_checked_index_is_reproducible (check_place_search.PlaceIndexTests.test_checked_index_is_reproducible) ... ok
+test_named_place_preserves_scenario_map_provenance (check_place_search.PlaceIndexTests.test_named_place_preserves_scenario_map_provenance) ... ok
+test_outside_coverage_and_no_connection_are_distinct (check_place_search.PlaceIndexTests.test_outside_coverage_and_no_connection_are_distinct) ... ok
+test_search_is_bounded_sourced_and_has_no_match (check_place_search.PlaceIndexTests.test_search_is_bounded_sourced_and_has_no_match) ... ok
+test_selected_search_coordinate_uses_existing_resolution (check_place_search.PlaceIndexTests.test_selected_search_coordinate_uses_existing_resolution) ... ok
+test_source_hash_survives_checkout_line_endings (check_place_search.PlaceIndexTests.test_source_hash_survives_checkout_line_endings) ... ok
+test_client_uses_local_storage_and_reuses_custom_engine (check_place_search.SavedJourneyClientTests.test_client_uses_local_storage_and_reuses_custom_engine) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 9.398s
+
+OK
