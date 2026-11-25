@@ -91,7 +91,7 @@
 
     'Explore Hamar bus lines':'Utforsk busslinjer i Hamar','Loading imported bus services…':'Laster importerte busslinjer…',
     'Search line or destination':'Søk etter linje eller reisemål','Line number or destination':'Linjenummer eller reisemål','Bus line':'Busslinje',
-    'Direction and route variant':'Retning og rutevariant','Show bus route':'Vis bussrute','Ordered stops':'Holdeplasser i rekkefølge',
+    'Direction and route variant':'Retning og rutevariant','Show bus route':'Vis bussrute','View stops':'Vis holdeplasser','Ordered stops':'Holdeplasser i rekkefølge',
     'Stops in Hamar':'Holdeplasser i Hamar','Scheduled journeys':'Planlagte avganger','Published bus route':'Publisert bussrute',
     'Saved timetable snapshot':'Lagret rutedatasnapshot','No matching bus lines.':'Fant ingen busslinjer.',
     'Entur source and attribution':'Entur-kilde og kreditering','Route-variant data unavailable for this line.':'Rutevariantdata er utilgjengelig for denne linjen.',

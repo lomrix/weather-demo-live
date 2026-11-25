@@ -1,28 +1,49 @@
 # Development checkpoint — 25 November 2026
 
-Branch: `feature/mobile-map-workspace`. The user authorised saving and committing
-the mobile, municipality-wide address/routing and readiness package. Publication
-has not been authorised. The last merged PR reported by the user is #31.
+## Completed and merged
 
-The current product changes, exact checks and pending human evidence are indexed
-in [exam-readiness.md](exam-readiness.md). Results: 228 full regression tests,
-59 final focused address/safety tests, and 14/14 frozen graph cases after repairing
-nearby-address snapping (13/14 before). These are separate, correctly scoped runs.
-Browser checks use replayed public address points and simulated source failure;
-they do not constitute a human usability study or new live-model experiment.
+PR #32 was merged as `28527ac`; the feature branch was deleted remotely.
+The merged files matched tested commit `53e80ac`. PR and post-merge Ubuntu and
+Windows checks passed. A clean-copy run passed 230 tests, saved-data verifiers
+and 14/14 frozen journey cases. Original failures and repairs are preserved.
 
-Next: review the preserved evidence, obtain the professor's meeting-report
-guidance tomorrow, get the teammate's actual experiment patches/logs, complete
-an independent walkthrough, align the final paper, and rehearse a clean checkout.
-No meeting, experiment, grade, payment demand or physical access claim is invented.
+## Current local follow-up
 
-Start with `python hamar_workspace.py --open`; restart any older Python server.
-Temporary sharing links require a running host and may expire.
+Branch: `feature/phone-review-walkthrough`. The user authorised one bounded
+save-and-commit step before stopping for the day. This follow-up adds a direct
+expandable View stops list beside the bus result, English/Norwegian labels,
+a 44 px summary target and bounded list scrolling. A 390 × 844 browser check
+covered B22's 39 stops, keyboard access and dark mode, without horizontal page
+overflow or observed JavaScript errors. Seventeen focused bus/static checks,
+JavaScript syntax and whitespace checks passed. It is not yet pushed or merged.
+The professor task sheet and blank observation record are in
+`docs/phone-review-walkthrough.md`. Developer checks are not a user study.
 
-Keep these unrelated/deferred items out of this feature commit: `.codex/`,
+## Resume next time
+
+1. Publish this saved follow-up through a PR and check CI before merging.
+2. Review the Overleaf draft against implemented features and preserved results.
+   That report-to-evidence review has not been completed in this stopping step.
+3. Obtain the teammate's actual experiment code, model settings and raw logs.
+4. Record an independent phone walkthrough; the observation sheet is still blank.
+5. Ask the professor on 26 November about missing meeting reports. No answer
+   has been received; never fabricate past meetings or human observations.
+6. Align the final paper/appendices and rehearse the exact submission version.
+   Create the immutable exam tag only when explicitly authorised.
+
+## Running and sharing
+
+Normal start: `python hamar_workspace.py --open`. The temporary shared preview
+was checked on 25 November, with shutdown scheduled for 26 November at 17:00
+Europe/Oslo. Its current URL/process information is kept in the local ChatGPT
+mirror's `.hamar-build/shared-preview.json`. Recheck it before reuse: the laptop
+must stay awake and online, and the sharing session must remain running.
+VS Code is not required. Local AI is disabled in that public preview.
+
+Keep unrelated/deferred items out of the follow-up commit: `.codex/`,
 `.python-version`, `hosted_preview.py`, `check_hosted_preview.py`,
 `docs/hosted-preview.md`, `hamar-compulsory-2-draft.pdf`.
 
-The user wants broad Hamar usefulness and a polished phone experience. Continue
-with coherent, visible patches and proportionate checks. Do not push or create
-the final submission tag without authorisation. Do not edit `eval/`.
+The user has limited daily usage and wants a completed stopping point, not a
+new long-running task. No grade, paid demand, complete physical access coverage,
+meeting evidence or unshared teammate result should be claimed as established.
