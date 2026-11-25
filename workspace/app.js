@@ -25,6 +25,7 @@ const st = {
   endpointPlaces: { origin: null, destination: null },
   placeMatches: { origin: [], destination: [] }, placeSeq: { origin: 0, destination: 0 },
   placeTimer: { origin: null, destination: null }, savedJourneys: [],
+  addressSeq: 0, aiPaused: false,
   invalidSavedData: false,
   journeyAlerts: [], dismissedJourneyAlerts: [], readJourneyAlerts: [], alertSnapshot: null,
   monitorScenario: null, invalidMonitorScenario: false, alertSeq: 0,
@@ -104,7 +105,7 @@ function drawCatalogue() {
 function syncGeographicMap() {
   if (!st.data) return;
   const features = [];
-  const coordinate = (id) => {const point=st.data.nodes[id];return point?[point[1],point[0]]:null;};
+  const coordinate = (id) => {const point=st.data.nodes[id] || st.customInfo?.routing_overlay?.nodes?.[id];return point?[point[1],point[0]]:null;};
   const line = (kind,path) => {
     if (!st.layers[kind]) return;
     const coordinates=path.map(coordinate).filter(Boolean);
@@ -121,7 +122,7 @@ function syncGeographicMap() {
     const stop=busStop($("bus-destination").value);if(stop)marker(stop.coordinates,stop.name,"#18374d");
   }else{
     const row=selectedRow();
-    if(row&&!st.assessStale){line("baseline",row.baseline_path);line("route",row.path);}
+    if(row&&!st.assessStale){line("baseline",row.baseline_path);if(!st.data.municipal || st.projects.length)line("route",row.path);}
     if(st.assessment&&!st.assessStale)section("closure",st.assessment.closed_link_ids);
     else for(const project of st.projects)for(const id of project.sections){const part=allSections().find(s=>s.id===id);if(part)section("inactive",part.link_ids);}
     if(!st.compareStale)selectedOptions().forEach(({row},i)=>{if(row)line(i?"opt2":"opt1",row.path);});
@@ -133,7 +134,7 @@ function syncGeographicMap() {
     }
   }
   const c=st.data.coverage;
-  if(st.layers.coverage)features.push({type:"Feature",properties:{kind:"coverage"},geometry:{type:"LineString",coordinates:[[c.minlon,c.minlat],[c.maxlon,c.minlat],[c.maxlon,c.maxlat],[c.minlon,c.maxlat],[c.minlon,c.minlat]]}});
+  if(st.layers.coverage)features.push({type:"Feature",properties:{kind:"coverage"},geometry:st.data.boundary || {type:"LineString",coordinates:[[c.minlon,c.minlat],[c.maxlon,c.minlat],[c.maxlon,c.maxlat],[c.minlon,c.maxlat],[c.minlon,c.minlat]]}});
   const box=journeyBox();
   const southwest=st.unproj(box.x,box.y+box.h),northeast=st.unproj(box.x+box.w,box.y);
   const payload={caseId:st.caseId,data:{type:"FeatureCollection",features},bounds:[[southwest[1],southwest[0]],[northeast[1],northeast[0]]]};
@@ -151,6 +152,83 @@ function wrapDisclosure(id, label, nodes) {
   return details;
 }
 
+/* Mobile uses the same controls and state, inside a native modal sheet. */
+function prepareMobileWorkspace() {
+  const mobile = window.matchMedia("(max-width: 760px)");
+  const controls = $("controls"), sheet = $("mobile-planner");
+  const anchor = document.createComment("Desktop planner position");
+  controls.before(anchor);
+  const extras = [document.querySelector(".map-options"), document.querySelector(".map-status-line"), document.querySelector(".map-card > .attribution")];
+  const extraAnchors = extras.map(node => { const marker = document.createComment("Map details position"); node.before(marker); return marker; });
+  const show = () => {
+    if (!mobile.matches || sheet.open) return;
+    sheet.showModal();
+    document.body.classList.add("mobile-planner-open");
+    sheet.scrollTop = 0;
+  };
+  const hide = () => { if (sheet.open) sheet.close(); };
+  $("open-mobile-planner").addEventListener("click", show);
+  $("close-mobile-planner").addEventListener("click", hide);
+  sheet.addEventListener("close", () => document.body.classList.remove("mobile-planner-open"));
+  sheet.addEventListener("click", event => { if (event.target === sheet && event.clientY < sheet.getBoundingClientRect().top) hide(); });
+  const changeLayout = () => {
+    if (mobile.matches) {
+      hide(); sheet.append(controls);
+      extras.forEach(node => $("results").append(node));
+    } else {
+      hide(); anchor.after(controls);
+      extras.forEach((node, index) => extraAnchors[index].after(node));
+    }
+    window.dispatchEvent(new Event("resize"));
+  };
+  mobile.addEventListener("change", changeLayout);
+  changeLayout();
+  const pickBar = el("div", {class:"mobile-pick-bar", id:"mobile-pick-bar", hidden:true},
+    el("span", {id:"mobile-pick-label",role:"status"}),
+    el("button", {type:"button",class:"btn btn-small",id:"cancel-mobile-pick"}, "Cancel"));
+  $("map-frame").append(pickBar);
+  $("cancel-mobile-pick").addEventListener("click", () => { setPick(null); show(); });
+  window.addEventListener("hamar-pick-state", event => {
+    pickBar.hidden = !mobile.matches || !event.detail;
+    if (event.detail && mobile.matches) {
+      hide();
+      $("mobile-pick-label").textContent = event.detail === "origin" ? "Tap the map to choose your start" : "Tap the map to choose your destination";
+    }
+  });
+  window.addEventListener("hamar-point-selected", () => { if (mobile.matches) show(); });
+  window.addEventListener("hamar-assessed", hide);
+  window.addEventListener("hamar-bus-catalogue", hide);
+  document.querySelectorAll("[data-workspace-mode]").forEach(button => button.addEventListener("click", show));
+  // Main journey inputs precede examples, coverage and expert controls on phones.
+  $("custom-journey").classList.add("journey-inputs");
+  document.querySelector(".place-search").append($("search-coverage"));
+  const tools = wrapDisclosure("planning-tools", "Planning tools & changes", [$("walking-projects"), $("ai-tools")]);
+  tools.open = !mobile.matches;
+  mobile.addEventListener("change", () => { tools.open = !mobile.matches; });
+  ["load-demo", "load-koigen-demo"].forEach(id => $(id).addEventListener("click", () => {
+    $("demo-settings").open = true;
+    tools.open = true;
+  }));
+}
+
+function prepareAiControls(dialog) {
+  const button=el("button",{type:"button",id:"toggle-ai-calls",class:"btn btn-small",disabled:true},"Pause AI assistance");
+  const status=el("p",{id:"ai-control-status",class:"hint",role:"status"},"Checking AI controls…");
+  dialog.append(el("section",{class:"ai-run-controls"},el("h3",{},"AI assistance"),status,button));
+  function show(result) {
+    st.aiPaused=!result.enabled;
+    button.textContent=st.aiPaused?"Resume AI assistance":"Pause AI assistance";
+    status.textContent=st.aiPaused?"AI paused. New calls are blocked; an already-started request may finish. Walking calculations still work.":"AI assistance is enabled. Each action allows one bounded local request.";
+    button.disabled=false;syncWorkspace();
+  }
+  button.addEventListener("click",async()=>{
+    button.disabled=true;
+    try {show(await api("/api/ai/control",{enabled:st.aiPaused}));}
+    catch(error){status.textContent=error.message;button.disabled=false;}
+  });
+  api("/api/ai/status").then(show).catch(()=>{status.textContent="Restart the workspace server to use AI pause controls.";});
+}
+
 function prepareWorkspace() {
   window.addEventListener("hamar-bus-catalogue",event=>{st.catalogue=event.detail;$("bus-controls").hidden=true;drawCatalogue();syncWorkspace();fitBox(journeyBox(),.2);});
   const results=$("results");
@@ -158,7 +236,7 @@ function prepareWorkspace() {
   const close=el("button",{type:"button",class:"btn btn-small","aria-label":"Close details"},"×");
   close.addEventListener("click",()=>dialog.close());
   dialog.append(el("div",{class:"details-header"},el("h2",{id:"details-heading"},"Source and technical details"),close));
-  results.before(dialog);dialog.append(results);
+  results.before(dialog);dialog.append(results);prepareAiControls(dialog);
   $("details-button").addEventListener("click",()=>showDetails());
   window.addEventListener("hamar-map-pick",(event)=>{if(st.pick){const [lat,lon]=event.detail;setPoint(st.pick,lat,lon);}});
   wrapDisclosure("demo-settings", "Example closure settings", [$("demo-controls")]);
@@ -182,16 +260,20 @@ function prepareWorkspace() {
   document.querySelectorAll("[data-workspace-mode]").forEach((button) => {
     button.addEventListener("click", () => switchWorkspaceMode(button.dataset.workspaceMode));
   });
+  prepareMobileWorkspace();
 }
 
 function syncWorkspace() {
   if (!st.data) return;
   const mode = (st.bus || st.catalogue) ? "bus" : isDriving() ? "driving" : "walking";
   document.body.dataset.mode = mode;
+  document.body.dataset.plainWalk = String(mode === "walking" && st.data.municipal && !st.projects.length);
   document.querySelectorAll("[data-workspace-mode]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.workspaceMode === mode));
     button.disabled = st.busy || st.demoBusy;
   });
+  $("draft-koigen-notice").disabled = st.aiPaused || st.busy;
+  $("compare-btn").disabled = st.aiPaused || st.busy || st.data.candidates.length < 3;
   $("bus-section").hidden = mode !== "bus";
   $("planner-actions").hidden = mode === "bus";
   $("assessment-panel").hidden = Boolean(st.catalogue);
@@ -202,9 +284,10 @@ function syncWorkspace() {
   $("walking-case").hidden = mode === "bus";
   $("walking-projects").hidden = mode === "bus";
   $("ai-tools").hidden = mode !== "walking" || st.data.candidates.length < 3;
+  $("assess-btn").textContent = mode === "walking" && st.data.municipal && !st.projects.length ? "Find walking route" : "Assess projects";
   $("planner-title").textContent = {walking: "Plan a walk", bus: "Explore Hamar buses", driving: "Explore a driving change"}[mode];
   $("mode-scope").textContent = {
-    walking: "Search saved places, pick map points, or try an example. Coverage depends on the selected map area.",
+    walking: "Search a Hamar street, house number or bus stop, then choose a result.",
     bus: "Search imported bus lines and route variants, or compare walking access in the saved closure examples.",
     driving: "One supported driving example. The road closure is hypothetical; custom driving journeys are not available yet.",
   }[mode];
@@ -213,6 +296,9 @@ function syncWorkspace() {
   $("load-demo").hidden = mode !== "walking";
   $("load-koigen-demo").hidden = mode !== "walking";
   renderOverview();
+  $("mobile-mode-label").textContent = {walking:"Plan a walk",bus:"Explore Hamar buses",driving:"Driving example"}[mode];
+  $("mobile-journey-status").textContent = mode === "bus" ? "Saved timetable · not live departures" : "Saved map · hypothetical changes";
+  $("open-mobile-planner").textContent = mode === "bus" ? "Find a bus" : mode === "driving" ? "Edit scenario" : "Plan journey";
 }
 
 async function switchWorkspaceMode(mode) {
@@ -223,16 +309,17 @@ async function switchWorkspaceMode(mode) {
   setBusView(false);
   $("assess-date").value = st.index.today;
   if (mode === "driving") { if (await loadCase("hamar-driving")) await assess(); }
-  else await loadCase("hamar-urban");
+  else await loadCase("hamar-municipality");
   syncWorkspace();
 }
 
 function renderOverview() {
   const host = $("journey-overview");
   if (!host || !st.data) return;
+  host.dataset.simple = String(Boolean(st.data.municipal && !st.projects.length));
   if (st.catalogue) { drawCatalogue(); return; }
   let normal = null, affected = null, title = "Choose your journey", status = "Ready to explore";
-  let note = "Choose two saved places or use an example, then assess the configured changes.";
+  let note = "Choose a start and destination, then check how the configured changes affect your walk.";
   if (st.bus) {
     title = `${st.bus.scenario.service} · Walking access to the bus`;
     status = st.bus.scenario.synthetic ? "Synthetic example" : "Dated trip · hypothetical stop skip";
@@ -241,12 +328,12 @@ function renderOverview() {
   } else {
     const row = selectedRow();
     const stale = st.assessStale;
-    title = isDriving() ? "Driving route comparison" : "Walking route comparison";
-    status = stale ? "Inputs changed · recalculate" : row ? "Hypothetical scenario" : "Choose a journey";
+    title = isDriving() ? "Driving route comparison" : st.data.municipal && !st.projects.length ? "Your walking route" : "Walking route comparison";
+    status = stale ? "Inputs changed · recalculate" : row ? (st.data.municipal && !st.projects.length ? "Saved walking network" : "Hypothetical scenario") : "Choose a journey";
     if (row && !stale) { normal = row.baseline_metres; affected = row.metres; }
     if (st.caseId === "koigen-demo") note = "Modeled candidate section. Exact closure extent and dates are unknown; accessibility requires review.";
     else if (isDriving()) note = "Fixed driving example. Turn restrictions, conditional rules and live conditions are not modeled.";
-    else if (row && !stale) note = `Walking assessment for ${st.assessment.assessment_date}. Saved map; hypothetical closures.`;
+    else if (row && !stale) note = st.data.municipal && !st.projects.length ? `Mapped network only. Start access: ${st.customInfo?.origin?.snap_metres ?? "unknown"} m; destination access: ${st.customInfo?.destination?.snap_metres ?? "unknown"} m excluded and unverified.` : `Walking assessment for ${st.assessment.assessment_date}. Saved map; hypothetical closures.`;
     else if (isCustom() && st.customInfo && st.customInfo.status !== "ready") note = st.customInfo.message;
   }
   const hasResult = normal !== null;
@@ -256,7 +343,7 @@ function renderOverview() {
   if (busLimited) note += " Some eligible stops are outside coverage; an alternative cannot be ruled out.";
   host.replaceChildren(
     el("div", {class: "overview-heading"}, el("h3", {}, title), el("span", {class: "scenario-badge"}, status)),
-    el("div", {class: "overview-stats"}, stat(st.bus ? "To usual stop" : "Normal route", display(normal)),
+    el("div", {class: "overview-stats"}, stat(st.bus ? "To usual stop" : st.data.municipal && !st.projects.length ? "Walking distance" : "Normal route", display(normal)),
       stat(st.bus ? "After stop skip" : "With changes", busLimited ? "Unassessed" : display(affected)),
       stat("Extra distance", change === null ? busLimited ? "Unknown" : hasResult ? "No route" : "—" : change === 0 ? "Unchanged" : signed(change))),
     el("p", {class: "overview-note"}, note));
@@ -315,11 +402,13 @@ function defaultProjects() {
   const today = st.index.today;
   const sections = st.data.sections;
   const first = sections.find((s) => s.verified) || sections[0];
+  if (!first) { st.projects = []; return; }
   st.projects = [{ uid: st.nextProject++, name: "Hypothetical roadworks A", start: today, end: today, sections: new Set([first.id]) }];
 }
 
 function renderProjects() {
   const host = $("projects");
+  $("add-project").disabled = !allSections().length;
   host.replaceChildren();
   st.projects.forEach((p, i) => {
     const sec = (cls, s) => el("label", { class: "check" },
@@ -412,6 +501,7 @@ async function assess() {
     const result = await api("/api/assess", payload(false));
     st.assessment = result;
     st.assessStale = false;
+    window.dispatchEvent(new Event("hamar-assessed"));
     if (st.compare && st.compare.assessment.fingerprint !== result.fingerprint) st.compareStale = true;
     st.seq++;
     $("assess-btn").textContent = "Assess projects";
@@ -569,9 +659,11 @@ function polyline(points, layer, extra) {
   return node;
 }
 const L = (key) => LAYERS.find((l) => l.key === key);
-function pathPoints(ids) { return ids.map((n) => st.xy[n]).filter(Boolean); }
+function nodePoint(id) { const point = st.customInfo?.routing_overlay?.nodes?.[id]; return point ? st.proj(...point) : st.xy[id]; }
+function pathPoints(ids) { return ids.map(nodePoint).filter(Boolean); }
 function linkSegments(linkIds) {
-  return linkIds.map((id) => st.linkIndex[id]).filter(Boolean).map((l) => [st.xy[l[1]], st.xy[l[2]]]);
+  const overlay = Object.fromEntries((st.customInfo?.routing_overlay?.links || []).map(link => [link.id,[link.id,link.from,link.to,link.metres]]));
+  return linkIds.map((id) => st.linkIndex[id] || overlay[id]).filter(Boolean).map((l) => [nodePoint(l[1]), nodePoint(l[2])]);
 }
 function addMarker(markers, p, text, fill, ring, side, shortLabel) {
   markers.append(svg("circle", { "data-map-marker": true, cx: p[0], cy: p[1], r: 7, fill: ring ? "#fff" : fill, stroke: ring ? fill : "#fff", "stroke-width": ring ? 3 : 2, "vector-effect": "non-scaling-stroke" }));
@@ -632,7 +724,7 @@ function drawMap() {
   }));
 
   const ctx = group("context");
-  const network = st.data.links.map((l) => {
+  const network = (st.data.municipal && window.hamarGeo?.active ? [] : st.data.links).map((l) => {
     const a = st.xy[l[1]], b = st.xy[l[2]];
     return a && b ? `M${a[0].toFixed(1)},${a[1].toFixed(1)}L${b[0].toFixed(1)},${b[1].toFixed(1)}` : "";
   }).join(" ");
@@ -653,7 +745,7 @@ function drawMap() {
     const base = group("baseline");
     base.append(polyline(pathPoints(row.baseline_path), L("baseline")));
     const rt = group("route");
-    if (row.path.length) rt.append(polyline(pathPoints(row.path), L("route")));
+    if (row.path.length && (!st.data.municipal || st.projects.length)) rt.append(polyline(pathPoints(row.path), L("route")));
   } else { group("baseline"); group("route"); }
 
   const opts = selectedOptions();
@@ -1112,6 +1204,7 @@ function setPick(which) {
   $("pick-hint").textContent = st.pick
     ? `Click the map to place the ${st.pick === "origin" ? "start" : "destination"}.`
     : "Or choose your own start and destination on the map.";
+  window.dispatchEvent(new CustomEvent("hamar-pick-state", {detail:st.pick}));
 }
 function selectCustom() {
   if (!$("journey-select").querySelector(`option[value="${CUSTOM}"]`)) $("journey-select").append(el("option", { value: CUSTOM }, "Your own journey"));
@@ -1143,6 +1236,7 @@ function setPoint(which, lat, lon) {
   st.customInfo = null;
   inputsChanged(); drawMap(); renderResults();
   resolveCustom();
+  window.dispatchEvent(new Event("hamar-point-selected"));
 }
 function clearCustom() {
   st.custom = { origin: null, destination: null }; st.customInfo = null; st.customSeq++;
@@ -1174,11 +1268,12 @@ function applyCoords() {
 function placeResultButton(side, place) {
   const type = place.kind === "bus_stop"
     ? `Bus stop${place.services ? ` · ${place.services.join(", ")}` : ""}`
-    : "Named walking place";
+    : place.kind === "address" ? `Address · ${place.postal_code} ${place.postal_place}`
+    : place.kind === "street" ? (place.walkable ? "Street · choose a house number for a precise location" : "Road · no mapped pedestrian access") : "Named walking place";
   return el("button", { type: "button", class: "btn btn-small place-result",
-    "data-place-side": side, "data-place-id": place.id },
+    "data-place-side": side, "data-place-id": place.id, disabled:place.kind === "street" && !place.walkable },
   place.name,
-  el("small", {}, `${type} · ${place.source && (place.source.provider || place.source.file)}`));
+  el("small", {}, `${type} · ${place.kind === "address" ? "© Kartverket" : place.source && (place.source.provider || place.source.file)}`));
 }
 
 function showPlaceMatches(side, result) {
@@ -1187,36 +1282,44 @@ function showPlaceMatches(side, result) {
   st.placeMatches[side] = result.matches;
   if (!result.matches.length) {
     host.replaceChildren();
-    status.textContent = "No match in the saved Hamar index. Try another name or use map/coordinates.";
+    status.textContent = result.message || "No Hamar address or saved place found. Check the spelling or choose a point on the map.";
     return;
   }
-  status.textContent = `${result.matches.length}${result.truncated ? "+" : ""} saved match${result.matches.length === 1 ? "" : "es"}.`;
+  status.textContent = result.message || (result.truncated ? "More matches available. Add a house number or a longer street name." : "Choose a result below.");
   host.replaceChildren(...result.matches.map((place) => placeResultButton(side, place)));
 }
 
 async function searchPlaces(side) {
   const input = $(side === "origin" ? "place-from" : "place-to");
   const status = $(side === "origin" ? "place-from-status" : "place-to-status");
-  const query = input.value.trim();
-  if (!query) {
-    st.placeMatches[side] = [];
-    $(side === "origin" ? "place-from-results" : "place-to-results").replaceChildren();
-    status.textContent = "";
-    return;
-  }
-  if (query.length > 80) {
-    status.textContent = "Use at most 80 characters.";
-    return;
-  }
-  const seq = ++st.placeSeq[side];
-  status.textContent = "Searching saved local data…";
+  const host = $(side === "origin" ? "place-from-results" : "place-to-results");
+  const query = input.value.trim(), seq = ++st.placeSeq[side];
+  st.placeMatches[side] = []; host.replaceChildren();
+  if (!query) { status.textContent = ""; return; }
+  if (query.length > 80) { status.textContent = "Use at most 80 characters."; return; }
+  const needsAddress = query.length >= 3 && /[^\W\d_]/u.test(query.replace(/[æøåÆØÅ]/g,"a"));
+  status.textContent = needsAddress ? "Searching Hamar addresses…" : "Type at least three characters to search addresses.";
+  // The offline results and address lookup run independently. An outage never
+  // removes a usable bus-stop result or turns an unavailable source into no match.
+  const addressRequest = needsAddress ? api(`/api/addresses?q=${encodeURIComponent(query)}`)
+    .catch(() => ({status:"unavailable", matches:[], message:"Address lookup is unavailable. Saved places and map selection still work."})) : null;
+  let local;
   try {
-    const result = await api(`/api/places?q=${encodeURIComponent(query)}`);
-    if (seq !== st.placeSeq[side]) return;
-    showPlaceMatches(side, result);
-  } catch (e) {
-    if (seq === st.placeSeq[side]) status.textContent = e.message;
-  }
+    const [saved, streets] = await Promise.all([
+      api(`/api/places?q=${encodeURIComponent(query)}`).catch(()=>({matches:[],truncated:false})),
+      api(`/api/streets?q=${encodeURIComponent(query)}`).catch(()=>({matches:[],truncated:false}))]);
+    local = {matches:[...streets.matches,...saved.matches],truncated:streets.truncated || saved.truncated};
+  } catch { local = {matches:[],truncated:false}; }
+  if (seq !== st.placeSeq[side]) return;
+  if (local.matches.length) showPlaceMatches(side, {...local, message:needsAddress ? "Searching Hamar addresses…" : "Choose a result below."});
+  if (!addressRequest) return;
+  const addresses = await addressRequest;
+  if (seq !== st.placeSeq[side]) return;
+  const exactLocal = local.matches.filter(item => item.name.toLocaleLowerCase() === query.toLocaleLowerCase());
+  const otherLocal = local.matches.filter(item => !exactLocal.includes(item));
+  const combined = [...exactLocal, ...addresses.matches, ...otherLocal];
+  showPlaceMatches(side, {matches:combined.slice(0,20),truncated:addresses.truncated || local.truncated || combined.length>20,
+    message: addresses.status === "unavailable" ? addresses.message : null});
 }
 
 async function choosePlace(side, id) {
@@ -1225,6 +1328,18 @@ async function choosePlace(side, id) {
     showError("The selected place is no longer in the current search results.");
     return;
   }
+  if (["address","street"].includes(place.kind) && st.caseId !== "hamar-municipality") {
+    const previous = isCustom() ? {custom:structuredClone(st.custom), labels:{...st.endpointLabels}, places:{...st.endpointPlaces}} : null;
+    const selection = ++st.addressSeq;
+    $("demo-controls").hidden = true;
+    if (!await loadCase("hamar-municipality") || selection !== st.addressSeq) return;
+    if (previous) {
+      st.custom = previous.custom; st.endpointLabels = previous.labels; st.endpointPlaces = previous.places;
+      for (const other of ["origin","destination"]) {
+        if (other !== side && previous.custom[other]) $(other === "origin" ? "place-from" : "place-to").value = previous.labels[other] || "";
+      }
+    }
+  }
   st.custom[side] = [...place.coordinates];
   st.endpointLabels[side] = place.name;
   st.endpointPlaces[side] = {
@@ -1232,6 +1347,8 @@ async function choosePlace(side, id) {
     kind: place.kind, services: place.services || [],
   };
   $(side === "origin" ? "place-from" : "place-to").value = place.name;
+  $(side === "origin" ? "place-from-results" : "place-to-results").replaceChildren();
+  $(side === "origin" ? "place-from-status" : "place-to-status").textContent = "Selected. Choose the other endpoint or check your journey.";
   selectCustom(); setPick(null); syncCoordInputs();
   st.customInfo = null;
   $("demo-controls").hidden = true;
@@ -1803,7 +1920,7 @@ async function loadCase(id) {
     $("custom-journey").hidden = isDriving();
     $("place-search-scope").textContent = isDriving()
       ? ""
-      : `Walking scope: ${st.data.label}. Results come from saved Hamar data; points outside this map or more than 75 m from its walking network cannot be assessed.`;
+      : `Walking scope: ${st.data.label}. Address search uses Kartverket for Hamar municipality; bus stops and named places use saved data. Address and street selection use the Hamar municipal walking network. A mapped public connection is needed near each endpoint.`;
     renderSavedJourneys();
     $("walking-ai").hidden = isDriving();
     $("compare-btn").disabled = st.data.candidates.length < 3;
@@ -1969,7 +2086,14 @@ async function init() {
     const id = side === "origin" ? "place-from" : "place-to";
     $(id).addEventListener("input", () => {
       clearTimeout(st.placeTimer[side]);
-      st.placeTimer[side] = setTimeout(() => searchPlaces(side), 180);
+      st.placeSeq[side]++;
+      st.placeMatches[side] = [];
+      $(side === "origin" ? "place-from-results" : "place-to-results").replaceChildren();
+      if (st.custom[side]) {
+        st.custom[side] = null; st.customInfo = null; st.endpointPlaces[side] = null;
+        selectCustom(); inputsChanged(); drawMap(); renderResults();
+      }
+      st.placeTimer[side] = setTimeout(() => searchPlaces(side), 400);
     });
     $(id).addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -2084,7 +2208,8 @@ async function init() {
   });
   frame.addEventListener("wheel", (e) => { if(window.hamarGeo?.active)return; if (e.ctrlKey) { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 0.87); } }, { passive: false });
   window.addEventListener("resize", () => { if (st.data) fitBox(journeyBox(), 0.25); });
-  await loadDemo();
+  await loadCase("hamar-municipality");
+  selectCustom(); drawMap(); renderResults();
   $("demo-settings").open = false;
   await refreshJourneyAlerts();
   syncWorkspace();

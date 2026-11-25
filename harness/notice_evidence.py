@@ -15,7 +15,7 @@ try:
 except ImportError:
     from notice_draft import MODEL, OLLAMA_URL, TIMEOUT_SECONDS, MAX_RESPONSE_BYTES
 
-VERSION = "focused-source-v3"
+VERSION = "focused-source-v4-budgeted"
 NUM_PREDICT = 700
 MODES = ("walking", "cycling", "driving", "parking", "bus")
 STATUSES = ("open", "closed", "restricted", "unknown")
@@ -247,9 +247,11 @@ def extract_evidence_notice(notice, opener=urlopen, model=MODEL):
                        "format": response_schema(len(notice["sentences"]), candidates),
                        "options": {"temperature": 0, "num_predict": NUM_PREDICT}}).encode("utf-8")
     request = Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    from harness.model_budget import LocalModelRun, policy
+    budget = LocalModelRun(opener)
     started = perf_counter()
     try:
-        with opener(request, timeout=TIMEOUT_SECONDS) as response:
+        with budget.open(request, timeout=TIMEOUT_SECONDS) as response:
             raw_bytes = response.read(MAX_RESPONSE_BYTES + 1)
     except (OSError, URLError, TimeoutError) as exc:
         raise RuntimeError(f"Ollama unavailable: {exc}") from exc
@@ -275,6 +277,8 @@ def extract_evidence_notice(notice, opener=urlopen, model=MODEL):
             "checked": check_evidence(raw, notice), "diagnostics": {
                 "model": model, "endpoint": OLLAMA_URL, "version": VERSION,
                 "timeout_seconds": TIMEOUT_SECONDS, "requests_made": 1,
+                "budget": policy(),
+                "usage_reported": "eval_count" in envelope and "prompt_eval_count" in envelope,
                 "candidate_sentence_ids": [item["sentence_id"] for item in candidates],
                 "candidate_hints": candidates,
                 "raw_model_reply": envelope["response"], "raw_bytes": len(raw_bytes),

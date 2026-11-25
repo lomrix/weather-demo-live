@@ -1,12 +1,13 @@
 {
   "id": "hamar-local-place-index-v1",
   "generated_from_saved_data_only": true,
+  "source_hash_format": "SHA-256 of saved text bytes with CRLF normalized to LF",
   "search_normalization": "Unicode casefold, whitespace and Norwegian diacritics preserved; substring match",
   "walking_scope": "Search results cover the saved Hamar fixtures, not a live geocoder. Coordinates outside the selected walking extract are reported as outside coverage; points are snapped to a walking node within 75 m.",
   "sources": [
     {
       "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-      "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+      "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
       "provider": "Entur AS",
       "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
       "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -17,7 +18,7 @@
     },
     {
       "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-      "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+      "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
       "provider": "Entur AS",
       "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
       "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -28,25 +29,25 @@
     },
     {
       "file": "fixtures/scenarios/hamar-ringgata-ankerskogen.json",
-      "sha256": "f8ad4af90f24c67791f0ab39755faa98f58713269ae7a762bf7984ba1ae32d14",
+      "sha256": "f62ac17710ae9c0545b00d14a6b774da39db589f62ef8eed12e8fcba11133bb4",
       "map_file": "fixtures/maps/ringgata.osm",
-      "map_sha256": "34fc48afb838805e299f41c2df8dfb9952137639ed733295094aeda6f3b24355",
+      "map_sha256": "db6079d622a2e380b79f1bc75a0732a9993646efa98b924e2af3635785f59621",
       "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
       "attribution": "OpenStreetMap contributors, ODbL 1.0",
       "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
     },
     {
       "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
-      "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+      "sha256": "b6449eca65621fb0e512c1761dc7410752faa901998b54e67c854e93dea10c69",
       "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
-      "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+      "map_sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
       "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
       "attribution": "OpenStreetMap contributors, ODbL 1.0",
       "source_url": "https://www.openstreetmap.org/"
     },
     {
       "file": "fixtures/scenarios/hamar-wider-extract.json",
-      "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+      "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
       "map_file": "fixtures/maps/hamar-wider.osm",
       "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
       "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -55,7 +56,7 @@
     },
     {
       "file": "fixtures/scenarios/hamar-wider-extract.json",
-      "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+      "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
       "map_file": "fixtures/maps/hamar-urban.osm",
       "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
       "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -64,7 +65,7 @@
     },
     {
       "file": "fixtures/scenarios/hamar-koigen-demo.json",
-      "sha256": "e3d17dd56422d7f24dd2744d47e7c16e1673e74141fa2569ab645c868b589fa1",
+      "sha256": "4d7cfa531dab6dba3f5452a8cd1346ca649112c77b3109a5a11695861942f285",
       "map_file": "fixtures/maps/hamar-urban.osm",
       "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
       "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -83,7 +84,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -103,7 +104,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-wider.osm",
         "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -123,9 +124,9 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-ringgata-ankerskogen.json",
-        "sha256": "f8ad4af90f24c67791f0ab39755faa98f58713269ae7a762bf7984ba1ae32d14",
+        "sha256": "f62ac17710ae9c0545b00d14a6b774da39db589f62ef8eed12e8fcba11133bb4",
         "map_file": "fixtures/maps/ringgata.osm",
-        "map_sha256": "34fc48afb838805e299f41c2df8dfb9952137639ed733295094aeda6f3b24355",
+        "map_sha256": "db6079d622a2e380b79f1bc75a0732a9993646efa98b924e2af3635785f59621",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
         "attribution": "OpenStreetMap contributors, ODbL 1.0",
         "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
@@ -143,7 +144,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -168,7 +169,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -193,7 +194,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -218,7 +219,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -243,7 +244,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -268,7 +269,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -293,7 +294,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -318,7 +319,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -343,7 +344,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -368,7 +369,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -393,7 +394,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-koigen-demo.json",
-        "sha256": "e3d17dd56422d7f24dd2744d47e7c16e1673e74141fa2569ab645c868b589fa1",
+        "sha256": "4d7cfa531dab6dba3f5452a8cd1346ca649112c77b3109a5a11695861942f285",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -413,7 +414,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-koigen-demo.json",
-        "sha256": "e3d17dd56422d7f24dd2744d47e7c16e1673e74141fa2569ab645c868b589fa1",
+        "sha256": "4d7cfa531dab6dba3f5452a8cd1346ca649112c77b3109a5a11695861942f285",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -433,7 +434,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -458,7 +459,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -483,7 +484,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -508,7 +509,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -533,7 +534,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -558,9 +559,9 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
-        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "sha256": "b6449eca65621fb0e512c1761dc7410752faa901998b54e67c854e93dea10c69",
         "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
-        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "map_sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
         "attribution": "OpenStreetMap contributors, ODbL 1.0",
         "source_url": "https://www.openstreetmap.org/"
@@ -578,7 +579,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -598,7 +599,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-wider.osm",
         "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -618,7 +619,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -643,7 +644,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -668,7 +669,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -693,7 +694,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -718,7 +719,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -743,7 +744,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -768,7 +769,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -793,7 +794,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -818,7 +819,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -843,7 +844,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -868,7 +869,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -893,7 +894,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -918,7 +919,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -943,9 +944,9 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
-        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "sha256": "b6449eca65621fb0e512c1761dc7410752faa901998b54e67c854e93dea10c69",
         "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
-        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "map_sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
         "attribution": "OpenStreetMap contributors, ODbL 1.0",
         "source_url": "https://www.openstreetmap.org/"
@@ -963,9 +964,9 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
-        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "sha256": "b6449eca65621fb0e512c1761dc7410752faa901998b54e67c854e93dea10c69",
         "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
-        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "map_sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
         "attribution": "OpenStreetMap contributors, ODbL 1.0",
         "source_url": "https://www.openstreetmap.org/"
@@ -983,7 +984,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1003,7 +1004,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1023,7 +1024,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-wider.osm",
         "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1043,7 +1044,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-wider.osm",
         "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1063,7 +1064,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1088,7 +1089,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1113,7 +1114,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1138,7 +1139,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1163,7 +1164,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1188,7 +1189,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1213,7 +1214,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1238,7 +1239,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1263,7 +1264,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1288,7 +1289,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1313,7 +1314,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1338,7 +1339,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1363,7 +1364,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1388,7 +1389,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1413,7 +1414,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1438,7 +1439,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1463,7 +1464,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1488,9 +1489,9 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-furubergvegen-masabekkvegen.json",
-        "sha256": "ec3acb9139c09fe3bdbfcd69c20f46977d6e1c9145cd323619694c06bfd30798",
+        "sha256": "b6449eca65621fb0e512c1761dc7410752faa901998b54e67c854e93dea10c69",
         "map_file": "fixtures/maps/furubergvegen-masabekkvegen.osm",
-        "map_sha256": "0b8116caf9d887514fb8c722e8ec10ce57be7e48dac80ae10899b7cba02376a3",
+        "map_sha256": "a479c6014a78441f76acff764b8eb30904fda9c06cb696053c86fe8451075855",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
         "attribution": "OpenStreetMap contributors, ODbL 1.0",
         "source_url": "https://www.openstreetmap.org/"
@@ -1508,7 +1509,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1528,7 +1529,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-wider.osm",
         "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1548,7 +1549,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1573,7 +1574,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1598,7 +1599,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1623,7 +1624,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1648,7 +1649,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1673,7 +1674,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1698,7 +1699,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1723,7 +1724,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1748,7 +1749,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1773,7 +1774,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-urban.osm",
         "map_sha256": "1330a404409182d25111f767e1af2e4f484576dee0bce68b539c43467a74deca",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1793,7 +1794,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-wider-extract.json",
-        "sha256": "94c879d3a36348d20cf22bea49aae3a9363e57cc53dd7ccd579a19ad08b6b695",
+        "sha256": "38a960ed62981f490e89e3b956f46ed5a0be4bec7fe827b81a24c9a2e348a3da",
         "map_file": "fixtures/maps/hamar-wider.osm",
         "map_sha256": "0eea999218cf6ad667554dacc069be19a18a0f905aaa3418fa920886e6fbd9f0",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
@@ -1813,9 +1814,9 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-ringgata-ankerskogen.json",
-        "sha256": "f8ad4af90f24c67791f0ab39755faa98f58713269ae7a762bf7984ba1ae32d14",
+        "sha256": "f62ac17710ae9c0545b00d14a6b774da39db589f62ef8eed12e8fcba11133bb4",
         "map_file": "fixtures/maps/ringgata.osm",
-        "map_sha256": "34fc48afb838805e299f41c2df8dfb9952137639ed733295094aeda6f3b24355",
+        "map_sha256": "db6079d622a2e380b79f1bc75a0732a9993646efa98b924e2af3635785f59621",
         "provider": "OpenStreetMap contributors plus saved Hamar scenario labels",
         "attribution": "OpenStreetMap contributors, ODbL 1.0",
         "source_url": "https://innlandetfylke.no/politikk/horinger/oppstart-reguleringsplan-fv-187-ringgata-i-hamar.83031.aspx"
@@ -1833,7 +1834,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1858,7 +1859,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1883,7 +1884,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1908,7 +1909,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1933,7 +1934,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1958,7 +1959,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -1983,7 +1984,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2008,7 +2009,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2033,7 +2034,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2058,7 +2059,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2083,7 +2084,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2108,7 +2109,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2133,7 +2134,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2158,7 +2159,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2183,7 +2184,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2208,7 +2209,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2233,7 +2234,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2258,7 +2259,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2283,7 +2284,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2308,7 +2309,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2333,7 +2334,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2358,7 +2359,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2383,7 +2384,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2408,7 +2409,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2433,7 +2434,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2458,7 +2459,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2483,7 +2484,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2508,7 +2509,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2533,7 +2534,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2558,7 +2559,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2583,7 +2584,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2608,7 +2609,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2633,7 +2634,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b21-2026-11-12.json",
-        "sha256": "84a62af4757b44050071da9311bb35ac8ba271772d9d98374570bea6b4f371d2",
+        "sha256": "3f806e2196b36a3c7e5896788d1ef27bcb8f9f3cd5963451d3636841c77cd4da",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",
@@ -2658,7 +2659,7 @@
       ],
       "source": {
         "file": "fixtures/scenarios/hamar-b23-2026-11-12.json",
-        "sha256": "f9507541ef0de42376ab6df109fdd32610ab2105c618cf8e1ef3afa39f5641db",
+        "sha256": "7785b0dbcb4f639785fb9dfb31f62e6fcf5ffaa06048a3f58467940cb7f0d5f2",
         "provider": "Entur AS",
         "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Entur AS.",
         "licence_url": "https://data.norge.no/nlod/no/2.0",

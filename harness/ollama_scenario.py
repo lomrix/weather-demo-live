@@ -160,7 +160,12 @@ def _request(prompt, opener=urlopen, response_schema=RESPONSE_SCHEMA):
         method="POST",
     )
     try:
-        with opener(request, timeout=TIMEOUT_SECONDS) as response:
+        try:
+            from .model_budget import LocalModelRun
+        except ImportError:
+            from model_budget import LocalModelRun
+        budget = LocalModelRun(opener)
+        with budget.open(request, timeout=TIMEOUT_SECONDS) as response:
             payload = response.read(MAX_RESPONSE_BYTES + 1)
     except (OSError, URLError, TimeoutError) as exc:
         raise RuntimeError(f"Ollama unavailable: {exc}") from exc

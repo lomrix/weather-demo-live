@@ -1,0 +1,477 @@
+{
+  "id": "hamar-journey-validation-v1",
+  "frozen_at": "2026-11-25T12:28:11.932418+00:00",
+  "selection": "Fixed before the first validation run; official addresses and named source streets across central, suburban, rural and northern Hamar, plus explicit boundary/rejection cases.",
+  "reference_scope": "Expected software outcomes for source-backed points, not independently verified physical routes or human usability results.",
+  "source_sha256": "92f9a05b0d5afff3145344718fa0841d18c9568caff022df162cbfb9f18f4687",
+  "street_index_sha256": "5ef784e4cf3f2960a7ac2d5164bd3e6b60b73e3bbd27654f5a9fd0044fc90807",
+  "cases": [
+    {
+      "id": "central-address",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Torggata 22",
+        "coordinates": [
+          60.792762813456456,
+          11.074915722234996
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Torggata%2A&nummer=22",
+          "retrieved_at_utc": "2026-11-25T12:28:11.925203+00:00",
+          "sha256": "1ef621bb81408faa14a2ccf97109cbb4f35f49d6a134c24d0f19cafb9532300a"
+        }
+      }
+    },
+    {
+      "id": "neighbouring-address",
+      "kind": "short-distance",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Seminargata 14",
+        "coordinates": [
+          60.79512048519726,
+          11.072293321609518
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=14",
+          "retrieved_at_utc": "2026-11-25T12:28:11.845110+00:00",
+          "sha256": "787359188136918ecc9520de7b548d698d1d2396e3451387552571b5fa1bd1f2"
+        }
+      }
+    },
+    {
+      "id": "street-3",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Ingeberggutua",
+        "coordinates": [
+          60.8241605,
+          11.1298518
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/30284915",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-4",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Høyvangvegen",
+        "coordinates": [
+          60.8204809,
+          11.1722025
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/30167422",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-5",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Hjellumvegen",
+        "coordinates": [
+          60.791573,
+          11.1495073
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/477043751",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-6",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Midtvangvegen",
+        "coordinates": [
+          60.829253,
+          11.174012
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/28451446",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-7",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Vanglivegen",
+        "coordinates": [
+          60.815283,
+          11.178999
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/36833334",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-8",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Gåsbuvegen",
+        "coordinates": [
+          60.883067,
+          11.181864
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/476969411",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-9",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Vangseterlia",
+        "coordinates": [
+          60.880826,
+          11.182665
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/928888059",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-10",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Brumundsjøvegen",
+        "coordinates": [
+          61.005648,
+          11.157413
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/34879105",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "street-11",
+      "kind": "ordinary",
+      "expected_status": "ready",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Bjørgeligutua",
+        "coordinates": [
+          61.10453,
+          11.053486
+        ],
+        "source": {
+          "provider": "OpenStreetMap",
+          "attribution": "© OpenStreetMap contributors",
+          "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "source_url": "https://www.openstreetmap.org/way/928887936",
+          "retrieved_at_utc": "2026-11-24T13:59:30.009914+00:00"
+        }
+      }
+    },
+    {
+      "id": "identical-endpoints",
+      "kind": "boundary",
+      "expected_status": "same_place",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      }
+    },
+    {
+      "id": "outside-municipality",
+      "kind": "rejection",
+      "expected_status": "outside_coverage",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Public central Oslo reference point",
+        "coordinates": [
+          59.9139,
+          10.7522
+        ],
+        "source": {}
+      }
+    },
+    {
+      "id": "invalid-latitude",
+      "kind": "rejection",
+      "expected_status": "rejected",
+      "origin": {
+        "name": "Seminargata 13",
+        "coordinates": [
+          60.794983916826205,
+          11.072413135617717
+        ],
+        "source": {
+          "provider": "Kartverket",
+          "attribution": "© Kartverket",
+          "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_url": "https://api.kartverket.no/adresser/v1/sok?kommunenummer=3403&treffPerSide=20&side=0&utkoordsys=4258&filtrer=metadata%2Cadresser.adressenavn%2Cadresser.adressetekstutenadressetilleggsnavn%2Cadresser.nummer%2Cadresser.bokstav%2Cadresser.postnummer%2Cadresser.poststed%2Cadresser.kommunenummer%2Cadresser.representasjonspunkt&sok=Seminargata%2A&nummer=13",
+          "retrieved_at_utc": "2026-11-25T12:28:11.780822+00:00",
+          "sha256": "1b47df9f433e91b361fe49bc79241eaed889347e484044c61e408568dd5fa503"
+        }
+      },
+      "destination": {
+        "name": "Synthetic invalid coordinate",
+        "coordinates": [
+          91,
+          11.1
+        ],
+        "source": {}
+      }
+    }
+  ]
+}

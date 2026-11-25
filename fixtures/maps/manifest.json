@@ -354,6 +354,25 @@
         "road way id and node references",
         "road, car access, direction and junction tags"
       ]
+    },
+    "hamar-municipality.json": {
+      "source_url": "https://overpass-api.de/api/interpreter",
+      "query": "[out:json][timeout:60];area[\"boundary\"=\"administrative\"][\"ref\"=\"3403\"][\"admin_level\"=\"7\"]->.hamar;.hamar out tags;way[\"highway\"](area.hamar);(._;>;);out body;",
+      "retrieved_at": "2026-11-24T13:59:30.009914+00:00",
+      "source_timestamp": "2026-11-24T13:58:05Z",
+      "area": {
+        "id": 3600410882,
+        "name": "Hamar",
+        "ref": "3403"
+      },
+      "original_download_sha256": "e7b60c66b24386212b1d69f3a44c8417c45c657199b15777a71ad8d7875ce5ad",
+      "sanitized_fixture_sha256": "92f9a05b0d5afff3145344718fa0841d18c9568caff022df162cbfb9f18f4687",
+      "boundary_sha256": "0fe4a485289bf8ca7497debe1da426133a0e9505df4fde1ef56917b31c058593",
+      "street_index_sha256": "5ef784e4cf3f2960a7ac2d5164bd3e6b60b73e3bbd27654f5a9fd0044fc90807",
+      "source_way_count": 8415,
+      "source_node_count": 74403,
+      "named_street_count": 564,
+      "sanitization": "Allowlisted highway/access/geometry tags only; no contributor/contact/owner/resident fields."
     }
   }
 }

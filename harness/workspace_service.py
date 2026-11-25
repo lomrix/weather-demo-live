@@ -217,6 +217,7 @@ class Workspace:
         self.root = Path(root)
         self.opener = opener
         self._busy = threading.Lock()
+        self._model_paused = False
         self.notice = load_notice(self.root)
         self.koigen_accessibility = load_evidence(self.root)
         manifest = json.loads(
@@ -506,6 +507,12 @@ class Workspace:
                 "message": f"{label} snapped to the nearest mapped walking node ({round(best)} m away)."}
 
     def resolve_custom(self, case, custom):
+        if case.get("municipal"):
+            from harness.municipal_snap import resolve
+            return resolve(case, custom, shortest_route, self._custom_sections, MAX_SNAP_METRES)
+        return self._resolve_custom_nodes(case, custom)
+
+    def _resolve_custom_nodes(self, case, custom):
         origin = self._snap(case, custom["origin"], "Start")
         destination = self._snap(case, custom["destination"], "Destination")
         result = {"id": CUSTOM_ID, "origin": origin, "destination": destination,
@@ -552,6 +559,9 @@ class Workspace:
         return self.resolve_custom(case, custom)
 
     def get_case(self, case_id):
+        if case_id == "hamar-municipality" and case_id not in self.cases:
+            from harness.municipal_walk import load_case
+            self.cases[case_id] = load_case(self.root)
         case = self.cases.get(case_id) if isinstance(case_id, str) else None
         if case is None:
             raise LookupError("Unknown case")
@@ -642,6 +652,7 @@ class Workspace:
         }
 
     def index(self):
+        cases = list(self.cases.values())
         return {
             "today": date.today().isoformat(),
             "mode": {"supported": ["walking", "vehicle"], "note": "Walking and a fixed driving case are supported."},
@@ -658,8 +669,10 @@ class Workspace:
             "cases": [
                 {"id": case["id"], "label": case["config"]["label"],
                  "summary": case["config"]["summary"]}
-                for case in self.cases.values()
-            ],
+                for case in cases
+            ] + ([] if any(case["id"] == "hamar-municipality" for case in cases) else [{
+                "id":"hamar-municipality", "label":"Hamar municipality · streets and walking paths",
+                "summary":"Choose a walking journey across Hamar municipality."}]),
         }
 
     def search_places(self, query):
@@ -772,6 +785,22 @@ class Workspace:
 
     def case_payload(self, case_id):
         case = self.get_case(case_id)
+        if case.get("municipal"):
+            manifest = case["manifest"]
+            return {
+                "id":case_id, "mode":"walking", "municipal":True,
+                "label":case["config"]["label"], "summary":case["config"]["summary"],
+                "nodes":case["nodes"], "coverage":{**case["coverage"], "snap_metres":MAX_SNAP_METRES},
+                "links":[[link["id"],link["from"],link["to"],link["metres"]] for link in case["links"].values()],
+                "journeys":case["journeys"], "sections":[], "candidates":[], "boundary":case["boundary"],
+                "evidence":{"scenario_id":case_id, "fixture":{
+                    "file":"fixtures/maps/hamar-municipality.json", "sha256":manifest["sanitized_fixture_sha256"],
+                    "original_download_sha256":manifest["original_download_sha256"],
+                    "source_url":manifest["source_url"], "retrieved_at":manifest["retrieved_at"],
+                    "license":case["license"], "attribution":case["attribution"]},
+                    "statistics":case["statistics"],
+                    "unknowns":["OSM coverage and access tags can be incomplete. Entrances, crossing safety, surface, slope and live conditions are not verified."]},
+                "date_rule":DATE_RULE}
         if case.get("mode") == "vehicle":
             manifest = case["manifest"]
             return {
@@ -872,7 +901,8 @@ class Workspace:
         if resolved:
             section_ids.update({s["id"]: s for s in resolved["sections"]})
         raw_projects = payload.get("projects")
-        if not isinstance(raw_projects, list) or not 1 <= len(raw_projects) <= MAX_PROJECTS:
+        minimum = 0 if case.get("municipal") else 1
+        if not isinstance(raw_projects, list) or not minimum <= len(raw_projects) <= MAX_PROJECTS:
             raise ValueError(f"Add between 1 and {MAX_PROJECTS} projects")
         projects, names = [], set()
         for index, raw in enumerate(raw_projects, 1):
@@ -925,6 +955,10 @@ class Workspace:
                 key=_canonical,
             ),
         }
+        if norm["case"].get("municipal"):
+            from harness.municipal_snap import VERSION
+            core["routing_version"] = VERSION
+            core["map_sha256"] = norm["case"]["manifest"]["sanitized_fixture_sha256"]
         if norm["custom_request"]:
             core["custom_journey"] = norm["custom_request"]
         assessment = hashlib.sha256(_canonical(core).encode()).hexdigest()
@@ -966,10 +1000,14 @@ class Workspace:
         if custom and custom["status"] == "ready":
             journeys.append({"id": CUSTOM_ID, "origin": custom["origin"]["node_id"],
                              "destination": custom["destination"]["node_id"]})
+        network = scenario["network"]
+        if custom and custom.get("routing_overlay"):
+            from harness.municipal_snap import network_for
+            network = network_for(case, custom["routing_overlay"])
         return {
             "metadata": {"id": scenario["metadata"]["id"], "label": case["config"]["label"],
                          "synthetic": False, "offline": True},
-            "network": scenario["network"],
+            "network": network,
             "routing_mode": "vehicle" if driving else "walking",
             "journeys": journeys,
             "projects": projects,
@@ -978,7 +1016,11 @@ class Workspace:
     def assess_normalized(self, norm):
         case = norm["case"]
         scenario = self._project_scenario(norm)
-        result = assess_projects(scenario, norm["date"])
+        if case.get("municipal") and not norm["projects"]:
+            from harness.municipal_walk import no_change_assessment
+            result = no_change_assessment(scenario, norm["date"], shortest_route)
+        else:
+            result = assess_projects(scenario, norm["date"])
         info = result["project_assessment"]
         sections_by_project = {p["id"]: p["section_ids"] for p in norm["projects"]}
 
@@ -1054,14 +1096,36 @@ class Workspace:
     def assess(self, payload):
         return self.assess_normalized(self.normalize(payload))
 
+    def ai_status(self):
+        from harness.model_budget import policy
+        return {"enabled":not self._model_paused,"request_in_flight":self._busy.locked(),"policy":policy()}
+
+    def ai_control(self, payload):
+        if not isinstance(payload,dict) or set(payload)!={"enabled"} or type(payload["enabled"]) is not bool:
+            raise ValueError("Send enabled as true or false")
+        self._model_paused = not payload["enabled"]
+        return self.ai_status()
+
+    def _model_open(self, request, timeout):
+        if self._model_paused:
+            from harness.model_budget import BudgetStop
+            raise BudgetStop("AI calls are paused. Walking assessment remains available.")
+        if self.opener is urlopen:
+            from urllib.request import build_opener
+            from harness.model_budget import NoRedirect
+            return build_opener(NoRedirect()).open(request, timeout=timeout)
+        return self.opener(request, timeout=timeout)
+
     def draft_koigen_notice(self, payload):
         if not isinstance(payload, dict) or set(payload) != {"notice_id"}:
             raise ValueError("Send one saved notice_id")
         if payload["notice_id"] != NOTICE_ID:
             raise ValueError("Choose the saved Koigen notice")
+        if self._model_paused:
+            raise ValueError("AI calls are paused. Walking assessment remains available.")
         if not self._busy.acquire(blocking=False):
             raise BusyError("A local model request is already running")
-        recorder = Recorder(self.opener)
+        recorder = Recorder(self._model_open)
         try:
             try:
                 return {"state": "success", **draft_notice(self.notice, recorder)}
@@ -1099,7 +1163,7 @@ class Workspace:
                     "message": "No project is active on this date, so there is no closure to mitigate. "
                                "No model request was made.",
                 }, "diagnostics": self._diagnostics(None, 0)}
-            recorder = Recorder(self.opener)
+            recorder = Recorder(self._model_open)
             try:
                 result = run_comparison(
                     norm["case"]["scenario"], norm["question"], "walking",

@@ -3,6 +3,7 @@
 import json
 import sys
 import threading
+import tempfile
 import unittest
 import urllib.request
 from pathlib import Path
@@ -16,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "harness"))
 
 import hamar_workspace
-from build_place_index import build
+from build_place_index import build, _sha256
 from workspace_service import Workspace
 
 
@@ -41,6 +42,16 @@ class PlaceIndexTests(unittest.TestCase):
         self.assertGreater(len(checked["places"]), 50)
         self.assertTrue(checked["generated_from_saved_data_only"])
         self.assertTrue(all(place["source"]["sha256"] for place in checked["places"]))
+
+    def test_source_hash_survives_checkout_line_endings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "source.osm"
+            path.write_bytes(b"<osm>\n<node id='1'/>\n</osm>\n")
+            expected = _sha256(path)
+            path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
+            self.assertEqual(_sha256(path), expected)
+            path.write_bytes(b"<osm>\n<node id='2'/>\n</osm>\n")
+            self.assertNotEqual(_sha256(path), expected)
 
     def test_search_is_bounded_sourced_and_has_no_match(self):
         result = self.workspace.search_places("Stortorget")

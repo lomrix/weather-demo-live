@@ -18,6 +18,7 @@ sys.path.insert(0, str(HERE / "harness"))
 from workspace_service import BusyError, Workspace
 from harness.city_notices import notice_feed
 from harness.official_notices import OfficialNotices
+from harness.address_search import AddressSearch
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -35,7 +36,7 @@ STATIC = {
     "/vendor/maplibre/maplibre-gl-shared.mjs": ("vendor/maplibre/maplibre-gl-shared.mjs", "text/javascript; charset=utf-8"),
     "/vendor/maplibre/maplibre-gl.css": ("vendor/maplibre/maplibre-gl.css", "text/css; charset=utf-8"),
 }
-POSTS = {"/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compare": "compare",
+POSTS = {"/api/ai/control": "ai_control", "/api/fingerprint": "fingerprint", "/api/assess": "assess", "/api/compare": "compare",
          "/api/journey": "resolve_journey", "/api/bus/assess": "assess_bus",
          "/api/notice/draft": "draft_koigen_notice",
          "/api/monitor-scenario": "monitor_scenario",
@@ -58,10 +59,13 @@ SECURITY_HEADERS = {
 class WorkspaceServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, port=DEFAULT_PORT, opener=urlopen, root=HERE):
+    def __init__(self, port=DEFAULT_PORT, opener=urlopen, root=HERE, address_opener=None):
         self.workspace = Workspace(root, opener)
         self.root = Path(root)
         self.official_notices = OfficialNotices(self.root)
+        self.address_search = AddressSearch(address_opener)
+        street_path = self.root / "fixtures/maps/hamar-municipality-streets.json"
+        self.streets = json.loads(street_path.read_text(encoding="utf-8"))["streets"] if street_path.exists() else []
         super().__init__((HOST, port), Handler)
 
     @property
@@ -74,7 +78,7 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "HamarWorkspace"
 
     def log_message(self, format, *args):
-        sys.stderr.write("%s %s\n" % (self.command, self.path))
+        sys.stderr.write("%s %s\n" % (self.command, self.path.split("?", 1)[0]))
 
     def _send(self, status, body, content_type="application/json; charset=utf-8"):
         self.send_response(status)
@@ -152,6 +156,26 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(200, self.server.workspace.case_payload(path[len("/api/cases/"):]))
             except LookupError:
                 self._json(404, {"error": "Unknown case"})
+        elif path == "/api/ai/status":
+            self._json(200, self.server.workspace.ai_status())
+        elif path == "/api/streets":
+            query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query).get("q", [""])[0]
+            if not isinstance(query, str) or not query.strip() or len(query)>80:
+                self._json(400, {"error":"Type a street name of at most 80 characters"})
+                return
+            import unicodedata
+            def normal(value):
+                return " ".join("".join(c for c in unicodedata.normalize("NFKD", value.casefold().replace("ø","o").replace("æ","ae")) if not unicodedata.combining(c)).split())
+            needle = normal(query)
+            matches = [street for street in self.server.streets if all(word in normal(street["name"]) for word in needle.split())]
+            matches.sort(key=lambda street:(normal(street["name"])!=needle,not normal(street["name"]).startswith(needle),street["name"]))
+            self._json(200, {"matches":matches[:20], "truncated":len(matches)>20})
+        elif path == "/api/addresses":
+            query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query).get("q", [""])[0]
+            try:
+                self._json(200, self.server.address_search.search(query))
+            except ValueError as exc:
+                self._json(400, {"error": str(exc)})
         elif path == "/api/places":
             query = urllib.parse.parse_qs(self.path.split("?", 1)[1]).get("q", [""])[0] \
                 if "?" in self.path else ""

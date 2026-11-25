@@ -1,0 +1,3 @@
+# Preserve pinned map and evaluation bytes across platforms.
+fixtures/maps/hamar-municipality*.json -text whitespace=cr-at-eol
+fixtures/evaluation/** -text whitespace=cr-at-eol

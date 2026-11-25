@@ -1,4 +1,4 @@
-name: Traffic offline verification
+name: Hamar offline readiness
 on:
   pull_request:
     branches: [main]
@@ -9,7 +9,7 @@ permissions:
   contents: read
 jobs:
   traffic-offline:
-    timeout-minutes: 5
+    timeout-minutes: 12
     strategy:
       fail-fast: false
       matrix:
@@ -25,27 +25,13 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Verify saved traffic data offline
-        run: python scripts/verify_traffic.py
-      - name: Verify saved route coverage offline
-        run: python scripts/verify_route_coverage.py
-      - name: Verify bounded bus collection offline
-        run: python scripts/verify_bus_collection.py
-      - name: Run Hamar Access Lab offline evaluation
-        run: >-
-          python -m unittest
-          check_ringgata_demo.py
-          check_hamar_real_case.py
-          check_ollama_scenario.py
-          check_comparison_renderer.py
-          check_scenario_compare.py
-      - name: Run multi-project scenario checks
-        run: python -m unittest check_project_scenarios.py
-      - name: Run workspace request-boundary and stale-result checks
-        run: python -m unittest check_workspace.py
-      - name: Check raw notice evaluation offline (no model calls)
-        run: python -B -m unittest check_notice_evaluation.py check_koigen_notice.py check_notice_evidence.py
-      - name: Check imported Hamar bus inventory offline
-        run: python -B -m unittest check_bus_catalogue.py
-      - name: Check Hamar notification feeds offline
-        run: python -B -m unittest check_official_notices.py check_city_notices.py check_journey_alerts.py
+      - name: Run frozen offline readiness evaluation
+        run: python -B -m harness.run_readiness --output out/ci-readiness
+      - name: Preserve complete readiness evidence
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: readiness-${{ matrix.os }}
+          path: out/ci-readiness
+          if-no-files-found: warn
+          retention-days: 14

@@ -4,6 +4,42 @@
   let preferences={language:'en',theme:'light'};
   try {const saved=JSON.parse(localStorage.getItem(key));if(saved?.language==='nb')preferences.language='nb';if(['light','dark'].includes(saved?.theme))preferences.theme=saved.theme;} catch {}
   const dictionary={
+    "Pause AI assistance":"Sett KI-hjelp på pause", "Resume AI assistance":"Gjenoppta KI-hjelp",
+    "AI assistance":"KI-hjelp", "Checking AI controls…":"Kontrollerer KI-innstillinger…",
+    "AI paused. New calls are blocked; an already-started request may finish. Walking calculations still work.":"KI er satt på pause. Nye forespørsler blokkeres; en startet forespørsel kan fullføres. Gangruteberegning fungerer fortsatt.",
+    "AI assistance is enabled. Each action allows one bounded local request.":"KI-hjelp er aktivert. Hver handling tillater én begrenset lokal forespørsel.",
+    "Restart the workspace server to use AI pause controls.":"Start serveren på nytt for å bruke KI-pause.",
+
+    "Find walking route":"Finn gangrute", "Your walking route":"Gangruten din", "Walking distance":"Gangavstand",
+    'Hamar municipality · streets and walking paths':'Hamar kommune · gater og gangveger',
+    'Saved walking network':'Lagret gangnett',
+    'Mapped walking route. Entrances and current conditions are unverified.':'Beregnet gangrute. Innganger og dagens forhold er ubekreftet.',
+    'Street · choose a house number for a precise location':'Gate · velg husnummer for en nøyaktig plassering',
+    'Road · no mapped pedestrian access':'Veg · ingen kartlagt gangadgang',
+
+    'Street, house number or bus stop':'Gate, husnummer eller holdeplass',
+    'Search a Hamar street, house number or bus stop, then choose a result.':'Søk etter en gate, et husnummer eller en holdeplass i Hamar, og velg et treff.',
+    'Searching Hamar addresses…':'Søker etter adresser i Hamar…',
+    'Type at least three characters to search addresses.':'Skriv minst tre tegn for å søke etter adresser.',
+    'Choose a result below.':'Velg et treff nedenfor.',
+    'More matches available. Add a house number or a longer street name.':'Flere treff finnes. Legg til husnummer eller et lengre gatenavn.',
+    'No Hamar address or saved place found. Check the spelling or choose a point on the map.':'Fant ingen adresse eller lagrede steder i Hamar. Kontroller skrivemåten eller velg et punkt på kartet.',
+    'Address lookup is unavailable. Saved places and map selection still work.':'Adressesøket er utilgjengelig. Lagrede steder og kartvalg fungerer fortsatt.',
+    'Address search is busy. Please try again shortly.':'Adressesøket er opptatt. Prøv igjen om litt.',
+    'Selected. Choose the other endpoint or check your journey.':'Valgt. Velg det andre endepunktet eller vurder turen.',
+    'Addresses ©':'Adresser ©',
+    '· CC BY 4.0. Address lookup requires internet.':'· CC BY 4.0. Adressesøk krever internett.',
+    'Choose a start and destination, then check how the configured changes affect your walk.':'Velg start og mål, og vurder hvordan endringene påvirker gåturen.',
+
+    'Plan journey':'Planlegg tur','Find a bus':'Finn buss','Edit scenario':'Endre scenario',
+    'Back to map':'Tilbake til kartet','Close journey planner':'Lukk turplanleggeren',
+    'Planning tools & changes':'Planleggingsverktøy og endringer','Driving example':'Kjøreeksempel',
+    'Saved map · planning prototype':'Lagret kart · planleggingsprototype',
+    'Saved map · hypothetical changes':'Lagret kart · hypotetiske endringer',
+    'Saved timetable · not live departures':'Lagret rutetabell · ikke sanntidsavganger',
+    'Tap the map to choose your start':'Trykk på kartet for å velge start',
+    'Tap the map to choose your destination':'Trykk på kartet for å velge mål',
+
     'Official sources':'Offisielle kilder','Check official sources':'Kontroller offisielle kilder',
     'Last official source check':'Siste kontroll av offisielle kilder','Pending human review':'Venter på manuell gjennomgang',
     'Reviewed notices stay in place until a change is accepted.':'Gjennomgåtte varsler beholdes til en endring er godkjent.',
@@ -105,6 +141,7 @@
   };
   const originals=new WeakMap(),attributeOriginals=new WeakMap();
   const patterns=[
+    [/^Mapped network only\. Start access: (.+) m; destination access: (.+) m excluded and unverified\.$/,m=>`Kun kartlagt gangnett. Avstand fra start: ${m[1]} m; fra mål: ${m[2]} m er utelatt og ubekreftet.`],
     [/^(.+) · outside Hamar$/,m=>`${m[1]} · utenfor Hamar`],
     [/^(.+) · (inbound|outbound) · (\d+) stops$/,m=>`${m[1]} · ${m[2]==='inbound'?'inngående':'utgående'} · ${m[3]} holdeplasser`],
     [/^(.+) · (.+) → (.+)\. (Scheduled snapshot; not live departures\.|No scheduled journeys for this variant on the snapshot date\.) Bus delay and closure effects are not assessed\.$/,m=>`${m[1]} · ${m[2]} → ${m[3]}. ${m[4].startsWith('No scheduled')?'Ingen planlagte avganger for denne varianten på snapshotdatoen.':'Lagrede rutedata; ingen sanntidsavganger.'} Bussforsinkelse og stengningsvirkninger er ikke vurdert.`],
