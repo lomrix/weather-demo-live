@@ -1,0 +1,8 @@
+{
+  "run": "https://github.com/lomrix/weather-demo-live/actions/runs/45621967530",
+  "job_id": 139232185633,
+  "commit": "5e2d2113242252b768722a0f71bcfed9060c691d",
+  "artifact": "readiness-ubuntu-latest",
+  "download_proxy": "https://nightly.link/lomrix/weather-demo-live/actions/runs/45621967530/readiness-ubuntu-latest.zip",
+  "note": "Public GitHub artifact fetched through nightly.link after browser download timeout; original failure retained."
+}

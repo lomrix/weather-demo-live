@@ -78,7 +78,9 @@ def prepare(output, source=None, live=False, opener=None):
     output.mkdir(parents=True)
     (output / "hamar-municipality.json").write_bytes(saved)
     index_path = output / "hamar-municipality-streets.json"
-    index_path.write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    # The pinned index uses CRLF. Write explicit bytes so Linux replay is
+    # identical to Windows replay without altering the saved source hashes.
+    index_path.write_bytes((json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\r\n").encode("utf-8"))
     summary = {"source_url": data["source_url"], "query": data["query"],
                "retrieved_at": data["retrieved_at"], "source_timestamp": data["source_timestamp"],
                "original_download_sha256": data["original_download_sha256"],

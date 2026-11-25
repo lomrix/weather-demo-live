@@ -107,6 +107,7 @@ class MunicipalCaptureTests(unittest.TestCase):
             output=Path(directory)/'replay'
             summary=prepare(output,source=source,opener=no_network)
             self.assertFalse(summary['live_request'])
+            self.assertTrue((output/'hamar-municipality-streets.json').read_bytes().endswith(b'\r\n'))
             self.assertEqual((output/'hamar-municipality.json').read_bytes(),source.read_bytes())
             self.assertEqual((output/'hamar-municipality-streets.json').read_bytes(),(ROOT/'fixtures/maps/hamar-municipality-streets.json').read_bytes())
             with self.assertRaisesRegex(ValueError,'already exists'):

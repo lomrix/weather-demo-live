@@ -130,3 +130,13 @@ checks passed after repair. Original clean-checkout failure and focused logs
 are preserved under `fixtures/evaluation/runs/2026-11-25-place-index-portability/`.
 The corrected PR's CI and repeated clean-start results must be checked before
 merging; earlier development passes do not replace those checks.
+
+The subsequent Windows CI and fresh-copy 230-test run passed. Ubuntu identified
+one additional replay failure: the pinned street index ends in CRLF, while
+`write_text` emitted LF on Linux. The replay writer now emits explicit UTF-8
+bytes with the pinned CRLF terminator; the source and index hashes are unchanged.
+The replay test checks that terminator and retains the full byte-equality check.
+The readiness runner also prints a bounded failure-log tail into CI output,
+while preserving the complete artifact. The original Ubuntu failure log is
+saved in the portability evidence folder. Final cross-platform CI remains the
+merge gate; do not replace that check with the earlier local pass.

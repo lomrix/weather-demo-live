@@ -40,6 +40,8 @@ def run(output):
                 status='timed_out';code=None;log.write('\nReadiness runner stopped this command at its timeout.\n')
         checks.append({'name':name,'status':status,'exit_code':code,'seconds':round(perf_counter()-started,3),'command':command})
         print(name+': '+status,flush=True)
+        if status != 'passed':
+            print((output/(name+'.log')).read_text(encoding='utf-8',errors='replace')[-6000:],flush=True)
     print('Checking frozen journeys…',flush=True)
     journeys=evaluate(ROOT/'fixtures/evaluation/municipal-journeys.json')
     save_report(journeys,output/'journeys')
