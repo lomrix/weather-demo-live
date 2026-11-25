@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hamar Access Lab · Planning workspace</title>
 <link rel="stylesheet" href="/vendor/maplibre/maplibre-gl.css">
 <link rel="stylesheet" href="/app.css">
@@ -25,7 +25,7 @@
     <button type="button" data-workspace-mode="driving" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m5 9 2-5h10l2 5M4 10h16v8H4zM7 18v3M17 18v3M7 14h2M15 14h2"/></svg></span> Driving</button>
   </nav>
   <div class="appearance-controls">
-    <button type="button" class="btn btn-small" id="notifications-button" aria-haspopup="dialog">Notifications <span id="notifications-count"></span></button>
+    <button type="button" class="btn btn-small" id="notifications-button" aria-label="Notifications" aria-haspopup="dialog"><svg class="notification-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notification-label">Notifications</span> <span id="notifications-count"></span></button>
     <label class="sr-only" for="language-select">Language</label><select id="language-select" aria-label="Language"><option value="en">English</option><option value="nb">Norsk</option></select>
     <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">☾</button>
   </div>
@@ -95,8 +95,8 @@
     <div id="journey-overview" class="journey-overview" aria-live="polite"></div>
     <div class="map-tools" role="toolbar" aria-label="Map view">
       <label class="sr-only" for="map-style">Map style</label><select id="map-style" aria-label="Map style"><option value="street">Street map</option><option value="3d">3D buildings</option><option value="offline">Saved map (offline)</option></select>
-      <button type="button" class="btn btn-small" id="zoom-in">Zoom in</button>
-      <button type="button" class="btn btn-small" id="zoom-out">Zoom out</button>
+      <button type="button" class="btn btn-small" id="zoom-in" aria-label="Zoom in">Zoom in</button>
+      <button type="button" class="btn btn-small" id="zoom-out" aria-label="Zoom out">Zoom out</button>
       <button type="button" class="btn btn-small" id="fit-route">Fit journey</button>
       <button type="button" class="btn btn-small" id="fit-all">Whole area</button>
       <button type="button" class="btn btn-small details-button" id="details-button">Details</button>
@@ -193,13 +193,14 @@
             <h3 class="sr-only">Search walking endpoints</h3>
             <p class="hint" id="place-search-scope"></p>
             <label for="place-from">From</label>
-            <input type="search" id="place-from" maxlength="80" autocomplete="off" placeholder="Search a saved place or bus stop">
+            <input type="search" id="place-from" maxlength="80" autocomplete="off" placeholder="Street, house number or bus stop">
             <p class="search-status hint" id="place-from-status" role="status"></p>
             <div class="place-results" id="place-from-results"></div>
             <label for="place-to">To</label>
-            <input type="search" id="place-to" maxlength="80" autocomplete="off" placeholder="Search a saved place or bus stop">
+            <input type="search" id="place-to" maxlength="80" autocomplete="off" placeholder="Street, house number or bus stop">
             <p class="search-status hint" id="place-to-status" role="status"></p>
             <div class="place-results" id="place-to-results"></div>
+            <p class="hint address-attribution">Addresses © <a href="https://www.kartverket.no/" target="_blank" rel="noopener noreferrer">Kartverket</a> · CC BY 4.0. Address lookup requires internet.</p>
           </div>
           <p class="hint" id="pick-hint">Or choose your own start and destination on the map.</p>
           <div class="pick-row">
@@ -278,5 +279,12 @@
     </details>
   </section>
 </main>
+<div class="mobile-journey-bar" id="mobile-journey-bar">
+  <div><strong id="mobile-mode-label">Plan a walk</strong><span id="mobile-journey-status">Saved map · planning prototype</span></div>
+  <button type="button" class="btn btn-primary" id="open-mobile-planner" aria-haspopup="dialog">Plan journey</button>
+</div>
+<dialog id="mobile-planner" class="mobile-planner" aria-labelledby="planner-title">
+  <button type="button" class="btn sheet-close" id="close-mobile-planner" aria-label="Close journey planner">Back to map <span aria-hidden="true">↓</span></button>
+</dialog>
 </body>
 </html>

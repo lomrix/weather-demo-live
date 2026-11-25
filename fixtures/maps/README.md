@@ -46,3 +46,22 @@ tags. Its separate sanitizer and retained fields are recorded in its manifest
 entry; the top-level walking policy does not apply to it. Contributor attributes,
 relations, unrelated tags and contact tags are removed. See the main README
 for supported rules, limitations and the configurable rebuild command.
+
+
+## Municipal walking snapshot (24 November 2026)
+
+`hamar-municipality.json` captures all highway ways returned by the OSM Hamar
+municipal area (ref 3403, admin level 7) query, including their complete node
+references. It contains 8,415 ways and 74,403 source nodes, before routing
+policy filters. Only geographic, highway, name and access-related fields are
+retained; contributor metadata and contact fields are discarded. The exact
+query, acquisition time, OSM base timestamp, raw-response hash and sanitized
+hash are preserved. `manifest.json` also pins the existing official Kartverket
+municipal boundary and the generated street index.
+
+`hamar-municipality-streets.json` is a deterministic projection of the named
+ways. The routing graph is built by `harness/municipal_walk.py`; old urban,
+Ringgata and Koigen snapshots remain independent. Source: OpenStreetMap
+contributors, ODbL 1.0; the boundary source retains its Kartverket attribution.
+
+Details and reproduction commands: [municipal coverage](../../docs/municipal-walking-coverage.md).

@@ -86,11 +86,16 @@ class ServiceTests(unittest.TestCase):
     def test_both_cases_load_with_verified_fixture(self):
         index = self.ws.index()
         self.assertEqual(index["mode"]["supported"], ["walking", "vehicle"])
-        self.assertEqual(len(index["cases"]), 6)
+        self.assertEqual(len(index["cases"]), 7)
+        self.assertIn("hamar-municipality", [case["id"] for case in index["cases"]])
         for case in index["cases"]:
             data = self.ws.case_payload(case["id"])
-            self.assertEqual(data["sections"][0]["verified"], case["id"] not in {"hamar-driving", "koigen-demo"})
-            self.assertEqual(data["sections"][0].get("modeled", False), case["id"] == "koigen-demo")
+            if case["id"] == "hamar-municipality":
+                self.assertEqual(data["sections"], [])
+                self.assertTrue(data["municipal"])
+            else:
+                self.assertEqual(data["sections"][0]["verified"], case["id"] not in {"hamar-driving", "koigen-demo"})
+                self.assertEqual(data["sections"][0].get("modeled", False), case["id"] == "koigen-demo")
             self.assertNotIn("path", data["evidence"].get("fixture", {}))
             self.assertNotIn(str(ROOT), json.dumps(data))
 
@@ -607,7 +612,8 @@ class HttpBoundaryTests(unittest.TestCase):
         status, body, _ = self.call("GET", "/api/cases")
         self.assertEqual(status, 200)
         index = json.loads(body)
-        self.assertEqual(len(index["cases"]), 6)
+        self.assertEqual(len(index["cases"]), 7)
+        self.assertIn("hamar-municipality", [case["id"] for case in index["cases"]])
         self.assertIn("koigen-demo", [case["id"] for case in index["cases"]])
         self.assertEqual([case["id"] for case in index["bus_cases"]],
                          ["hamar-b21-2026-11-12", "hamar-b23-2026-11-12"])
@@ -756,7 +762,7 @@ class StaticAssetTests(unittest.TestCase):
     def test_assets_are_offline_and_use_safe_dom_writes(self):
         for name in ("index.html", "app.css", "app.js"):
             text = (ROOT / "workspace" / name).read_text(encoding="utf-8")
-            self.assertEqual(re.findall(r"https?://[^\s\"')]+", text.replace("http://www.w3.org/2000/svg", "")), [], name)
+            self.assertEqual(re.findall(r"https?://[^\s\"')]+", text.replace("http://www.w3.org/2000/svg", "")), ["https://www.kartverket.no/"] if name == "index.html" else [], name)
         script = (ROOT / "workspace" / "app.js").read_text(encoding="utf-8")
         for forbidden in ("innerHTML", "outerHTML", "insertAdjacentHTML", "eval(", "document.write"):
             self.assertNotIn(forbidden, script)

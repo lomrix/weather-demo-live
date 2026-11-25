@@ -158,3 +158,17 @@ Official starting points:
 The municipal traffic page links to municipal closures, county/national road
 information and Innlandstrafikk bus updates. A single municipal article feed
 does not establish comprehensive coverage of all these authorities.
+
+
+## Implemented municipal walking expansion (24–25 November 2026)
+
+The default walking case is now `hamar-municipality`, backed by the sanitized
+municipal OSM highway snapshot (8,415 source ways; 82,295 accepted walking
+links). Kartverket address lookup is scoped to Hamar 3403; 564 mapped road/path
+names are available offline. New addresses and streets use this case, with no
+closure applied by default. Historical cases remain unchanged. Explicit access
+exclusions, pedestrian direction, blocked nodes and disconnected outcomes are
+preserved. Full details, reproduction and evidence are recorded in
+`docs/municipal-walking-coverage.md`. Municipal source acquisition is opt-in;
+this does not implement live closures, general driving navigation or live bus
+departures, nor establish that every physical entrance is mapped/connected.

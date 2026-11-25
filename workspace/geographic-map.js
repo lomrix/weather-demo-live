@@ -65,7 +65,7 @@ function start() {
   status('Loading geographic map…');
   try {
     map = new maplibregl.Map({container:'geographic-map',style:styles[document.documentElement.dataset.theme==='dark'?'dark':'light'],
-      center:[11.069,60.800],zoom:13.5,maxPitch:65,cooperativeGestures:true,attributionControl:true,
+      center:[11.069,60.800],zoom:13.5,maxPitch:65,cooperativeGestures:!window.matchMedia("(max-width: 760px)").matches,attributionControl:true,
       canvasContextAttributes:{antialias:true}});
     map.addControl(new maplibregl.NavigationControl({showZoom:false,visualizePitch:true}),'top-right');
     map.on('idle',()=>{if(!offline){applyOverlays();ready=Boolean(map.getSource('hamar-routes'));frame.dataset.geoReady=String(ready);}});

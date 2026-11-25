@@ -26,7 +26,16 @@ compulsory-assignment PDFs are different briefs and do not replace this one.
 An A is the target, not a promised result. Prioritise evidence against these
 criteria while delivering a product people can understand and use.
 
-## Current state and gaps
+## Update — 25 November 2026
+
+The original schedule below is retained as a plan, not a time sheet. Mobile,
+municipal routing/address lookup, repeatable readiness checks and model controls
+have progressed; see [current evidence](exam-readiness.md). The older uncommitted
+branch description below is historical. Professor guidance on meeting reports,
+teammate experiment evidence, independent walkthrough, paper alignment and final
+release rehearsal remain pending. The user will ask the professor tomorrow.
+
+## Original state and gaps — 19 November
 
 Existing: walking routes and custom endpoints; fixed driving scenario; B21/B23
 stop-access cases; saved journeys and in-app alerts; source-linked Koigen review;

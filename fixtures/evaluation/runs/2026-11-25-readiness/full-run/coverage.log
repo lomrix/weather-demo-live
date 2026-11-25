@@ -1,0 +1,26 @@
+PASS: valid-fixture
+PASS: fixture-lf-copy
+PASS: fixture-crlf-copy
+PASS: duplicate-journey
+PASS: duplicate-call
+PASS: malformed-actual
+PASS: no-actuals
+PASS: unknown-quay
+PASS: mismatched-name
+PASS: conflicting-line-name
+PASS: missing-input
+PASS: invalid-preserves-reports
+PASS: timezone-required
+PASS: cancelled-invalid-time
+PASS: strict-boolean
+PASS: unexpected-identifier
+PASS: invalid-service-date
+PASS: cancellation-precedence
+PASS: html-escaping
+PASS: strict-order
+PASS: bad-source-hash
+PASS: invalid-quay-metadata
+PASS: other-valid-service-date
+PASS: other-valid-line
+PASS: 24/24 offline cases; zero model requests
+C:\Users\moham\weather-demo-live\out\route-coverage-verification\checks-4qcqg224\summary.json

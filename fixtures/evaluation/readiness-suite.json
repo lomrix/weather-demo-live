@@ -1,0 +1,27 @@
+{
+  "id": "exam-readiness-v1",
+  "modules": [
+    "check_address_search",
+    "check_bus_catalogue",
+    "check_city_notices",
+    "check_comparison_renderer",
+    "check_driving",
+    "check_hamar_real_case",
+    "check_journey_alerts",
+    "check_koigen_accessibility",
+    "check_koigen_notice",
+    "check_municipal_walk",
+    "check_notice_evaluation",
+    "check_notice_evidence",
+    "check_official_notices",
+    "check_ollama_scenario",
+    "check_place_search",
+    "check_prepare_walking_map",
+    "check_project_scenarios",
+    "check_readiness",
+    "check_ringgata_demo",
+    "check_scenario_compare",
+    "check_workspace"
+  ],
+  "scope": "Existing tracked root regression modules plus the new address, municipal and readiness checks; excludes deferred hosting files."
+}

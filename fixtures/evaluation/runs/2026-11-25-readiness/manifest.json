@@ -1,0 +1,43 @@
+{
+  "description": "Actual local offline runs; full 228-test run preceded final redirect guard and extra test. Final 48-test focused run includes them. Raw logs retain original paths. No new live-model experiment or human study. Final 59-test focused run also covers address lookup after unreachable duplicate handler cleanup. Browser evidence uses replayed address responses and simulated outage; its script records the local Playwright installation path.",
+  "current_code_sha256": {
+    "harness/workspace_service.py": "fbce2fa4d566b86a79ab71688ca056a1a307de5fa3e0e16d3218915c7ed86e3f",
+    "harness/municipal_snap.py": "c4c0a7b36852e4439d4bb211ed24306047a0be02b1274ff93825c12e40c63a3f",
+    "harness/model_budget.py": "f7d9e3ded30cbcd86c3fd52c35d5973ae9c2ce066fa6ea1173361da34f0ff8c4",
+    "harness/notice_evidence.py": "0cacf8a4267129130f16adcda04784e10962d5012d1492bf5bf48ece88de7bb4",
+    "harness/ollama_scenario.py": "8b4ba80abf2d78e7f813126ebd50e006c154cd0d9accbb2fd098d3c4c20b93b1",
+    "harness/validate_journeys.py": "9e20649919a89fce607611ddb76e5874983d07d707afdb53c80a580bc387f9c5",
+    "harness/run_readiness.py": "99eb20ceb6de588b75fe0d57ceee0012a70748fc7b14c763749f237ec9fc01c4",
+    "workspace/app.js": "c5d032668cc55c6d5203de97a695b903d9727658d5855557ba3b6cacc3e1fc8a",
+    "workspace/preferences.js": "017fe094518742a7740b55d3cf9888f84025246c04e7c8ad17dd8c3a6efbb473",
+    "check_readiness.py": "e02618d5d4fae7bf2418606f6db48b759f0732ef6c51f81cf84e3cfd71aa8c49",
+    "hamar_workspace.py": "ba058579a6af099900ae998417294aa591217b1f9e6db65fb97b02a56d0e8981"
+  },
+  "artifact_sha256": {
+    "browser-check.mjs": "e9a6484cf4d7a5d9f2e4760096d9410c402ad8b6f80f7afabde1f8f3bfd2b85a",
+    "browser.json": "5fbe53837f36af2753b15b2810a6711730d2a32c30e4681f5ed55374da4d7862",
+    "final-focused.log": "2f186984e3f67ca13ca5d1a3c811aabcca74c3f52d657ffa1f5c09f043bda5cb",
+    "final-safety.log": "a17800f5a2ab0814c85372d145be73eabe68d7677b316dbe34fbc8e51fe6f712",
+    "full-run/bus-collection.log": "57afd7b0afc401d8954bf83393fbadf1d76aeaf81f6319c95c6ef97d79eb7598",
+    "full-run/coverage.log": "ad98905602fb2f4499db4d3a598deb1806d2210e9605134647dbc4b2cfe76b4f",
+    "full-run/regression.log": "e077fa104c7d0f4ba3c544ac8f525e7d5dd9fe7d1364c781a1d982466cfed3b0",
+    "full-run/summary.json": "4171d7a8b306288db180d93546e0578696d3860afc385963a0dea4c509af9f35",
+    "full-run/traffic.log": "45a9429233c1a7fc76fea19af617eb34882473d64dbd05cabb11d9c23bbda08e",
+    "full-run/journeys/results.json": "42b5b87cce91b9cc1d4b789482d56e808eadf05663667d7f00e37da994f66f77",
+    "full-run/journeys/summary.md": "cb3528422b7aa553cbd9f7a079e28ccae4ce5a6859951605618db1a4ddb6c03d"
+  },
+  "code_hash_scope": "Raw local working-tree bytes at capture time; source checkout line endings may differ. Canonical hashes below normalize CRLF to LF.",
+  "current_code_lf_sha256": {
+    "harness/workspace_service.py": "abe2d52267e7a5dd8241eaeddfffe095f9edd9835af9b277dae1eaef84cdae18",
+    "harness/municipal_snap.py": "c4c0a7b36852e4439d4bb211ed24306047a0be02b1274ff93825c12e40c63a3f",
+    "harness/model_budget.py": "f7d9e3ded30cbcd86c3fd52c35d5973ae9c2ce066fa6ea1173361da34f0ff8c4",
+    "harness/notice_evidence.py": "8eeeb400c794466ac533549069e0eeecd582931b30a460fb6768b753daf0c5af",
+    "harness/ollama_scenario.py": "766e838edfb242d19540d90937a84c12a205b6d1db079a7326226f3b94798faf",
+    "harness/validate_journeys.py": "53c2cd23812dbff3786b2a3fe53d8afdd921191f35cf6441303f92f88450c590",
+    "harness/run_readiness.py": "99eb20ceb6de588b75fe0d57ceee0012a70748fc7b14c763749f237ec9fc01c4",
+    "workspace/app.js": "f5b2ff8fb7fd30cc0edacbf5f034314704bc98771ca79858947eda19b2f23f54",
+    "workspace/preferences.js": "aaec215751167c6569330114eb7f7cda04e3344c7ec34c38237c0afea493e04e",
+    "check_readiness.py": "8e3305f22c46878504f233326e69058da35d0b209a322635e4163d0a89f00006",
+    "hamar_workspace.py": "21118603ab8a7dd35d039f0d50b1742cd6ce372bb6413fadea806b045d9689a9"
+  }
+}

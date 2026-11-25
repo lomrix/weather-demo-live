@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-11-25T12:56:13.768Z",
+  "mode": "Chromium phone emulation and desktop; replayed official address points; simulated address-source outage; zero live model calls",
+  "checks": [
+    "AI pause blocks new AI requests; manual short walk works",
+    "distinct adjacent addresses: 4 m mapped route plus separately disclosed access offsets",
+    "projected route geometry renders",
+    "Norwegian and dark mode",
+    "offline street lookup survives simulated address outage",
+    "B22 catalogue",
+    "fixed driving comparison"
+  ],
+  "errors": []
+}

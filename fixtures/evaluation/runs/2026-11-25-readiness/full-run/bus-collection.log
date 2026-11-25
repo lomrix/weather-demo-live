@@ -1,0 +1,102 @@
+ERROR: Wrong SIRI namespace or envelope
+ERROR: Malformed XML
+ERROR: DOCTYPE and entity declarations are not allowed
+ERROR: Provider service status is false
+ERROR: Live cooldown active until 2026-11-25T12:46:29.764512+00:00
+ERROR: Duplicate selected journey identity
+ERROR: Duplicate selected call identity
+ERROR: Malformed timezone-bearing ExpectedDepartureTime
+ERROR: Cancellation must be boolean
+ERROR: Mismatched selected quay name
+ERROR: Invalid service date
+ERROR: HTTP 429
+ERROR: HTTP 429
+ERROR: Live cooldown active until 2026-10-27T15:02:20+00:00
+ERROR: Wrong SIRI namespace or envelope
+ERROR: HTTP 429
+ERROR: Live cooldown active until 2026-10-27T08:02:00+00:00
+ERROR: HTTP 429
+ERROR: Live cooldown active until 2026-10-27T08:03:00+00:00
+ERROR: synthetic output failure
+ERROR: HTTP 503
+ERROR: timed out
+ERROR: Redirect rejected
+ERROR: Response body exceeds 5 MiB
+ERROR: Replay response file could not be read
+ERROR: Local lock is held; retry after the current run releases it
+{"mode": "dry-run", "endpoint": "https://api.entur.io/realtime/v1/rest/et?datasetId=INN&maxSize=100", "headers": {"ET-Client-Name": "lomrix-weather-demo-live", "Accept": "application/xml"}, "scope": "one bounded INN first page; six selected public quays", "request_limit": 1, "size_limit_bytes": 5242880, "timeout_seconds": 20, "destination": "C:\\Users\\moham\\weather-demo-live\\out\\bus-collection-verification\\checks-m1a2_qvv\\dry-root", "network_calls": 0, "filesystem_mutations": 0}
+PASS: dry-run-no-network-or-files
+PASS: cli-default-dry-run
+PASS: cli-impossible-timestamp
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\valid\output\run-xrrn9ari
+PASS: valid-replay-and-projection
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\format-one\output\run-g8x98y_p
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\format-two\output\run-k6v1yzca
+PASS: formatting-variation
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\wrong-envelope\output\run-h9sxfkal
+PASS: wrong-envelope
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\malformed\output\run-5bbsuqzj
+PASS: malformed
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\doctype\output\run-t__dlsib
+PASS: doctype
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\failed-status\output\run-0_ukou10
+PASS: failed-service-status
+PASS: failed-delivery-status
+PASS: delivery-error
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\empty\output\run-86pclydp
+PASS: empty-selection
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\unselected-missing-name\output\run-zt2yaffw
+PASS: unselected-missing-stop-name
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\unselected-missing-metadata\output\run-yy4fqgyt
+PASS: unselected-missing-journey-metadata
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\live\run-tkno1pyd
+PASS: mocked-live-single-request
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\cooldown\run-6xfmg580
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\cooldown\run-q5ws0275
+PASS: cooldown-blocks-second-request
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\replay-cooldown\run-n1_1_jg4
+PASS: replay-does-not-consume-cooldown
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\arrival-only\output\run-s8msgi9_
+PASS: missing-and-arrival-only-times
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\reject-duplicate\output\run-g91o_1ru
+PASS: duplicate-journey
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\reject-duplicate\output\run-uppik3f_
+PASS: duplicate-call
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\reject-expecteddeparturetime\output\run-i9assf7c
+PASS: bad-time
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\reject-boolean\output\run-wgzixpz3
+PASS: bad-cancellation
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\reject-mismatched\output\run-49n5ppvo
+PASS: bad-quay-name
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\reject-service-date\output\run-eka36mx8
+PASS: bad-date
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\canaries\output\run-xgemd85x
+PASS: discarded-source-canaries
+PASS: provider-metadata-canaries
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\transport-failure\run-itfyr9yh
+PASS: http-429-no-retry
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\moving-retry\run-j7dakgry
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\moving-retry\run-rcbrrs9t
+PASS: moving-retry-after-receipt
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\received-invalid\run-xj9wf31r
+PASS: received-invalid-preserves-metadata
+PASS: actual-transport-body-limit
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\retry-after\seconds\run-hj9datda
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\retry-after\seconds\run-f2mzqfdq
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\retry-after\http-date\run-j6ca7ss2
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\retry-after\http-date\run-h6rfk60u
+PASS: retry-after-delay-and-date
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\publication\prior\run-d9q2u3oc
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\publication\failed\run-toxtbck8
+PASS: publication-failure-preserves-prior
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\transport-errors\503\run-kvjl5ovl
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\transport-errors\timeout\run-d7isfbm1
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\transport-errors\redirect\run-ltd2t1qr
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\transport-errors\body-limit\run-kek21hd1
+PASS: bounded-live-failures
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\missing-replay\output\run-on5093tm
+PASS: missing-replay-input
+RUN_DIRECTORY C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\held-lock\run-hq6ux2bg
+PASS: held-lock-no-request
+PASS: 35/35 offline cases; zero model/live requests
+C:\Users\moham\weather-demo-live\out\bus-collection-verification\checks-m1a2_qvv\summary.json

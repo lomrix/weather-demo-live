@@ -1,0 +1,11 @@
+EVIDENCE_DIRECTORY C:\Users\moham\weather-demo-live\out\traffic-verification\checks-neo9r4wz
+PASS prepare (controller exit 0)
+PASS valid-replay (controller exit 0)
+PASS unknown-highlight (controller exit 1)
+PASS duplicate-highlights (controller exit 1)
+PASS duplicate-followups (controller exit 1)
+PASS malformed-time (controller exit 1)
+PASS missing-input (controller exit 1)
+PASS no-actuals-prepare (controller exit 0)
+PASS unavailable-actual (controller exit 1)
+PASS: 9/9 offline cases; zero model requests

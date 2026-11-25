@@ -4,6 +4,11 @@ Intended users are transport staff reviewing recurring road patterns and bus tim
 
 ## Hamar Access Lab
 
+The default walking workspace now uses a municipal OSM road/path snapshot,
+with official Hamar address lookup and 564 offline road/path names. It starts
+without a hypothetical closure. See [Municipal walking coverage](docs/municipal-walking-coverage.md)
+for source counts, access policy, reproduction and verification.
+
 Hamar Access Lab is the current integration for lecturer and teammate review.
 It demonstrates bounded, offline walking and fixed-journey driving assessments around Hamar:
 import sanitized OpenStreetMap walking and car graphs, compare baselines with
@@ -726,3 +731,50 @@ python -m unittest discover -s eval -p check_probe_inputs.py -v
 ```
 
 Expected: the producer is normally silent, the checker prints `PASS`, and three tests report `OK`. The synthetic cases cover missing input, invalid JSON and missing `source_quote`; each checks that neither the output file nor its parent directory is created.
+
+
+## Hamar street and house-number search
+
+From/To search now combines saved bus stops/places with Kartverket's official
+address API, scoped to Hamar municipality (3403). Type at least three characters,
+for example `Seminargata`, or a house number such as `Seminargata 13`. Select a
+specific result. This is an online municipal address lookup, not a hand-selected
+address list; it is separate from the saved 108-location index. Address data is
+credited to © Kartverket, CC BY 4.0.
+
+Address and road selection use the saved Hamar municipal walking network and
+retain the other selected custom endpoint. The existing 75 m snapping and
+coverage checks still decide whether a journey can be assessed. Finding an
+address does not establish walking-network coverage, an entrance or a safe
+connection to the road. The municipal import replaces the old city-only cutoff. Missing or disconnected
+public walking connections are still reported explicitly.
+
+Lookup is performed by the Python server, with one fixed HTTPS request per
+uncached search, no redirects or retries, a five-second socket timeout, 256 KiB
+response cap, 20 results, two concurrent requests and 60 requests/minute per
+server. A 128-query in-memory cache expires after ten minutes; search queries
+are not written to disk or included in HTTP console logs. Only public street,
+house-number, postal and coordinate fields are requested, not ownership,
+resident or apartment details. Offline places remain usable during an address
+service outage; source unavailability is distinguished from zero matches.
+
+Offline regression command: `python -B -m unittest check_address_search check_place_search check_municipal_walk -v`.
+API documentation: https://api.kartverket.no/adresser/v1
+
+## Consolidated exam-readiness checks
+
+The mobile map, municipal routing, official house-number search and local-AI
+controls are documented in [exam readiness](docs/exam-readiness.md). Municipal
+endpoint projection preserves distinct positions along existing links. Route
+distances exclude the separately displayed, unverified address access offsets.
+
+```text
+python -B -m harness.run_readiness --output out/my-new-readiness-run
+```
+
+Use a new output directory. This runs the frozen regression list, saved traffic,
+coverage and bus checks, and 14 frozen journey cases. Full raw results and before/
+after evidence are retained under `fixtures/evaluation/runs/`. The Details panel
+can pause new local AI calls without disabling route planning; it does not promise
+to cancel a request already running. Independent human validation and final
+submission rehearsal remain pending; see the readiness checklist.

@@ -11,7 +11,8 @@ def shortest_route(network, origin, destination, closed=None, mode="walking"):
         if mode not in link["modes"]:
             continue
         directions = [(link["from"], link["to"])]
-        if mode != "vehicle" or not link.get("oneway", False):
+        directed = link.get("oneway", False) if mode == "vehicle" else link.get("walking_oneway", False)
+        if not directed:
             directions.append((link["to"], link["from"]))
         for start, end in directions:
             connections.setdefault(start, []).append((link["metres"], end))
