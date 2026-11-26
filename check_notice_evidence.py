@@ -193,6 +193,7 @@ class NoticeEvidenceTests(unittest.TestCase):
         for focus, sentence, mode in (
             ("Bus stop at Example", "The bus stop at Example is closed.", "bus"),
             ("Bilveien ved Eksempel", "Bilveien ved Eksempel er stengt.", "driving"),
+            ("Kjøreadkomst i Eksempelgata", "Eksempelgata er stengt for biltrafikk.", "driving"),
         ):
             with self.subTest(mode=mode):
                 candidates = source_candidates({"focus": focus, "sentences": [sentence]})

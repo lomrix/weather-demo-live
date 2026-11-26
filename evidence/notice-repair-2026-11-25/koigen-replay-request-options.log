@@ -1,0 +1,3 @@
+qwen2.5:3b: think=omitted; checked=2/4; grevelokka-driving-qwen2.5-3b-raw.json
+qwen3.5:9b: think=False; checked=3/4; grevelokka-driving-qwen3.5-9b-raw.json
+Offline replay passed. No requests were sent to Ollama.
