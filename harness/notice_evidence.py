@@ -23,7 +23,7 @@ BLOCK_KEYS = {"sentence_id", "location_quote", "restriction_quote", "access_stat
 MODE_PATTERNS = {
     "walking": r"gangsti|gangveg|gangvei|fortau|fotgjenger|gang-\s*og|footpath|pedestrian|sidewalk",
     "cycling": r"sykkel|cycl|bike",
-    "driving": r"kjøre|\bbilvei|\bbilveg|\bveien\b|\bvegen\b|\broad\b|motor|driving",
+    "driving": r"kjøre|\bbiltrafikk\b|\bbilvei|\bbilveg|\bveien\b|\bvegen\b|\broad\b|motor|driving",
     "parking": r"parker|parkering|p-plass|parking",
     "bus": r"buss|\bbus\b|holdeplass|bus stop",
 }

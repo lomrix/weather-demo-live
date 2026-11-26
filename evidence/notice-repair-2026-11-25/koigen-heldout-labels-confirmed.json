@@ -1,0 +1,31 @@
+{
+  "skappelsgate-walking": {
+    "access_status": "unknown",
+    "reference": {
+      "location": "Skappelsgate",
+      "travel_modes": [
+        "walking"
+      ],
+      "restriction": "Det kan likevel bli nødvendig med midlertidige endringer som følge av anleggsarbeidet.",
+      "stated_dates": null,
+      "supporting_sentence_ids": [
+        4,
+        5
+      ]
+    }
+  },
+  "grevelokka-driving": {
+    "access_status": "closed",
+    "reference": {
+      "location": "Høyensalgata",
+      "travel_modes": [
+        "driving"
+      ],
+      "restriction": "stengt for biltrafikk",
+      "stated_dates": null,
+      "supporting_sentence_ids": [
+        4
+      ]
+    }
+  }
+}
