@@ -526,3 +526,8 @@ body[data-plain-walk="true"] .map-key span:not(:first-child) { display:none; }
 
 .ai-run-controls { padding:16px 22px 22px; border-top:1px solid var(--line); }
 .ai-run-controls .btn { min-height:44px; }
+
+.overview-stops > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; color:var(--accent); font-weight:600; }
+.overview-stops > summary::before { content:"▸"; margin-right:8px; }
+.overview-stops[open] > summary::before { content:"▾"; }
+.overview-stops .catalogue-stop-list { max-height:240px; overflow-y:auto; overscroll-behavior:contain; font-size:14px; }

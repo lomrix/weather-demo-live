@@ -96,10 +96,13 @@ function drawCatalogue() {
   st.catalogueBox={x,y,w,h};
   $('map-freshness').textContent='Saved timetable snapshot';$('map-freshness').className='chip chip-idle';
   $('map-caption').textContent=pattern.geometry?'Imported Entur route geometry; not a closure assessment.':'Stop-to-stop schematic: route geometry unavailable.';
+  const stopList=el('ol',{class:'catalogue-stop-list'},pattern.stops.map(stop=>
+    el('li',{},stop.name+(stop.in_hamar?'':' · outside Hamar'))));
+  const stopDetails=el('details',{class:'overview-stops'},el('summary',{},'View stops'),stopList);
   $('journey-overview').replaceChildren(
     el('div',{class:'overview-heading'},el('h3',{},`${line.code} · ${line.name}`),el('span',{class:'scenario-badge'},'Published bus route')),
     el('div',{class:'overview-stats'},stat('Ordered stops',String(pattern.stops.length)),stat('Stops in Hamar',String(pattern.stops.filter(s=>s.in_hamar).length)),stat('Scheduled journeys',String(pattern.scheduled_journey_count))),
-    el('p',{class:'overview-note'},`${service_date} · ${pattern.stops[0].name} → ${pattern.stops.at(-1).name}. ${pattern.scheduled_journey_count===0?'No scheduled journeys for this variant on the snapshot date.':'Scheduled snapshot; not live departures.'} Bus delay and closure effects are not assessed.`));
+    el('p',{class:'overview-note'},`${service_date} · ${pattern.stops[0].name} → ${pattern.stops.at(-1).name}. ${pattern.scheduled_journey_count===0?'No scheduled journeys for this variant on the snapshot date.':'Scheduled snapshot; not live departures.'} Bus delay and closure effects are not assessed.`),stopDetails);
 }
 
 function syncGeographicMap() {
